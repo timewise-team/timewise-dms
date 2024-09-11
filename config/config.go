@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/spf13/viper"
 	"log"
+	"os"
 )
 
 type Config struct {
@@ -16,11 +17,18 @@ type Config struct {
 
 func LoadConfig() (*Config, error) {
 	// Load config here
-	viper.AddConfigPath(".")
-	viper.SetConfigType("env")
-	viper.SetConfigFile(".env")
+	env := os.Getenv("ENV")
+	if env == "production" {
+		// For Docker, where .env is mounted at the root
+		viper.AddConfigPath("/")
+		viper.SetConfigFile("/.env")
+	} else {
+		viper.AddConfigPath(".")
+		viper.SetConfigFile(".env")
+	}
 
-	viper.SetDefault("sever.port", "3000")
+	viper.SetConfigType("env")
+	viper.SetDefault("sever.port", "8089")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Printf("Error reading config file, %s", err)

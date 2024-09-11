@@ -9,7 +9,7 @@ import (
 )
 
 func InitDB(cfg *config.Config) (*gorm.DB, error) {
-	// MySQL DSN (Data Source Name) format: user:password@tcp(host:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local
+	// MySQL DSN (Data Source Name) format: routes:password@tcp(host:port)/dbname?charset=utf8mb4&parseTime=True&loc=Local
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
