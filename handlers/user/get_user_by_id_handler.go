@@ -8,6 +8,15 @@ import (
 )
 
 // GET /users/{id}
+// getUserById godoc
+// @Summary Get user by ID
+// @Description Get user by ID
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {object} models.TwUser
+// @Router /users/{id} [get]
 func (h *UserHandler) getUserById(c *fiber.Ctx) error {
 	var user models.TwUser
 	userId := c.Params("user_id")
