@@ -16,6 +16,6 @@ COPY . /app/
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o timewise-dms .
 
-EXPOSE 8080
+EXPOSE 8089
 
 CMD ["./timewise-dms"]
