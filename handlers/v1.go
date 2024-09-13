@@ -13,7 +13,7 @@ import (
 func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	router := fiber.New()
 	v1 := router.Group("/dbms/v1")
-	router.Get("/swagger/*", swagger.HandlerDefault)
+	v1.Get("/swagger/*", swagger.HandlerDefault)
 	user.RegisterUserHandler(v1.Group("/user"), db)
 
 	return router
