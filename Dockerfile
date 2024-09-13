@@ -14,6 +14,9 @@ RUN go mod download
 
 COPY . /app/
 
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+RUN swag init --parseDependency
+
 RUN CGO_ENABLED=0 GOOS=linux go build -o timewise-dms .
 
 EXPOSE 8089
