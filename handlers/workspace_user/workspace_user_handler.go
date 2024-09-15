@@ -61,7 +61,6 @@ func (h *WorkspaceUserHandler) removeWorkspaceUserById(c *fiber.Ctx) error {
 	}
 	return c.SendStatus(fiber.StatusNoContent)
 }
-
 func (h *WorkspaceUserHandler) createWorkspaceUser(c *fiber.Ctx) error {
 	workspaceUser := new(models.TwWorkspaceUser)
 	if err := c.BodyParser(workspaceUser); err != nil {
