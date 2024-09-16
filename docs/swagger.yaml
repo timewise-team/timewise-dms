@@ -83,6 +83,57 @@ definitions:
       workspace_id:
         type: integer
     type: object
+  core_dtos.TwRecurrenceExceptionCreateDTO:
+    properties:
+      exception_date:
+        type: string
+      extra_data:
+        type: string
+      is_cancelled:
+        type: boolean
+      new_end_time:
+        type: string
+      new_start_time:
+        type: string
+      schedule_id:
+        type: integer
+    required:
+    - schedule_id
+    type: object
+  core_dtos.TwRecurrenceExceptionResponseDTO:
+    properties:
+      created_at:
+        type: string
+      exception_date:
+        type: string
+      extra_data:
+        type: string
+      id:
+        type: integer
+      is_cancelled:
+        type: boolean
+      new_end_time:
+        type: string
+      new_start_time:
+        type: string
+      schedule_id:
+        type: integer
+      updated_at:
+        type: string
+    type: object
+  core_dtos.TwRecurrenceExceptionUpdateDTO:
+    properties:
+      exception_date:
+        type: string
+      extra_data:
+        type: string
+      is_cancelled:
+        type: boolean
+      new_end_time:
+        type: string
+      new_start_time:
+        type: string
+    type: object
   core_dtos.TwScheduleResponse:
     properties:
       all_day:
@@ -235,6 +286,109 @@ info:
   title: timewise-dbms
   version: "1.0"
 paths:
+  /dbms/v1/recurrence_exception:
+    get:
+      consumes:
+      - application/json
+      description: Get all recurrence exceptions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/core_dtos.TwRecurrenceExceptionResponseDTO'
+            type: array
+      summary: Get all recurrence exceptions
+      tags:
+      - recurrence_exception
+    post:
+      consumes:
+      - application/json
+      description: Create a recurrence exception
+      parameters:
+      - description: Recurrence Exception
+        in: body
+        name: recurrence_exception
+        required: true
+        schema:
+          $ref: '#/definitions/core_dtos.TwRecurrenceExceptionCreateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core_dtos.TwRecurrenceExceptionResponseDTO'
+      summary: Create a recurrence exception
+      tags:
+      - recurrence_exception
+  /dbms/v1/recurrence_exception/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a recurrence exception
+      parameters:
+      - description: Recurrence Exception ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete a recurrence exception
+      tags:
+      - recurrence_exception
+    get:
+      consumes:
+      - application/json
+      description: Get recurrence exception by ID
+      parameters:
+      - description: Recurrence Exception ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core_dtos.TwRecurrenceExceptionResponseDTO'
+      summary: Get recurrence exception by ID
+      tags:
+      - recurrence_exception
+    put:
+      consumes:
+      - application/json
+      description: Update a recurrence exception
+      parameters:
+      - description: Recurrence Exception ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Recurrence Exception
+        in: body
+        name: recurrence_exception
+        required: true
+        schema:
+          $ref: '#/definitions/core_dtos.TwRecurrenceExceptionUpdateDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core_dtos.TwRecurrenceExceptionResponseDTO'
+      summary: Update a recurrence exception
+      tags:
+      - recurrence_exception
   /dbms/v1/schedule:
     get:
       consumes:

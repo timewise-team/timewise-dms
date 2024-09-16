@@ -139,6 +139,12 @@ github.com/timewise-team/timewise-models v0.0.0-20240915005137-e20e8d44f6c6 h1:B
 github.com/timewise-team/timewise-models v0.0.0-20240915005137-e20e8d44f6c6/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
 github.com/timewise-team/timewise-models v0.0.0-20240916072532-78ead448355b h1:1lOnIlnKUyHFcCvQ7yQQMWEctSZEwL2PaitowwfyXpQ=
 github.com/timewise-team/timewise-models v0.0.0-20240916072532-78ead448355b/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
+github.com/timewise-team/timewise-models v0.0.0-20240916131523-dc7c1f36e6b8 h1:n2lvDI3HYHa+LMo8lxSIARQE8e12wZc2kgeDjZRCPQc=
+github.com/timewise-team/timewise-models v0.0.0-20240916131523-dc7c1f36e6b8/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
+github.com/timewise-team/timewise-models v0.0.0-20240916134520-54900ecd0f9d h1:xLdPnmI/NI3ek1CTUqX7W0TLZEZczo8TGHX424/puEs=
+github.com/timewise-team/timewise-models v0.0.0-20240916134520-54900ecd0f9d/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
+github.com/timewise-team/timewise-models v0.0.0-20240916135532-0455864a337c h1:DvdIoYPvnLySFT+btyY53JJl9Lwbzna4GGlhbrq3P54=
+github.com/timewise-team/timewise-models v0.0.0-20240916135532-0455864a337c/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasthttp v1.55.0 h1:Zkefzgt6a7+bVKHnu/YaYSOPfNYNisSVBo/unVCf8k8=

@@ -7,6 +7,162 @@
         "version": "1.0"
     },
     "paths": {
+        "/dbms/v1/recurrence_exception": {
+            "get": {
+                "description": "Get all recurrence exceptions",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recurrence_exception"
+                ],
+                "summary": "Get all recurrence exceptions",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/core_dtos.TwRecurrenceExceptionResponseDTO"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a recurrence exception",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recurrence_exception"
+                ],
+                "summary": "Create a recurrence exception",
+                "parameters": [
+                    {
+                        "description": "Recurrence Exception",
+                        "name": "recurrence_exception",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwRecurrenceExceptionCreateDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwRecurrenceExceptionResponseDTO"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/recurrence_exception/{id}": {
+            "get": {
+                "description": "Get recurrence exception by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recurrence_exception"
+                ],
+                "summary": "Get recurrence exception by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recurrence Exception ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwRecurrenceExceptionResponseDTO"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a recurrence exception",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recurrence_exception"
+                ],
+                "summary": "Update a recurrence exception",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recurrence Exception ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Recurrence Exception",
+                        "name": "recurrence_exception",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwRecurrenceExceptionUpdateDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwRecurrenceExceptionResponseDTO"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a recurrence exception",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "recurrence_exception"
+                ],
+                "summary": "Delete a recurrence exception",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Recurrence Exception ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/dbms/v1/schedule": {
             "get": {
                 "description": "Get all schedules",
@@ -340,6 +496,84 @@
                 },
                 "workspace_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "core_dtos.TwRecurrenceExceptionCreateDTO": {
+            "type": "object",
+            "required": [
+                "schedule_id"
+            ],
+            "properties": {
+                "exception_date": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "is_cancelled": {
+                    "type": "boolean"
+                },
+                "new_end_time": {
+                    "type": "string"
+                },
+                "new_start_time": {
+                    "type": "string"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "core_dtos.TwRecurrenceExceptionResponseDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "exception_date": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_cancelled": {
+                    "type": "boolean"
+                },
+                "new_end_time": {
+                    "type": "string"
+                },
+                "new_start_time": {
+                    "type": "string"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "core_dtos.TwRecurrenceExceptionUpdateDTO": {
+            "type": "object",
+            "properties": {
+                "exception_date": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "is_cancelled": {
+                    "type": "boolean"
+                },
+                "new_end_time": {
+                    "type": "string"
+                },
+                "new_start_time": {
+                    "type": "string"
                 }
             }
         },

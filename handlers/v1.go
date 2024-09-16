@@ -2,7 +2,7 @@ package feature
 
 import (
 	_ "dbms/docs"
-
+	"dbms/handlers/recurrence_exception"
 	"dbms/handlers/schedule"
 	"dbms/handlers/schedule_log"
 	"dbms/handlers/schedule_participant"
@@ -24,6 +24,7 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	schedule_log.RegisterScheduleLogHandler(v1.Group("/schedulelog"), db)
 	schedule_participant.RegisterScheduleParticipantHandler(v1.Group("/scheduleparticipant"), db)
 	schedule.RegisterScheduleHandler(v1.Group("/schedule"), db)
+	recurrence_exception.RegisterRecurrenceExceptionHandler(v1.Group("/recurrence_exception"), db)
 	workspace_user.RegisterWorkspaceUserHandler(v1.Group("/workspace_user"), db)
 	workspace_log.RegisterWorkspaceLogHandler(v1.Group("/workspace_log"), db)
 	return router
