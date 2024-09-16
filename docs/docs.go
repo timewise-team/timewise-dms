@@ -34,8 +34,40 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.TwSchedule"
+                                "$ref": "#/definitions/core_dtos.TwScheduleResponse"
                             }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule"
+                ],
+                "summary": "Create a new schedule",
+                "parameters": [
+                    {
+                        "description": "Schedule",
+                        "name": "schedule",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwCreateScheduleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwCreateShecduleResponse"
                         }
                     }
                 }
@@ -67,8 +99,74 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TwSchedule"
+                            "$ref": "#/definitions/core_dtos.TwScheduleResponse"
                         }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update an existing schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule"
+                ],
+                "summary": "Update an existing schedule",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Schedule",
+                        "name": "schedule",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwUpdateScheduleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.TwUpdateScheduleResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule"
+                ],
+                "summary": "Delete a schedule",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
                     }
                 }
             }
@@ -133,7 +231,68 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "models.TwSchedule": {
+        "core_dtos.TwCreateScheduleRequest": {
+            "type": "object",
+            "properties": {
+                "all_day": {
+                    "description": "Nullable field (represented by tinyint in SQL)",
+                    "type": "boolean"
+                },
+                "assigned_to": {
+                    "description": "Nullable field",
+                    "type": "integer"
+                },
+                "board_column_id": {
+                    "description": "Nullable field",
+                    "type": "integer"
+                },
+                "created_by": {
+                    "description": "Required field",
+                    "type": "integer"
+                },
+                "description": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "end_time": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "extra_data": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "location": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "recurrence_pattern": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "start_time": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "visibility": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "description": "Nullable field",
+                    "type": "integer"
+                }
+            }
+        },
+        "core_dtos.TwCreateShecduleResponse": {
             "type": "object",
             "properties": {
                 "all_day": {
@@ -145,17 +304,11 @@ const docTemplate = `{
                 "board_column_id": {
                     "type": "integer"
                 },
-                "createdAt": {
-                    "type": "string"
-                },
                 "created_at": {
                     "type": "string"
                 },
                 "created_by": {
                     "type": "integer"
-                },
-                "deletedAt": {
-                    "type": "string"
                 },
                 "description": {
                     "type": "string"
@@ -187,7 +340,172 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
+                    "type": "string"
+                },
+                "visibility": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "core_dtos.TwScheduleResponse": {
+            "type": "object",
+            "properties": {
+                "all_day": {
+                    "type": "boolean"
+                },
+                "assigned_to": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "board_column_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "recurrence_pattern": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "visibility": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "core_dtos.TwUpdateScheduleRequest": {
+            "type": "object",
+            "properties": {
+                "all_day": {
+                    "type": "boolean"
+                },
+                "assigned_to": {
+                    "type": "integer"
+                },
+                "board_column_id": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "recurrence_pattern": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "visibility": {
+                    "type": "string"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "core_dtos.TwUpdateScheduleResponse": {
+            "type": "object",
+            "properties": {
+                "all_day": {
+                    "type": "boolean"
+                },
+                "assigned_to": {
+                    "type": "integer"
+                },
+                "board_column_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "recurrence_pattern": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "updated_at": {
@@ -204,49 +522,43 @@ const docTemplate = `{
         "models.TwUser": {
             "type": "object",
             "properties": {
-                "calendar_settings": {
+                "calendarSettings": {
                     "type": "string"
                 },
                 "createdAt": {
                     "type": "string"
                 },
-                "created_at": {
-                    "type": "string"
-                },
-                "deletedAt": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
-                "first_name": {
+                "firstName": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "is_active": {
+                "isActive": {
                     "type": "boolean"
                 },
-                "is_verified": {
+                "isVerified": {
                     "type": "boolean"
                 },
-                "last_login_at": {
+                "lastLoginAt": {
                     "type": "string"
                 },
-                "last_name": {
+                "lastName": {
                     "type": "string"
                 },
                 "locale": {
                     "type": "string"
                 },
-                "notification_settings": {
+                "notificationSettings": {
                     "type": "string"
                 },
-                "password_hash": {
+                "passwordHash": {
                     "type": "string"
                 },
-                "profile_picture": {
+                "profilePicture": {
                     "type": "string"
                 },
                 "role": {
@@ -256,9 +568,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updatedAt": {
-                    "type": "string"
-                },
-                "updated_at": {
                     "type": "string"
                 }
             }
