@@ -12,18 +12,6 @@ type WorkspaceLog struct {
 	DB     *gorm.DB
 }
 
-func RegisterWorkspaceLogHandler(router fiber.Router, db *gorm.DB) {
-	workspaceLogHandler := WorkspaceLog{
-		Router: router,
-		DB:     db,
-	}
-
-	// Register all endpoints here
-	router.Get("/", workspaceLogHandler.getWorkspaceLog)
-	router.Get("/:workspace_log_id", workspaceLogHandler.getWorkspaceLogById)
-	router.Delete("/:workspace_log_id", workspaceLogHandler.removeWorkspaceLogById)
-}
-
 func (h *WorkspaceLog) getWorkspaceLog(c *fiber.Ctx) error {
 	var workspaceLogs []models.TwWorkspaceLog
 	if result := h.DB.Find(&workspaceLogs); result.Error != nil {
