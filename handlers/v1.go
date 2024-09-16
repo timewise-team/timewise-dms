@@ -2,6 +2,7 @@ package feature
 
 import (
 	_ "dbms/docs"
+
 	"dbms/handlers/schedule"
 	"dbms/handlers/schedule_log"
 	"dbms/handlers/schedule_participant"
