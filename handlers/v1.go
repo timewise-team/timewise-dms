@@ -2,6 +2,7 @@ package feature
 
 import (
 	_ "dbms/docs"
+	"dbms/handlers/recurrence_exception"
 	"dbms/handlers/schedule"
 	"dbms/handlers/user"
 	"github.com/gofiber/fiber/v2"
@@ -17,5 +18,6 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	v1.Get("/swagger/*", swagger.HandlerDefault)
 	user.RegisterUserHandler(v1.Group("/user"), db)
 	schedule.RegisterScheduleHandler(v1.Group("/schedule"), db)
+	recurrence_exception.RegisterRecurrenceExceptionHandler(v1.Group("/recurrence_exception"), db)
 	return router
 }
