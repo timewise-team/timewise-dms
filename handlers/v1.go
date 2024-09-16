@@ -2,10 +2,13 @@ package feature
 
 import (
 	_ "dbms/docs"
+
 	"dbms/handlers/schedule"
 	"dbms/handlers/schedule_log"
 	"dbms/handlers/schedule_participant"
 	"dbms/handlers/user"
+	"dbms/handlers/workspace_log"
+	"dbms/handlers/workspace_user"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"gorm.io/gorm"
@@ -21,5 +24,7 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	schedule_log.RegisterScheduleLogHandler(v1.Group("/schedulelog"), db)
 	schedule_participant.RegisterScheduleParticipantHandler(v1.Group("/scheduleparticipant"), db)
 	schedule.RegisterScheduleHandler(v1.Group("/schedule"), db)
+	workspace_user.RegisterWorkspaceUserHandler(v1.Group("/workspace_user"), db)
+	workspace_log.RegisterWorkspaceLogHandler(v1.Group("/workspace_log"), db)
 	return router
 }
