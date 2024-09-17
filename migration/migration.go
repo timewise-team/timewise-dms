@@ -1,8 +1,44 @@
-package migration
+package main
 
 import (
-	"embed"
+	"dbms/config"
+	"dbms/database"
+	"github.com/spf13/viper"
+	"github.com/timewise-team/timewise-models/models"
+	"log"
 )
 
-//go:embed *.sql
-var FS embed.FS
+func main() {
+	viper.AddConfigPath("..")
+	viper.SetConfigFile(".env")
+	viper.SetConfigType("env")
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Printf("Error reading config file, %s", err)
+		return
+	}
+
+	viper.AutomaticEnv()
+	cfg := &config.Config{
+		ServerPort: viper.GetString("WEB.PORT"),
+		DBUser:     viper.GetString("DB.USERNAME"),
+		DBPassword: viper.GetString("DB.PASSWORD"),
+		DBName:     viper.GetString("DB.NAME"),
+		DBHost:     viper.GetString("DB.HOST"),
+		DBPort:     viper.GetString("DB.PORT"),
+	}
+
+	// Initialize database
+	db, err := database.InitDB(cfg)
+	if err != nil {
+		log.Fatalf("Could not initialize database: %v", err)
+		return
+	}
+
+	// Migrate the schema
+	err = db.AutoMigrate(&models.TwUser{})
+	if err != nil {
+		log.Fatalf("Could not migrate schema: %v", err)
+		return
+	}
+}
