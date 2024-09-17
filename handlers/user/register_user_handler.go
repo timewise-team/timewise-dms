@@ -21,4 +21,5 @@ func RegisterUserHandler(router fiber.Router, db *gorm.DB) {
 	router.Get("/:user_id", userHandler.getUserById)
 	router.Post("/", userHandler.createUser)
 	router.Put("/:user_id", userHandler.updateUser)
+	router.Delete("/:user_id", userHandler.deleteUser)
 }
