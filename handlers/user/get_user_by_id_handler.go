@@ -6,8 +6,27 @@ import (
 	dtos "github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
-	"reflect"
+	"time"
 )
+
+// GET /users
+// getUsers godoc
+// @Summary Get all users
+// @Description Get all users
+// @Tags user
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.TwUser
+// @Router /users [get]
+func (h *UserHandler) getUsers(c *fiber.Ctx) error {
+	var users []models.TwUser
+	if result := h.DB.Find(&users); result.Error != nil {
+		// handle error
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	return c.JSON(users)
+}
 
 // GET /users/{id}
 // getUserById godoc
@@ -63,35 +82,74 @@ func (h *UserHandler) createUser(ctx *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "User ID"
-// @Param user body models.TwUser true "User object"
+// @Param user body dtos.UpdateUserRequest true "User object"
 // @Success 200 {object} models.TwUser
 // @Router /users/{id} [put]
 func (h *UserHandler) updateUser(c *fiber.Ctx) error {
-	// Parse the body data into a UpdateUserRequest DTO
-	var req dtos.UpdateUserRequest
-	if err := c.BodyParser(&req); err != nil {
+	var userDTO dtos.UpdateUserRequest
+	if err := c.BodyParser(&userDTO); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
-	updatedFields := req.UpdatedFields
 
-	// Create a map for the Updates method
-	updates := make(map[string]interface{})
-	for _, field := range updatedFields {
-		// Use reflection to get the field value from the TwUser object
-		r := reflect.ValueOf(&req.User).Elem()
-		f := r.FieldByName(field)
-		if f.IsValid() {
-			fieldValue := f.Interface()
-			updates[field] = fieldValue
-		} else {
-			return c.Status(fiber.StatusBadRequest).SendString("Invalid field name: " + field)
+	var user models.TwUser
+	userId := c.Params("user_id")
+
+	if err := h.DB.Where("id = ?", userId).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("User not found")
 		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
-	// Perform the update operation
-	if result := h.DB.Model(&req.User).Where("id = ?", req.User.ID).Updates(updates); result.Error != nil {
+	// Update the fields if they are provided (not nil)
+	if userDTO.FirstName != "" {
+		user.FirstName = userDTO.FirstName
+	}
+	if userDTO.LastName != "" {
+		user.LastName = userDTO.LastName
+	}
+	if userDTO.Email != "" {
+		user.Email = userDTO.Email
+	}
+	if userDTO.ProfilePicture != "" {
+		user.ProfilePicture = userDTO.ProfilePicture
+	}
+	if userDTO.Timezone != "" {
+		user.Timezone = userDTO.Timezone
+	}
+	if userDTO.Locale != "" {
+		user.Locale = userDTO.Locale
+	}
+	if userDTO.IsVerified {
+		user.IsVerified = userDTO.IsVerified
+	}
+	if userDTO.IsActive {
+		user.IsActive = userDTO.IsActive
+	}
+	if userDTO.NotificationSettings != "" {
+		user.NotificationSettings = userDTO.NotificationSettings
+	}
+	if userDTO.CalendarSettings != "" {
+		user.CalendarSettings = userDTO.CalendarSettings
+	}
+	if userDTO.Role != "" {
+		user.Role = userDTO.Role
+	}
+
+	// Update the timestamp
+	user.UpdatedAt = time.Now()
+
+	if result := h.DB.Save(&user); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
-	return c.JSON(req.User)
+	return c.JSON(user)
+}
+
+func (h *UserHandler) deleteUser(ctx *fiber.Ctx) error {
+	userId := ctx.Params("user_id")
+	if result := h.DB.Delete(&models.TwUser{}, userId); result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return ctx.SendString("User deleted successfully")
 }
