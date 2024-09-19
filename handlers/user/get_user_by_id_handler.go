@@ -166,10 +166,7 @@ func (h *UserHandler) loginUser(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	var user models.TwUser
-	if err := h.DB.Where("password_hash = ?", user_login.Password).First(&user).Error; err != nil {
-		return ctx.Status(fiber.StatusUnauthorized).SendString("Invalid email or password")
-	}
-	if err := h.DB.Where("username = ?", user_login.Username).First(&user).Error; err != nil {
+	if err := h.DB.Where("username = ? AND password_hash = ?", user_login.Username, user_login.Password).First(&user).Error; err != nil {
 		return ctx.Status(fiber.StatusUnauthorized).SendString("Invalid email or password")
 	}
 
