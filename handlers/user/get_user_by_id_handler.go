@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
 	dtos "github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_login_dtos"
@@ -69,6 +70,10 @@ func (h *UserHandler) createUser(ctx *fiber.Ctx) error {
 	}
 
 	if result := h.DB.Create(&user); result.Error != nil {
+		var driverErr *mysql.MySQLError
+		if errors.As(result.Error, &driverErr) && driverErr.Number == 1062 {
+			return ctx.Status(fiber.StatusBadRequest).SendString("username already exists")
+		}
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
