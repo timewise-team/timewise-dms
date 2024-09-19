@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	dtos "github.com/timewise-team/timewise-models/dtos/core_dtos"
+	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_login_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
 	"time"
@@ -152,4 +153,21 @@ func (h *UserHandler) deleteUser(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return ctx.SendString("User deleted successfully")
+}
+
+func (h *UserHandler) loginUser(ctx *fiber.Ctx) error {
+	var user_login user_login_dtos.UserLoginRequest
+	if err := ctx.BodyParser(&user_login); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	var user models.TwUser
+	if err := h.DB.Where("password_hash = ?", user_login.Password).First(&user).Error; err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).SendString("Invalid email or password")
+	}
+	if err := h.DB.Where("username = ?", user_login.Username).First(&user).Error; err != nil {
+		return ctx.Status(fiber.StatusUnauthorized).SendString("Invalid email or password")
+	}
+
+	return ctx.JSON(user)
+
 }
