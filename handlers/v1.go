@@ -8,6 +8,7 @@ import (
 	"dbms/handlers/schedule_log"
 	"dbms/handlers/schedule_participant"
 	"dbms/handlers/user"
+	"dbms/handlers/user_email"
 	"dbms/handlers/workspace_log"
 	"dbms/handlers/workspace_user"
 	"github.com/gofiber/fiber/v2"
@@ -29,5 +30,6 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	workspace_user.RegisterWorkspaceUserHandler(v1.Group("/workspace_user"), db)
 	workspace_log.RegisterWorkspaceLogHandler(v1.Group("/workspace_log"), db)
 	auth.RegisterAuthHandler(v1.Group("/auth"), db)
+	user_email.RegisterUserEmailHandler(v1.Group("/user_email"), db)
 	return router
 }
