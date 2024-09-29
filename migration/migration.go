@@ -36,7 +36,20 @@ func main() {
 	}
 
 	// Migrate the schema
-	err = db.AutoMigrate(&models.TwUser{})
+	err = db.AutoMigrate(
+		&models.TwUser{},
+		&models.TwUserEmail{},
+		&models.TwWorkspace{},
+		&models.TwWorkspaceUser{},
+		&models.TwBoardColumn{},
+		&models.TwSchedule{},
+		&models.TwScheduleParticipant{},
+		&models.TwScheduleLog{},
+		&models.TwComment{},
+		&models.TwRecurrenceException{},
+		&models.TwReminder{},
+		&models.TwWorkspaceLog{},
+	)
 	if err != nil {
 		log.Fatalf("Could not migrate schema: %v", err)
 		return
