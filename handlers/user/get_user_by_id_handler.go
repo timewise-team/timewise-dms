@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	dtos "github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_login_dtos"
+	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_register_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
 	"time"
@@ -172,4 +173,42 @@ func (h *UserHandler) loginUser(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(user)
 
+}
+
+func (h *UserHandler) getOrCreateUser(ctx *fiber.Ctx) error {
+	// Parse the request body
+	var req user_register_dto.GetOrCreateUserRequestDto
+	if err := ctx.BodyParser(&req); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	// Try to find the user in the database
+	isNewUser := false
+	var user models.TwUser
+	if err := h.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// User not found, create a new one
+			user = models.TwUser{
+				Email:          req.Email,
+				Username:       req.UserName,
+				FirstName:      req.FullName,
+				ProfilePicture: req.ProfilePicture,
+				LastLoginAt:    time.Now(),
+			}
+			if result := h.DB.Create(&user); result.Error != nil {
+				return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+			}
+			isNewUser = true
+		} else {
+			// Some other error occurred
+			return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+	}
+
+	// Return the user
+	resp := user_register_dto.GetOrCreateUserResponseDto{
+		User:      user,
+		IsNewUser: isNewUser,
+	}
+	return ctx.JSON(resp)
 }
