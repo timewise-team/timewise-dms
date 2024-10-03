@@ -7,6 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
+// getScheduleParticipants godoc
+// @Summary Get all schedule participants
+// @Description Get all schedule participants
+// @Tags schedule_participant
+// @Accept json
+// @Produce json
+// @Success 200 {array} models.TwScheduleParticipant
+// @Router /dbms/v1/schedule_participant [get]
 func (h *ScheduleParticipantHandler) getScheduleParticipants(c *fiber.Ctx) error {
 	var scheduleParticipants []models.TwScheduleParticipant
 	if result := h.DB.Find(&scheduleParticipants); result.Error != nil {
@@ -17,6 +25,14 @@ func (h *ScheduleParticipantHandler) getScheduleParticipants(c *fiber.Ctx) error
 	return c.JSON(scheduleParticipants)
 }
 
+// @Summary Get schedule participant by ID
+// @Description Get schedule participant by ID
+// @Tags schedule_participant
+// @Accept json
+// @Produce json
+// @Param id path int true "Schedule Participant ID"
+// @Success 200 {object} models.TwScheduleParticipant
+// @Router /dbms/v1/schedule_participant/{id} [get]
 func (h *ScheduleParticipantHandler) getScheduleParticipantById(c *fiber.Ctx) error {
 	var scheduleParticipant models.TwScheduleParticipant
 	scheduleParticipantId := c.Params("id")
@@ -30,6 +46,16 @@ func (h *ScheduleParticipantHandler) getScheduleParticipantById(c *fiber.Ctx) er
 	return c.JSON(scheduleParticipant)
 }
 
+// updateScheduleParticipant godoc
+// @Summary Update schedule participant
+// @Description Update schedule participant
+// @Tags schedule_participant
+// @Accept json
+// @Produce json
+// @Param id path int true "Schedule Participant ID"
+// @Param schedule_participant body models.TwScheduleParticipant true "Schedule participant object"
+// @Success 200 {object} models.TwScheduleParticipant
+// @Router /dbms/v1/schedule_participant/{id} [put]
 func (h *ScheduleParticipantHandler) updateScheduleParticipant(c *fiber.Ctx) error {
 	var scheduleParticipants models.TwScheduleParticipant
 	if result := h.DB.First(&scheduleParticipants, c.Params("id")); result.Error != nil {
@@ -45,6 +71,15 @@ func (h *ScheduleParticipantHandler) updateScheduleParticipant(c *fiber.Ctx) err
 
 }
 
+// deleteScheduleParticipant godoc
+// @Summary Delete schedule participant
+// @Description Delete schedule participant
+// @Tags schedule_participant
+// @Accept json
+// @Produce json
+// @Param id path int true "Schedule Participant ID"
+// @Success 200 {object} models.TwScheduleParticipant
+// @Router /dbms/v1/schedule_participant/{id} [delete]
 func (h *ScheduleParticipantHandler) deleteScheduleParticipant(c *fiber.Ctx) error {
 	var scheduleParticipants models.TwScheduleParticipant
 	if result := h.DB.First(&scheduleParticipants, c.Params("id")); result.Error != nil {
@@ -58,6 +93,15 @@ func (h *ScheduleParticipantHandler) deleteScheduleParticipant(c *fiber.Ctx) err
 	})
 }
 
+// createScheduleParticipant godoc
+// @Summary Create schedule participant
+// @Description Create schedule participant
+// @Tags schedule_participant
+// @Accept json
+// @Produce json
+// @Param schedule_participant body models.TwScheduleParticipant true "Schedule participant object"
+// @Success 200 {object} models.TwScheduleParticipant
+// @Router /dbms/v1/schedule_participant [post]
 func (h *ScheduleParticipantHandler) createScheduleParticipant(c *fiber.Ctx) error {
 	var scheduleParticipants models.TwScheduleParticipant
 	if err := c.BodyParser(&scheduleParticipants); err != nil {

@@ -319,6 +319,429 @@
                 }
             }
         },
+        "/dbms/v1/schedule_log": {
+            "get": {
+                "description": "Get all schedule logs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_log"
+                ],
+                "summary": "Get all schedule logs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwScheduleLog"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new schedule log",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_log"
+                ],
+                "summary": "Create a new schedule log",
+                "parameters": [
+                    {
+                        "description": "Schedule log object",
+                        "name": "schedule_log",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleLog"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/schedule_log/{id}": {
+            "get": {
+                "description": "Get schedule log by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_log"
+                ],
+                "summary": "Get schedule log by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Schedule Log ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleLog"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update schedule log",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_log"
+                ],
+                "summary": "Update schedule log",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Schedule Log ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Schedule log object",
+                        "name": "schedule_log",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleLog"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleLog"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete schedule log",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_log"
+                ],
+                "summary": "Delete schedule log",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Schedule Log ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/schedule_participant": {
+            "get": {
+                "description": "Get all schedule participants",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Get all schedule participants",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwScheduleParticipant"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create schedule participant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Create schedule participant",
+                "parameters": [
+                    {
+                        "description": "Schedule participant object",
+                        "name": "schedule_participant",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/schedule_participant/{id}": {
+            "get": {
+                "description": "Get schedule participant by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Get schedule participant by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Schedule Participant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update schedule participant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Update schedule participant",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Schedule Participant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Schedule participant object",
+                        "name": "schedule_participant",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete schedule participant",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Delete schedule participant",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Schedule Participant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/user": {
+            "post": {
+                "description": "Create a new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUser"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/user/{id}": {
+            "put": {
+                "description": "Update user by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update user by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.UpdateUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUser"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete user by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Delete user by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/user_email": {
             "get": {
                 "description": "Get all user emails",
@@ -441,6 +864,377 @@
                 }
             }
         },
+        "/dbms/v1/workspace": {
+            "get": {
+                "description": "Get all workspaces",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Get all workspaces",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwWorkspace"
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update workspace",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Update workspace",
+                "parameters": [
+                    {
+                        "description": "Workspace",
+                        "name": "workspace",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspace"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspace"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create workspace",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Create workspace",
+                "parameters": [
+                    {
+                        "description": "Workspace",
+                        "name": "workspace",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspace"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspace"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace/is_active/{is_active}": {
+            "get": {
+                "description": "Get workspaces by is_active",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Get workspaces by is_active",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Is Active",
+                        "name": "is_active",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwWorkspace"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace/status/{status}": {
+            "get": {
+                "description": "Get workspaces by status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Get workspaces by status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Status",
+                        "name": "status",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwWorkspace"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace/user/{user_id}": {
+            "get": {
+                "description": "Get workspaces by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Get workspaces by user ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwWorkspace"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace/{workspace_id}": {
+            "get": {
+                "description": "Get workspace by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Get workspace by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspace"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove workspace by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Remove workspace by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_log": {
+            "get": {
+                "description": "Get all workspace logs",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_log"
+                ],
+                "summary": "Get all workspace logs",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwWorkspaceLog"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create workspace log",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_log"
+                ],
+                "summary": "Create workspace log",
+                "parameters": [
+                    {
+                        "description": "Workspace log object",
+                        "name": "workspace_log",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceLog"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_log/{workspace_log_id}": {
+            "get": {
+                "description": "Get workspace log by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_log"
+                ],
+                "summary": "Get workspace log by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workspace log ID",
+                        "name": "workspace_log_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceLog"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove workspace log by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_log"
+                ],
+                "summary": "Remove workspace log by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workspace log ID",
+                        "name": "workspace_log_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Get all users",
@@ -462,38 +1256,6 @@
                             "items": {
                                 "$ref": "#/definitions/models.TwUser"
                             }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new user",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Create a new user",
-                "parameters": [
-                    {
-                        "description": "User object",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.TwUser"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TwUser"
                         }
                     }
                 }
@@ -519,45 +1281,6 @@
                         "name": "id",
                         "in": "path",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TwUser"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update user by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user"
-                ],
-                "summary": "Update user by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "User object",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/core_dtos.UpdateUserRequest"
-                        }
                     }
                 ],
                 "responses": {
@@ -985,6 +1708,200 @@
                 }
             }
         },
+        "models.TwBoardColumn": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "$ref": "#/definitions/models.TwWorkspace"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TwSchedule": {
+            "type": "object",
+            "properties": {
+                "all_day": {
+                    "type": "boolean"
+                },
+                "boardColumn": {
+                    "$ref": "#/definitions/models.TwBoardColumn"
+                },
+                "board_column_id": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "end_time": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "recurrence_pattern": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "video_transcript": {
+                    "type": "string"
+                },
+                "visibility": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "$ref": "#/definitions/models.TwWorkspace"
+                },
+                "workspaceUser": {
+                    "$ref": "#/definitions/models.TwWorkspaceUser"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                },
+                "workspace_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TwScheduleLog": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "field_changed": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "new_value": {
+                    "type": "string"
+                },
+                "old_value": {
+                    "type": "string"
+                },
+                "schedule": {
+                    "$ref": "#/definitions/models.TwSchedule"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "workspaceUser": {
+                    "$ref": "#/definitions/models.TwWorkspaceUser"
+                },
+                "workspace_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TwScheduleParticipant": {
+            "type": "object",
+            "properties": {
+                "assignByUser": {
+                    "$ref": "#/definitions/models.TwWorkspaceUser"
+                },
+                "assign_at": {
+                    "type": "string"
+                },
+                "assign_by": {
+                    "type": "integer"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "invitation_sent_at": {
+                    "type": "string"
+                },
+                "invitation_status": {
+                    "type": "string"
+                },
+                "response_time": {
+                    "type": "string"
+                },
+                "schedule": {
+                    "$ref": "#/definitions/models.TwSchedule"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "workspaceUser": {
+                    "$ref": "#/definitions/models.TwWorkspaceUser"
+                },
+                "workspace_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.TwUser": {
             "type": "object",
             "properties": {
@@ -1064,6 +1981,132 @@
                 },
                 "user_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.TwWorkspace": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TwWorkspaceLog": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "field_changed": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "new_value": {
+                    "type": "string"
+                },
+                "old_value": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "workspace": {
+                    "$ref": "#/definitions/models.TwWorkspace"
+                },
+                "workspaceUser": {
+                    "$ref": "#/definitions/models.TwWorkspaceUser"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                },
+                "workspace_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TwWorkspaceUser": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "userEmail": {
+                    "$ref": "#/definitions/models.TwUserEmail"
+                },
+                "user_email_id": {
+                    "type": "integer"
+                },
+                "workspace": {
+                    "$ref": "#/definitions/models.TwWorkspace"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                },
+                "workspace_key": {
+                    "type": "string"
                 }
             }
         }

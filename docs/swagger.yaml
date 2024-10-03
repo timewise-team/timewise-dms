@@ -276,6 +276,134 @@ definitions:
       updatedAt:
         type: string
     type: object
+  models.TwBoardColumn:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      position:
+        type: integer
+      updated_at:
+        type: string
+      workspace:
+        $ref: '#/definitions/models.TwWorkspace'
+      workspace_id:
+        type: integer
+    type: object
+  models.TwSchedule:
+    properties:
+      all_day:
+        type: boolean
+      board_column_id:
+        type: integer
+      boardColumn:
+        $ref: '#/definitions/models.TwBoardColumn'
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      end_time:
+        type: string
+      extra_data:
+        type: string
+      id:
+        type: integer
+      is_deleted:
+        type: boolean
+      location:
+        type: string
+      recurrence_pattern:
+        type: string
+      start_time:
+        type: string
+      status:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+      video_transcript:
+        type: string
+      visibility:
+        type: string
+      workspace:
+        $ref: '#/definitions/models.TwWorkspace'
+      workspace_id:
+        type: integer
+      workspace_user_id:
+        type: integer
+      workspaceUser:
+        $ref: '#/definitions/models.TwWorkspaceUser'
+    type: object
+  models.TwScheduleLog:
+    properties:
+      action:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      field_changed:
+        type: string
+      id:
+        type: integer
+      new_value:
+        type: string
+      old_value:
+        type: string
+      schedule:
+        $ref: '#/definitions/models.TwSchedule'
+      schedule_id:
+        type: integer
+      updated_at:
+        type: string
+      workspace_user_id:
+        type: integer
+      workspaceUser:
+        $ref: '#/definitions/models.TwWorkspaceUser'
+    type: object
+  models.TwScheduleParticipant:
+    properties:
+      assign_at:
+        type: string
+      assign_by:
+        type: integer
+      assignByUser:
+        $ref: '#/definitions/models.TwWorkspaceUser'
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      invitation_sent_at:
+        type: string
+      invitation_status:
+        type: string
+      response_time:
+        type: string
+      schedule:
+        $ref: '#/definitions/models.TwSchedule'
+      schedule_id:
+        type: integer
+      status:
+        type: string
+      updated_at:
+        type: string
+      workspace_user_id:
+        type: integer
+      workspaceUser:
+        $ref: '#/definitions/models.TwWorkspaceUser'
+    type: object
   models.TwUser:
     properties:
       calendarSettings:
@@ -329,6 +457,89 @@ definitions:
         $ref: '#/definitions/models.TwUser'
       user_id:
         type: integer
+    type: object
+  models.TwWorkspace:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      extra_data:
+        type: string
+      id:
+        type: integer
+      is_deleted:
+        type: boolean
+      key:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  models.TwWorkspaceLog:
+    properties:
+      action:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      field_changed:
+        type: string
+      id:
+        type: integer
+      new_value:
+        type: string
+      old_value:
+        type: string
+      updated_at:
+        type: string
+      workspace:
+        $ref: '#/definitions/models.TwWorkspace'
+      workspace_id:
+        type: integer
+      workspace_user_id:
+        type: integer
+      workspaceUser:
+        $ref: '#/definitions/models.TwWorkspaceUser'
+    type: object
+  models.TwWorkspaceUser:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      extra_data:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      is_verified:
+        type: boolean
+      role:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_email_id:
+        type: integer
+      userEmail:
+        $ref: '#/definitions/models.TwUserEmail'
+      workspace:
+        $ref: '#/definitions/models.TwWorkspace'
+      workspace_id:
+        type: integer
+      workspace_key:
+        type: string
     type: object
 info:
   contact: {}
@@ -542,6 +753,285 @@ paths:
       summary: Update an existing schedule
       tags:
       - schedule
+  /dbms/v1/schedule_log:
+    get:
+      consumes:
+      - application/json
+      description: Get all schedule logs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwScheduleLog'
+            type: array
+      summary: Get all schedule logs
+      tags:
+      - schedule_log
+    post:
+      consumes:
+      - application/json
+      description: Create a new schedule log
+      parameters:
+      - description: Schedule log object
+        in: body
+        name: schedule_log
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwScheduleLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwScheduleLog'
+      summary: Create a new schedule log
+      tags:
+      - schedule_log
+  /dbms/v1/schedule_log/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete schedule log
+      parameters:
+      - description: Schedule Log ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwScheduleLog'
+      summary: Delete schedule log
+      tags:
+      - schedule_log
+    get:
+      consumes:
+      - application/json
+      description: Get schedule log by ID
+      parameters:
+      - description: Schedule Log ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwScheduleLog'
+      summary: Get schedule log by ID
+      tags:
+      - schedule_log
+    put:
+      consumes:
+      - application/json
+      description: Update schedule log
+      parameters:
+      - description: Schedule Log ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Schedule log object
+        in: body
+        name: schedule_log
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwScheduleLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwScheduleLog'
+      summary: Update schedule log
+      tags:
+      - schedule_log
+  /dbms/v1/schedule_participant:
+    get:
+      consumes:
+      - application/json
+      description: Get all schedule participants
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwScheduleParticipant'
+            type: array
+      summary: Get all schedule participants
+      tags:
+      - schedule_participant
+    post:
+      consumes:
+      - application/json
+      description: Create schedule participant
+      parameters:
+      - description: Schedule participant object
+        in: body
+        name: schedule_participant
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwScheduleParticipant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwScheduleParticipant'
+      summary: Create schedule participant
+      tags:
+      - schedule_participant
+  /dbms/v1/schedule_participant/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete schedule participant
+      parameters:
+      - description: Schedule Participant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwScheduleParticipant'
+      summary: Delete schedule participant
+      tags:
+      - schedule_participant
+    get:
+      consumes:
+      - application/json
+      description: Get schedule participant by ID
+      parameters:
+      - description: Schedule Participant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwScheduleParticipant'
+      summary: Get schedule participant by ID
+      tags:
+      - schedule_participant
+    put:
+      consumes:
+      - application/json
+      description: Update schedule participant
+      parameters:
+      - description: Schedule Participant ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Schedule participant object
+        in: body
+        name: schedule_participant
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwScheduleParticipant'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwScheduleParticipant'
+      summary: Update schedule participant
+      tags:
+      - schedule_participant
+  /dbms/v1/user:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwUser'
+      summary: Create a new user
+      tags:
+      - user
+  /dbms/v1/user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete user by ID
+      tags:
+      - user
+    put:
+      consumes:
+      - application/json
+      description: Update user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: User object
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/core_dtos.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwUser'
+      summary: Update user by ID
+      tags:
+      - user
   /dbms/v1/user_email:
     get:
       consumes:
@@ -622,6 +1112,250 @@ paths:
       summary: Get user email by user ID
       tags:
       - user_email
+  /dbms/v1/workspace:
+    get:
+      consumes:
+      - application/json
+      description: Get all workspaces
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwWorkspace'
+            type: array
+      summary: Get all workspaces
+      tags:
+      - workspace
+    post:
+      consumes:
+      - application/json
+      description: Create workspace
+      parameters:
+      - description: Workspace
+        in: body
+        name: workspace
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwWorkspace'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwWorkspace'
+      summary: Create workspace
+      tags:
+      - workspace
+    put:
+      consumes:
+      - application/json
+      description: Update workspace
+      parameters:
+      - description: Workspace
+        in: body
+        name: workspace
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwWorkspace'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwWorkspace'
+      summary: Update workspace
+      tags:
+      - workspace
+  /dbms/v1/workspace/{workspace_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove workspace by ID
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Remove workspace by ID
+      tags:
+      - workspace
+    get:
+      consumes:
+      - application/json
+      description: Get workspace by ID
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwWorkspace'
+      summary: Get workspace by ID
+      tags:
+      - workspace
+  /dbms/v1/workspace/is_active/{is_active}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspaces by is_active
+      parameters:
+      - description: Is Active
+        in: path
+        name: is_active
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwWorkspace'
+            type: array
+      summary: Get workspaces by is_active
+      tags:
+      - workspace
+  /dbms/v1/workspace/status/{status}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspaces by status
+      parameters:
+      - description: Status
+        in: path
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwWorkspace'
+            type: array
+      summary: Get workspaces by status
+      tags:
+      - workspace
+  /dbms/v1/workspace/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspaces by user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwWorkspace'
+            type: array
+      summary: Get workspaces by user ID
+      tags:
+      - workspace
+  /dbms/v1/workspace_log:
+    get:
+      consumes:
+      - application/json
+      description: Get all workspace logs
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwWorkspaceLog'
+            type: array
+      summary: Get all workspace logs
+      tags:
+      - workspace_log
+    post:
+      consumes:
+      - application/json
+      description: Create workspace log
+      parameters:
+      - description: Workspace log object
+        in: body
+        name: workspace_log
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwWorkspaceLog'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwWorkspaceLog'
+      summary: Create workspace log
+      tags:
+      - workspace_log
+  /dbms/v1/workspace_log/{workspace_log_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove workspace log by ID
+      parameters:
+      - description: Workspace log ID
+        in: path
+        name: workspace_log_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Remove workspace log by ID
+      tags:
+      - workspace_log
+    get:
+      consumes:
+      - application/json
+      description: Get workspace log by ID
+      parameters:
+      - description: Workspace log ID
+        in: path
+        name: workspace_log_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwWorkspaceLog'
+      summary: Get workspace log by ID
+      tags:
+      - workspace_log
   /users:
     get:
       consumes:
@@ -637,27 +1371,6 @@ paths:
               $ref: '#/definitions/models.TwUser'
             type: array
       summary: Get all users
-      tags:
-      - user
-    post:
-      consumes:
-      - application/json
-      description: Create a new user
-      parameters:
-      - description: User object
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/models.TwUser'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.TwUser'
-      summary: Create a new user
       tags:
       - user
   /users/{id}:
@@ -679,32 +1392,6 @@ paths:
           schema:
             $ref: '#/definitions/models.TwUser'
       summary: Get user by ID
-      tags:
-      - user
-    put:
-      consumes:
-      - application/json
-      description: Update user by ID
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: User object
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/core_dtos.UpdateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.TwUser'
-      summary: Update user by ID
       tags:
       - user
 swagger: "2.0"
