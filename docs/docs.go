@@ -327,6 +327,128 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/user_email": {
+            "get": {
+                "description": "Get all user emails",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Get all user emails",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwUserEmail"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new user email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Create a new user email",
+                "parameters": [
+                    {
+                        "description": "User Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/user_email/user/{user_id}": {
+            "get": {
+                "description": "Get user email by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Get user email by user ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/user_email/{email_id}": {
+            "delete": {
+                "description": "Delete user email by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Delete user email by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Email ID",
+                        "name": "email_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Get all users",
@@ -348,6 +470,38 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.TwUser"
                             }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUser"
                         }
                     }
                 }
@@ -373,6 +527,45 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUser"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update user by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Update user by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.UpdateUserRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -753,7 +946,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.TwUser": {
+        "core_dtos.UpdateUserRequest": {
             "type": "object",
             "properties": {
                 "calendarSettings": {
@@ -766,6 +959,59 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "firstName": {
+                    "type": "string"
+                },
+                "isActive": {
+                    "type": "boolean"
+                },
+                "isVerified": {
+                    "type": "boolean"
+                },
+                "lastLoginAt": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "locale": {
+                    "type": "string"
+                },
+                "notificationSettings": {
+                    "type": "string"
+                },
+                "profilePicture": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "timezone": {
+                    "type": "string"
+                },
+                "updatedAt": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TwUser": {
+            "type": "object",
+            "properties": {
+                "calendarSettings": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "googleId": {
                     "type": "string"
                 },
                 "id": {
@@ -789,9 +1035,6 @@ const docTemplate = `{
                 "notificationSettings": {
                     "type": "string"
                 },
-                "passwordHash": {
-                    "type": "string"
-                },
                 "profilePicture": {
                     "type": "string"
                 },
@@ -801,8 +1044,34 @@ const docTemplate = `{
                 "timezone": {
                     "type": "string"
                 },
-                "updatedAt": {
+                "updated_at": {
                     "type": "string"
+                }
+            }
+        },
+        "models.TwUserEmail": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.TwUser"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         }
