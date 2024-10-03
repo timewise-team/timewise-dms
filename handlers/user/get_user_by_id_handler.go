@@ -5,7 +5,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
 	dtos "github.com/timewise-team/timewise-models/dtos/core_dtos"
-	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_login_dtos"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_register_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
@@ -63,7 +62,7 @@ func (h *UserHandler) getUserById(c *fiber.Ctx) error {
 // @Produce json
 // @Param user body models.TwUser true "User object"
 // @Success 200 {object} models.TwUser
-// @Router /users [post]
+// @Router /dbms/v1/user [post]
 func (h *UserHandler) createUser(ctx *fiber.Ctx) error {
 	user := new(models.TwUser)
 	if err := ctx.BodyParser(user); err != nil {
@@ -91,7 +90,7 @@ func (h *UserHandler) createUser(ctx *fiber.Ctx) error {
 // @Param id path int true "User ID"
 // @Param user body dtos.UpdateUserRequest true "User object"
 // @Success 200 {object} models.TwUser
-// @Router /users/{id} [put]
+// @Router /dbms/v1/user/{id} [put]
 func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	var userDTO dtos.UpdateUserRequest
 	if err := c.BodyParser(&userDTO); err != nil {
@@ -153,26 +152,22 @@ func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+// DELETE /users/{id}
+// deleteUser godoc
+// @Summary Delete user by ID
+// @Description Delete user by ID
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param id path int true "User ID"
+// @Success 200 {string} string
+// @Router /dbms/v1/user/{id} [delete]
 func (h *UserHandler) deleteUser(ctx *fiber.Ctx) error {
 	userId := ctx.Params("user_id")
 	if result := h.DB.Delete(&models.TwUser{}, userId); result.Error != nil {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return ctx.SendString("User deleted successfully")
-}
-
-func (h *UserHandler) loginUser(ctx *fiber.Ctx) error {
-	var user_login user_login_dtos.UserLoginRequest
-	if err := ctx.BodyParser(&user_login); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
-	}
-	var user models.TwUser
-	if err := h.DB.Where("username = ?", user_login.Username).First(&user).Error; err != nil {
-		return ctx.Status(fiber.StatusUnauthorized).SendString("Invalid email or password")
-	}
-
-	return ctx.JSON(user)
-
 }
 
 func (h *UserHandler) getOrCreateUser(ctx *fiber.Ctx) error {

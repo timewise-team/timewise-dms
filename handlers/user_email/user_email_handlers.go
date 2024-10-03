@@ -75,6 +75,14 @@ func (h *UserEmailHandler) createUserEmail(ctx *fiber.Ctx) error {
 		}
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
+	// Lấy thông tin người dùng từ cơ sở dữ liệu dựa trên UserId
+	var user models.TwUser
+	if err := h.DB.Where("id = ?", userEmail.UserId).First(&user).Error; err != nil {
+		return ctx.Status(fiber.StatusNotFound).SendString("User not found")
+	}
+
+	// Gán thông tin user vào userEmail để trả về kèm thông tin user
+	userEmail.User = user
 
 	return ctx.JSON(userEmail)
 }
