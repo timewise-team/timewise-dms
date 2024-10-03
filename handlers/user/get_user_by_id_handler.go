@@ -181,7 +181,9 @@ func (h *UserHandler) getOrCreateUser(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
-
+	if !req.VerifiedEmail {
+		return ctx.Status(fiber.StatusForbidden).SendString("User is not verified")
+	}
 	// Try to find the user in the database
 	isNewUser := false
 	var user models.TwUser
@@ -190,11 +192,17 @@ func (h *UserHandler) getOrCreateUser(ctx *fiber.Ctx) error {
 			// User not found, create a new one
 			user = models.TwUser{
 				Email:          req.Email,
-				Username:       req.UserName,
-				FirstName:      req.FullName,
 				ProfilePicture: req.ProfilePicture,
 				LastLoginAt:    time.Now(),
+				Role:           "user",
+				IsVerified:     req.VerifiedEmail,
+				//GoogleId:       req.GoogleId,
+				FirstName: req.GivenName,
+				LastName:  req.FamilyName,
+				Locale:    req.Locale,
+				IsActive:  true,
 			}
+
 			if result := h.DB.Create(&user); result.Error != nil {
 				return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 			}
