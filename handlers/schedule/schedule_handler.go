@@ -47,7 +47,7 @@ func (h *ScheduleHandler) GetSchedules(c *fiber.Ctx) error {
 			ExtraData:         schedule.ExtraData,
 			IsDeleted:         schedule.IsDeleted,
 			RecurrencePattern: schedule.RecurrencePattern,
-			AssignedTo:        []int{schedule.AssignedTo},
+			//AssignedTo:        []int{schedule.AssignedTo},
 		})
 	}
 
@@ -92,7 +92,7 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
-		AssignedTo:        []int{schedule.AssignedTo},
+		//AssignedTo:        []int{schedule.AssignedTo},
 	}
 
 	return c.JSON(scheduleDTO)
@@ -130,7 +130,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		ExtraData:         *scheduleDTO.ExtraData,
 		IsDeleted:         false,
 		RecurrencePattern: *scheduleDTO.RecurrencePattern,
-		AssignedTo:        *scheduleDTO.AssignedTo,
+		//AssignedTo:        *scheduleDTO.AssignedTo,
 	}
 
 	if result := h.DB.Create(&schedule); result.Error != nil {
@@ -155,7 +155,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
-		AssignedTo:        schedule.AssignedTo,
+		//AssignedTo:        schedule.AssignedTo,
 	})
 }
 
@@ -225,9 +225,9 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	if scheduleDTO.RecurrencePattern != nil {
 		schedule.RecurrencePattern = *scheduleDTO.RecurrencePattern
 	}
-	if scheduleDTO.AssignedTo != nil {
-		schedule.AssignedTo = *scheduleDTO.AssignedTo
-	}
+	//if scheduleDTO.AssignedTo != nil {
+	//	schedule.AssignedTo = *scheduleDTO.AssignedTo
+	//}
 
 	// Update the timestamp
 	schedule.UpdatedAt = time.Now()
@@ -254,7 +254,7 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
-		AssignedTo:        schedule.AssignedTo,
+		//AssignedTo:        schedule.AssignedTo,
 	})
 }
 

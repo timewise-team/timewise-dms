@@ -13,13 +13,13 @@ func (h *AuthHandler) CreateNewUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	user := models.TwUser{
-		Username:     registerResponseDto.UserName,
-		FirstName:    registerResponseDto.FirstName,
-		LastName:     registerResponseDto.LastName,
-		Email:        registerResponseDto.Email,
-		PasswordHash: registerResponseDto.HashPassword,
-		LastLoginAt:  time.Now(),
-		Role:         "user",
+		//Username:     registerResponseDto.UserName,
+		FirstName: registerResponseDto.FirstName,
+		LastName:  registerResponseDto.LastName,
+		Email:     registerResponseDto.Email,
+		//PasswordHash: registerResponseDto.HashPassword,
+		LastLoginAt: time.Now(),
+		Role:        "user",
 	}
 	if result := h.DB.Create(&user); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
