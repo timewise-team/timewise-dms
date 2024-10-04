@@ -276,6 +276,13 @@ definitions:
       updatedAt:
         type: string
     type: object
+  fiber.Error:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
   models.TwBoardColumn:
     properties:
       created_at:
@@ -963,6 +970,74 @@ paths:
       summary: Update schedule participant
       tags:
       - schedule_participant
+  /dbms/v1/schedules:
+    get:
+      consumes:
+      - application/json
+      description: Filter schedules
+      parameters:
+      - description: Workspace ID
+        in: query
+        name: workspace_id
+        type: integer
+      - description: Board Column ID
+        in: query
+        name: board_column_id
+        type: integer
+      - description: Title of the schedule (searches with LIKE)
+        in: query
+        name: title
+        type: string
+      - description: Start time of the schedule (ISO8601 format, filter by schedules
+          starting after this date)
+        in: query
+        name: start_time
+        type: string
+      - description: End time of the schedule (ISO8601 format, filter by schedules
+          ending before this date)
+        in: query
+        name: end_time
+        type: string
+      - description: Location of the schedule (searches with LIKE)
+        in: query
+        name: location
+        type: string
+      - description: User ID of the creator
+        in: query
+        name: created_by
+        type: integer
+      - description: Status of the schedule
+        in: query
+        name: status
+        type: string
+      - description: Filter by deleted schedules
+        in: query
+        name: is_deleted
+        type: boolean
+      - description: User ID assigned to the schedule
+        in: query
+        name: assigned_to
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Filtered list of schedules
+          schema:
+            items:
+              $ref: '#/definitions/core_dtos.TwScheduleResponse'
+            type: array
+        "400":
+          description: Invalid query parameters
+          schema:
+            $ref: '#/definitions/fiber.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/fiber.Error'
+      summary: Filter schedule
+      tags:
+      - schedule
   /dbms/v1/user:
     post:
       consumes:

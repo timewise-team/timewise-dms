@@ -13,6 +13,119 @@ type ScheduleHandler struct {
 	DB *gorm.DB
 }
 
+// FilterSchedules godoc
+// @Summary Filter schedule
+// @Description Filter schedules
+// @Tags schedule
+// @Accept json
+// @Produce json
+// @Param workspace_id query int false "Workspace ID"
+// @Param board_column_id query int false "Board Column ID"
+// @Param title query string false "Title of the schedule (searches with LIKE)"
+// @Param start_time query string false "Start time of the schedule (ISO8601 format, filter by schedules starting after this date)"
+// @Param end_time query string false "End time of the schedule (ISO8601 format, filter by schedules ending before this date)"
+// @Param location query string false "Location of the schedule (searches with LIKE)"
+// @Param created_by query int false "User ID of the creator"
+// @Param status query string false "Status of the schedule"
+// @Param is_deleted query bool false "Filter by deleted schedules"
+// @Param assigned_to query int false "User ID assigned to the schedule"
+// @Success 200 {array} core_dtos.TwScheduleResponse "Filtered list of schedules"
+// @Failure 400 {object} fiber.Error "Invalid query parameters"
+// @Failure 500 {object} fiber.Error "Internal Server Error"
+// @Router /dbms/v1/schedules [get]
+func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
+	var schedules []models.TwSchedule
+
+	query := h.DB.Model(&models.TwSchedule{})
+
+	workspaceID := c.Query("workspace_id")
+	boardColumnID := c.Query("board_column_id")
+	title := c.Query("title")
+	startTime := c.Query("start_time")
+	endTime := c.Query("end_time")
+	location := c.Query("location")
+	createdBy := c.Query("created_by")
+	status := c.Query("status")
+	isDeleted := c.Query("is_deleted")
+	assignedTo := c.Query("assigned_to")
+
+	if workspaceID != "" {
+		query = query.Where("workspace_id = ?", workspaceID)
+	}
+
+	if boardColumnID != "" {
+		query = query.Where("board_column_id = ?", boardColumnID)
+	}
+
+	if title != "" {
+		query = query.Where("title LIKE ?", "%"+title+"%")
+	}
+
+	if startTime != "" {
+		parsedStartTime, err := time.Parse(time.RFC3339, startTime)
+		if err == nil {
+			query = query.Where("start_time >= ?", parsedStartTime)
+		}
+	}
+
+	if endTime != "" {
+		parsedEndTime, err := time.Parse(time.RFC3339, endTime)
+		if err == nil {
+			query = query.Where("end_time <= ?", parsedEndTime)
+		}
+	}
+
+	if location != "" {
+		query = query.Where("location LIKE ?", "%"+location+"%")
+	}
+
+	if createdBy != "" {
+		query = query.Where("created_by = ?", createdBy)
+	}
+
+	if status != "" {
+		query = query.Where("status = ?", status)
+	}
+
+	if isDeleted != "" {
+		query = query.Where("is_deleted = ?", isDeleted)
+	}
+
+	if assignedTo != "" {
+		query = query.Where("assigned_to @> ?", "{"+assignedTo+"}")
+	}
+
+	if result := query.Find(&schedules); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	var scheduleDTOs []core_dtos.TwScheduleResponse
+	for _, schedule := range schedules {
+		scheduleDTOs = append(scheduleDTOs, core_dtos.TwScheduleResponse{
+			ID:                int(schedule.ID),
+			WorkspaceID:       schedule.WorkspaceId,
+			BoardColumnID:     schedule.BoardColumnId,
+			Title:             schedule.Title,
+			Description:       schedule.Description,
+			StartTime:         schedule.StartTime,
+			EndTime:           schedule.EndTime,
+			Location:          schedule.Location,
+			CreatedBy:         schedule.CreatedBy,
+			CreatedAt:         schedule.CreatedAt,
+			UpdatedAt:         schedule.UpdatedAt,
+			Status:            schedule.Status,
+			AllDay:            schedule.AllDay,
+			Visibility:        schedule.Visibility,
+			ExtraData:         schedule.ExtraData,
+			IsDeleted:         schedule.IsDeleted,
+			RecurrencePattern: schedule.RecurrencePattern,
+			//AssignedTo:        schedule.AssignedTo,
+		})
+	}
+
+	return c.JSON(scheduleDTOs)
+}
+
 // GetSchedules godoc
 // @Summary Get all schedules
 // @Description Get all schedules
