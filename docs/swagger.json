@@ -221,6 +221,106 @@
                 }
             }
         },
+        "/dbms/v1/schedule/schedules/filter": {
+            "get": {
+                "description": "Filter schedules",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule"
+                ],
+                "summary": "Filter schedule",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Board Column ID",
+                        "name": "board_column_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title of the schedule (searches with LIKE)",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Start time of the schedule (ISO8601 format, filter by schedules starting after this date)",
+                        "name": "start_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "End time of the schedule (ISO8601 format, filter by schedules ending before this date)",
+                        "name": "end_time",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Location of the schedule (searches with LIKE)",
+                        "name": "location",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID of the creator",
+                        "name": "created_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status of the schedule",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Filter by deleted schedules",
+                        "name": "is_deleted",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "User ID assigned to the schedule",
+                        "name": "assigned_to",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Filtered list of schedules",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/core_dtos.TwScheduleResponse"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid query parameters",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/schedule/{schedule_id}": {
             "get": {
                 "description": "Get schedule by ID",
@@ -1500,10 +1600,7 @@
                     "type": "boolean"
                 },
                 "assigned_to": {
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "type": "integer"
                 },
                 "board_column_id": {
                     "type": "integer"
@@ -1708,6 +1805,17 @@
                 }
             }
         },
+        "fiber.Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "models.TwBoardColumn": {
             "type": "object",
             "properties": {
@@ -1742,6 +1850,9 @@
             "properties": {
                 "all_day": {
                     "type": "boolean"
+                },
+                "assigned_to": {
+                    "type": "integer"
                 },
                 "boardColumn": {
                     "$ref": "#/definitions/models.TwBoardColumn"
