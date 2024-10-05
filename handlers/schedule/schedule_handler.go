@@ -32,7 +32,7 @@ type ScheduleHandler struct {
 // @Success 200 {array} core_dtos.TwScheduleResponse "Filtered list of schedules"
 // @Failure 400 {object} fiber.Error "Invalid query parameters"
 // @Failure 500 {object} fiber.Error "Internal Server Error"
-// @Router /dbms/v1/schedules [get]
+// @Router /dbms/v1/schedule/schedules/filter [get]
 func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 	var schedules []models.TwSchedule
 
@@ -88,7 +88,13 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 	}
 
 	if isDeleted != "" {
-		query = query.Where("is_deleted = ?", isDeleted)
+		if isDeleted == "true" {
+			query = query.Where("is_deleted = ?", 1)
+		} else if isDeleted == "false" {
+			query = query.Where("is_deleted = ?", 0)
+		} else {
+			return c.Status(fiber.StatusBadRequest).SendString("Invalid value for is_deleted. Must be 'true' or 'false'")
+		}
 	}
 
 	if assignedTo != "" {
@@ -119,7 +125,7 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 			ExtraData:         schedule.ExtraData,
 			IsDeleted:         schedule.IsDeleted,
 			RecurrencePattern: schedule.RecurrencePattern,
-			//AssignedTo:        schedule.AssignedTo,
+			AssignedTo:        schedule.AssignedTo,
 		})
 	}
 
