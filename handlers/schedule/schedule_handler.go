@@ -125,7 +125,7 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 			ExtraData:         schedule.ExtraData,
 			IsDeleted:         schedule.IsDeleted,
 			RecurrencePattern: schedule.RecurrencePattern,
-			AssignedTo:        schedule.AssignedTo,
+			//AssignedTo:        schedule.AssignedTo,
 		})
 	}
 
