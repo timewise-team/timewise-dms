@@ -20,4 +20,5 @@ func RegisterWorkspaceHandler(router fiber.Router, db *gorm.DB) {
 	router.Get("/user/:user_id", workspaceHandler.getWorkspacesByUserId)
 	router.Get("/status/:status", workspaceHandler.getWorkspacesByStatus)
 	router.Get("/is_active/:is_active", workspaceHandler.getWorkspacesByIsActive)
+	router.Get("/email/:email", workspaceHandler.getWorkspacesByEmail)
 }

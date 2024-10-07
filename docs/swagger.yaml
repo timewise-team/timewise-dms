@@ -1166,11 +1166,34 @@ paths:
       summary: Delete user email by ID
       tags:
       - user_email
+  /dbms/v1/user_email/email/{email}:
+    get:
+      consumes:
+      - application/json
+      description: Get user emails by email
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwUserEmail'
+            type: array
+      summary: Get user emails by email
+      tags:
+      - user_email
   /dbms/v1/user_email/user/{user_id}:
     get:
       consumes:
       - application/json
-      description: Get user email by user ID
+      description: Get user emails by user ID
       parameters:
       - description: User ID
         in: path
@@ -1183,8 +1206,10 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.TwUserEmail'
-      summary: Get user email by user ID
+            items:
+              $ref: '#/definitions/models.TwUserEmail'
+            type: array
+      summary: Get user emails by user ID
       tags:
       - user_email
   /dbms/v1/workspace:
@@ -1283,6 +1308,29 @@ paths:
           schema:
             $ref: '#/definitions/models.TwWorkspace'
       summary: Get workspace by ID
+      tags:
+      - workspace
+  /dbms/v1/workspace/email/{email}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspaces by email
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwWorkspace'
+            type: array
+      summary: Get workspaces by email
       tags:
       - workspace
   /dbms/v1/workspace/is_active/{is_active}:
