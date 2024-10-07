@@ -808,9 +808,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/dbms/v1/user_email/user/{user_id}": {
+        "/dbms/v1/user_email/email/{email}": {
             "get": {
-                "description": "Get user email by user ID",
+                "description": "Get user emails by email",
                 "consumes": [
                     "application/json"
                 ],
@@ -820,7 +820,42 @@ const docTemplate = `{
                 "tags": [
                     "user_email"
                 ],
-                "summary": "Get user email by user ID",
+                "summary": "Get user emails by email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwUserEmail"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/user_email/user/{user_id}": {
+            "get": {
+                "description": "Get user emails by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Get user emails by user ID",
                 "parameters": [
                     {
                         "type": "integer",
@@ -834,7 +869,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/models.TwUserEmail"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwUserEmail"
+                            }
                         }
                     }
                 }
@@ -957,6 +995,41 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.TwWorkspace"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace/email/{email}": {
+            "get": {
+                "description": "Get workspaces by email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Get workspaces by email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwWorkspace"
+                            }
                         }
                     }
                 }

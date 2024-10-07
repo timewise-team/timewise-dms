@@ -5,7 +5,7 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/models"
-	"gorm.io/gorm"
+	"net/url"
 )
 
 // @Summary Get all user emails
@@ -33,25 +33,25 @@ func (h *UserEmailHandler) getUserEmails(c *fiber.Ctx) error {
 	return c.JSON(userEmails)
 }
 
-// @Summary Get user email by user ID
-// @Description Get user email by user ID
+// @Summary Get user emails by user ID
+// @Description Get user emails by user ID
 // @Tags user_email
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
-// @Success 200 {object} models.TwUserEmail
+// @Success 200 {array} models.TwUserEmail
 // @Router /dbms/v1/user_email/user/{user_id} [get]
 func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
-	var userEmail models.TwUserEmail
+	var userEmails []models.TwUserEmail
 	userId := c.Params("user_id")
 
-	if err := h.DB.Where("user_id = ?", userId).First(&userEmail).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).SendString("Email not found")
-		}
+	if err := h.DB.Where("user_id = ?", userId).Find(&userEmails).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
-	return c.JSON(userEmail)
+	if len(userEmails) == 0 {
+		return c.Status(fiber.StatusNotFound).SendString("Emails not found")
+	}
+	return c.JSON(userEmails)
 }
 
 // @Summary Create a new user email
@@ -129,4 +129,32 @@ func (h *UserEmailHandler) deleteUserEmail(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return ctx.SendString("Email deleted successfully")
+}
+
+// @Summary Get user emails by email
+// @Description Get user emails by email
+// @Tags user_email
+// @Accept json
+// @Produce json
+// @Param email path string true "Email"
+// @Success 200 {array} models.TwUserEmail
+// @Router /dbms/v1/user_email/email/{email} [get]
+func (h *UserEmailHandler) getUserEmailByEmail(c *fiber.Ctx) error {
+	var userEmails models.TwUserEmail
+	email := c.Params("email")
+	emailFix, err1 := url.QueryUnescape(email)
+	if err1 != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err1.Error(),
+		})
+	}
+
+	if err := h.DB.Where("email = ?", emailFix).Find(&userEmails).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	if userEmails.Email == "" {
+		return c.Status(fiber.StatusNotFound).SendString("Email not found")
+	}
+
+	return c.JSON(userEmails)
 }
