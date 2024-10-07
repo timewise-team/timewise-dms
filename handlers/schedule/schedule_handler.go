@@ -6,6 +6,7 @@ import (
 	"github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
+	"strconv"
 	"time"
 )
 
@@ -125,7 +126,6 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 			ExtraData:         schedule.ExtraData,
 			IsDeleted:         schedule.IsDeleted,
 			RecurrencePattern: schedule.RecurrencePattern,
-			AssignedTo:        schedule.AssignedTo,
 		})
 	}
 
@@ -227,6 +227,13 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 // @Success 201 {object} core_dtos.TwCreateShecduleResponse
 // @Router /dbms/v1/schedule [post]
 func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
+
+	workspaceUserIdStr := c.Params("workspaceUserId")
+	workspaceUserId, err := strconv.Atoi(workspaceUserIdStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid workspaceUserId")
+	}
+
 	var scheduleDTO core_dtos.TwCreateScheduleRequest
 	if err := c.BodyParser(&scheduleDTO); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
@@ -240,7 +247,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		StartTime:         *scheduleDTO.StartTime,
 		EndTime:           *scheduleDTO.EndTime,
 		Location:          *scheduleDTO.Location,
-		CreatedBy:         scheduleDTO.CreatedBy,
+		CreatedBy:         workspaceUserId,
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 		Status:            *scheduleDTO.Status,
@@ -253,6 +260,31 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	}
 
 	if result := h.DB.Create(&schedule); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	newScheduleLog := models.TwScheduleLog{
+		ScheduleId:      schedule.ID,
+		WorkspaceUserId: workspaceUserId,
+		Action:          "create schedule",
+	}
+
+	if result := h.DB.Create(&newScheduleLog); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	newScheduleParticipant := models.TwScheduleParticipant{
+		ScheduleId:       schedule.ID,
+		WorkspaceUserId:  workspaceUserId,
+		AssignAt:         time.Now(),
+		AssignBy:         workspaceUserId,
+		Status:           "participating",
+		ResponseTime:     time.Now(),
+		InvitationSentAt: time.Now(),
+		InvitationStatus: "joined",
+	}
+
+	if result := h.DB.Create(&newScheduleParticipant); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
@@ -274,7 +306,6 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
-		//AssignedTo:        schedule.AssignedTo,
 	})
 }
 
@@ -351,7 +382,17 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	// Update the timestamp
 	schedule.UpdatedAt = time.Now()
 
-	if result := h.DB.Save(&schedule); result.Error != nil {
+	if result := h.DB.Omit("deleted_at").Save(&schedule); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	newScheduleLog := models.TwScheduleLog{
+		ScheduleId:      schedule.ID,
+		WorkspaceUserId: schedule.WorkspaceId,
+		Action:          "update schedule",
+	}
+
+	if result := h.DB.Create(&newScheduleLog); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
@@ -400,6 +441,7 @@ func (h *ScheduleHandler) DeleteSchedule(c *fiber.Ctx) error {
 	// Soft delete by setting IsDeleted to true
 	schedule.IsDeleted = true
 	schedule.UpdatedAt = time.Now()
+	schedule.DeletedAt = time.Now()
 
 	if result := h.DB.Save(&schedule); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
