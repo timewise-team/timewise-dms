@@ -136,7 +136,8 @@ func (handler *WorkspaceHandler) getWorkspacesByUserId(c *fiber.Ctx) error {
 		Select("tw_workspaces.id, tw_workspaces.created_at, tw_workspaces.updated_at, tw_workspaces.deleted_at, tw_workspaces.title, tw_workspaces.extra_data, tw_workspaces.description, tw_workspaces.key, tw_workspaces.type, tw_workspaces.is_deleted").
 		Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
-		Where("tw_user_emails.user_id = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'Guest' and tw_workspace_users.status ='Joined'", userId).
+		Joins("JOIN tw_users ON tw_user_emails.user_id = tw_users.id").
+		Where("tw_users.id = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'guest' and tw_workspace_users.status ='joined'", userId).
 		Scan(&workspaces).Error
 
 	if err != nil {
@@ -214,7 +215,7 @@ func (handler *WorkspaceHandler) getWorkspacesByEmail(c *fiber.Ctx) error {
 		Select("tw_workspaces.id, tw_workspaces.created_at, tw_workspaces.updated_at, tw_workspaces.deleted_at, tw_workspaces.title, tw_workspaces.extra_data, tw_workspaces.description, tw_workspaces.key, tw_workspaces.type, tw_workspaces.is_deleted").
 		Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
-		Where("tw_user_emails.email = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'Guest' and tw_workspace_users.status ='Joined'", emails).
+		Where("tw_user_emails.email = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'Guest' and tw_workspace_users.status ='joined'", emails).
 		Scan(&workspaces).Error
 
 	if err != nil {
