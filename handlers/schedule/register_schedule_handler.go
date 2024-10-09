@@ -15,7 +15,7 @@ func RegisterScheduleHandler(router fiber.Router, db *gorm.DB) {
 		handler.Router.Get("/:schedule_id", scheduleHandler.GetScheduleById)
 		handler.Router.Get("/schedules/filter", scheduleHandler.FilterSchedules)
 		//handler.Router.Get("/user/:user_id", scheduleHandler.GetSchedulesByUserId)
-		handler.Router.Post("/:workspaceUserId", scheduleHandler.CreateSchedule)
+		handler.Router.Post("/", scheduleHandler.CreateSchedule)
 		handler.Router.Put("/:schedule_id", scheduleHandler.UpdateSchedule)
 		handler.Router.Delete("/:schedule_id", scheduleHandler.DeleteSchedule)
 	})

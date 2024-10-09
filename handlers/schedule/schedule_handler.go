@@ -6,7 +6,6 @@ import (
 	"github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
-	"strconv"
 	"time"
 )
 
@@ -228,12 +227,6 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 // @Router /dbms/v1/schedule [post]
 func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 
-	workspaceUserIdStr := c.Params("workspaceUserId")
-	workspaceUserId, err := strconv.Atoi(workspaceUserIdStr)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString("Invalid workspaceUserId")
-	}
-
 	var scheduleDTO core_dtos.TwCreateScheduleRequest
 	if err := c.BodyParser(&scheduleDTO); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
@@ -247,7 +240,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		StartTime:         *scheduleDTO.StartTime,
 		EndTime:           *scheduleDTO.EndTime,
 		Location:          *scheduleDTO.Location,
-		CreatedBy:         workspaceUserId,
+		CreatedBy:         *scheduleDTO.WorkspaceUserID,
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 		Status:            *scheduleDTO.Status,
@@ -256,7 +249,6 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		ExtraData:         *scheduleDTO.ExtraData,
 		IsDeleted:         false,
 		RecurrencePattern: *scheduleDTO.RecurrencePattern,
-		//AssignedTo:        *scheduleDTO.AssignedTo,
 	}
 
 	if result := h.DB.Create(&schedule); result.Error != nil {
@@ -265,7 +257,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 
 	newScheduleLog := models.TwScheduleLog{
 		ScheduleId:      schedule.ID,
-		WorkspaceUserId: workspaceUserId,
+		WorkspaceUserId: *scheduleDTO.WorkspaceUserID,
 		Action:          "create schedule",
 	}
 
@@ -275,10 +267,10 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 
 	newScheduleParticipant := models.TwScheduleParticipant{
 		ScheduleId:       schedule.ID,
-		WorkspaceUserId:  workspaceUserId,
+		WorkspaceUserId:  *scheduleDTO.WorkspaceUserID,
 		AssignAt:         time.Now(),
-		AssignBy:         workspaceUserId,
-		Status:           "participating",
+		AssignBy:         *scheduleDTO.WorkspaceUserID,
+		Status:           "participant",
 		ResponseTime:     time.Now(),
 		InvitationSentAt: time.Now(),
 		InvitationStatus: "joined",
@@ -336,9 +328,6 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	}
 
 	// Update the fields if they are provided (not nil)
-	if scheduleDTO.WorkspaceID != nil {
-		schedule.WorkspaceId = *scheduleDTO.WorkspaceID
-	}
 	if scheduleDTO.BoardColumnID != nil {
 		schedule.BoardColumnId = *scheduleDTO.BoardColumnID
 	}
@@ -375,9 +364,6 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	if scheduleDTO.RecurrencePattern != nil {
 		schedule.RecurrencePattern = *scheduleDTO.RecurrencePattern
 	}
-	//if scheduleDTO.AssignedTo != nil {
-	//	schedule.AssignedTo = *scheduleDTO.AssignedTo
-	//}
 
 	// Update the timestamp
 	schedule.UpdatedAt = time.Now()
@@ -414,7 +400,6 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
-		//AssignedTo:        schedule.AssignedTo,
 	})
 }
 
