@@ -4,6 +4,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
+	"log"
+	"net/http"
+	"net/url"
 )
 
 type WorkspaceHandler struct {
@@ -123,12 +126,29 @@ func (handler *WorkspaceHandler) updateWorkspace(c *fiber.Ctx) error {
 // @Success 200 {object} []models.TwWorkspace
 // @Router /dbms/v1/workspace/user/{user_id} [get]
 func (handler *WorkspaceHandler) getWorkspacesByUserId(c *fiber.Ctx) error {
-	var workspaces []models.TwWorkspace
 	userId := c.Params("user_id")
-	if result := handler.DB.Where("user_id = ?", userId).Find(&workspaces); result.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+
+	var workspaces []models.TwWorkspace
+
+	// Thực hiện JOIN giữa các bảng để lấy các workspace liên quan đến email
+	err := handler.DB.
+		Table("tw_workspaces").
+		Select("tw_workspaces.id, tw_workspaces.created_at, tw_workspaces.updated_at, tw_workspaces.deleted_at, tw_workspaces.title, tw_workspaces.extra_data, tw_workspaces.description, tw_workspaces.key, tw_workspaces.type, tw_workspaces.is_deleted").
+		Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
+		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
+		Joins("JOIN tw_users ON tw_user_emails.user_id = tw_users.id").
+		Where("tw_users.id = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'guest' and tw_workspace_users.status ='joined'", userId).
+		Scan(&workspaces).Error
+
+	if err != nil {
+		log.Println(err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Không thể lấy workspace",
+		})
 	}
-	return c.JSON(workspaces)
+
+	return c.Status(http.StatusOK).JSON(workspaces)
+
 }
 
 // GET /workspaces/status/{status}
@@ -167,4 +187,44 @@ func (handler *WorkspaceHandler) getWorkspacesByIsActive(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return c.JSON(workspaces)
+}
+
+// getWorkspacesByEmail godoc
+// @Summary Get workspaces by email
+// @Description Get workspaces by email
+// @Tags workspace
+// @Accept json
+// @Produce json
+// @Param email path string true "Email"
+// @Success 200 {object} []models.TwWorkspace
+// @Router /dbms/v1/workspace/email/{email} [get]s
+func (handler *WorkspaceHandler) getWorkspacesByEmail(c *fiber.Ctx) error {
+	email := c.Params("email")
+	emails, err1 := url.QueryUnescape(email)
+	if err1 != nil {
+		log.Println("Lỗi khi giải mã email:", err1)
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email không hợp lệ",
+		})
+	}
+	var workspaces []models.TwWorkspace
+
+	// Thực hiện JOIN giữa các bảng để lấy các workspace liên quan đến email
+	err := handler.DB.
+		Table("tw_workspaces").
+		Select("tw_workspaces.id, tw_workspaces.created_at, tw_workspaces.updated_at, tw_workspaces.deleted_at, tw_workspaces.title, tw_workspaces.extra_data, tw_workspaces.description, tw_workspaces.key, tw_workspaces.type, tw_workspaces.is_deleted").
+		Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
+		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
+		Where("tw_user_emails.email = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'Guest' and tw_workspace_users.status ='joined'", emails).
+		Scan(&workspaces).Error
+
+	if err != nil {
+		log.Println(err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Không thể lấy workspace",
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(workspaces)
+
 }

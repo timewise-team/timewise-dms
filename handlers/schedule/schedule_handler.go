@@ -432,5 +432,5 @@ func (h *ScheduleHandler) DeleteSchedule(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
-	return c.SendStatus(fiber.StatusNoContent)
+	return c.SendStatus(fiber.StatusOK)
 }
