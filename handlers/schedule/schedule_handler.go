@@ -125,7 +125,6 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 			ExtraData:         schedule.ExtraData,
 			IsDeleted:         schedule.IsDeleted,
 			RecurrencePattern: schedule.RecurrencePattern,
-			//AssignedTo:        schedule.AssignedTo,
 		})
 	}
 
@@ -227,6 +226,7 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 // @Success 201 {object} core_dtos.TwCreateShecduleResponse
 // @Router /dbms/v1/schedule [post]
 func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
+
 	var scheduleDTO core_dtos.TwCreateScheduleRequest
 	if err := c.BodyParser(&scheduleDTO); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
@@ -240,7 +240,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		StartTime:         *scheduleDTO.StartTime,
 		EndTime:           *scheduleDTO.EndTime,
 		Location:          *scheduleDTO.Location,
-		CreatedBy:         scheduleDTO.CreatedBy,
+		CreatedBy:         *scheduleDTO.WorkspaceUserID,
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 		Status:            *scheduleDTO.Status,
@@ -249,10 +249,34 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		ExtraData:         *scheduleDTO.ExtraData,
 		IsDeleted:         false,
 		RecurrencePattern: *scheduleDTO.RecurrencePattern,
-		//AssignedTo:        *scheduleDTO.AssignedTo,
 	}
 
 	if result := h.DB.Create(&schedule); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	newScheduleLog := models.TwScheduleLog{
+		ScheduleId:      schedule.ID,
+		WorkspaceUserId: *scheduleDTO.WorkspaceUserID,
+		Action:          "create schedule",
+	}
+
+	if result := h.DB.Create(&newScheduleLog); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	newScheduleParticipant := models.TwScheduleParticipant{
+		ScheduleId:       schedule.ID,
+		WorkspaceUserId:  *scheduleDTO.WorkspaceUserID,
+		AssignAt:         time.Now(),
+		AssignBy:         *scheduleDTO.WorkspaceUserID,
+		Status:           "participant",
+		ResponseTime:     time.Now(),
+		InvitationSentAt: time.Now(),
+		InvitationStatus: "joined",
+	}
+
+	if result := h.DB.Create(&newScheduleParticipant); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
@@ -274,7 +298,6 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
-		//AssignedTo:        schedule.AssignedTo,
 	})
 }
 
@@ -305,9 +328,6 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	}
 
 	// Update the fields if they are provided (not nil)
-	if scheduleDTO.WorkspaceID != nil {
-		schedule.WorkspaceId = *scheduleDTO.WorkspaceID
-	}
 	if scheduleDTO.BoardColumnID != nil {
 		schedule.BoardColumnId = *scheduleDTO.BoardColumnID
 	}
@@ -344,14 +364,21 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	if scheduleDTO.RecurrencePattern != nil {
 		schedule.RecurrencePattern = *scheduleDTO.RecurrencePattern
 	}
-	//if scheduleDTO.AssignedTo != nil {
-	//	schedule.AssignedTo = *scheduleDTO.AssignedTo
-	//}
 
 	// Update the timestamp
 	schedule.UpdatedAt = time.Now()
 
-	if result := h.DB.Save(&schedule); result.Error != nil {
+	if result := h.DB.Omit("deleted_at").Save(&schedule); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	newScheduleLog := models.TwScheduleLog{
+		ScheduleId:      schedule.ID,
+		WorkspaceUserId: schedule.WorkspaceId,
+		Action:          "update schedule",
+	}
+
+	if result := h.DB.Create(&newScheduleLog); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
@@ -373,7 +400,6 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
-		//AssignedTo:        schedule.AssignedTo,
 	})
 }
 
@@ -400,10 +426,11 @@ func (h *ScheduleHandler) DeleteSchedule(c *fiber.Ctx) error {
 	// Soft delete by setting IsDeleted to true
 	schedule.IsDeleted = true
 	schedule.UpdatedAt = time.Now()
+	schedule.DeletedAt = time.Now()
 
 	if result := h.DB.Save(&schedule); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
-	return c.SendStatus(fiber.StatusNoContent)
+	return c.SendStatus(fiber.StatusOK)
 }

@@ -112,3 +112,17 @@ func (h *ScheduleParticipantHandler) createScheduleParticipant(c *fiber.Ctx) err
 	}
 	return c.JSON(scheduleParticipants)
 }
+
+func (h *ScheduleParticipantHandler) getScheduleParticipantByScheduleIdAndWorkspaceUserId(c *fiber.Ctx) error {
+	var scheduleParticipant models.TwScheduleParticipant
+	scheduleId := c.Params("scheduleId")
+	workspaceUserId := c.Params("workspaceUserId")
+
+	if err := h.DB.Where("workspace_user_id = ? AND schedule_id = ?", workspaceUserId, scheduleId).First(&scheduleParticipant).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("ScheduleParticipant not found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	return c.JSON(scheduleParticipant)
+}

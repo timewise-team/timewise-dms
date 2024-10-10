@@ -13,11 +13,9 @@ func (h *AuthHandler) CreateNewUser(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 	user := models.TwUser{
-		//Username:     registerResponseDto.UserName,
-		FirstName: registerResponseDto.FirstName,
-		LastName:  registerResponseDto.LastName,
-		Email:     registerResponseDto.Email,
-		//PasswordHash: registerResponseDto.HashPassword,
+		FirstName:   registerResponseDto.FirstName,
+		LastName:    registerResponseDto.LastName,
+		Email:       registerResponseDto.Email,
 		LastLoginAt: time.Now(),
 		Role:        "user",
 	}
