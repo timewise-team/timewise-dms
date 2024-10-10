@@ -167,6 +167,8 @@ github.com/timewise-team/timewise-models v0.0.0-20241003030706-d0ebb6ecfe31 h1:L
 github.com/timewise-team/timewise-models v0.0.0-20241003030706-d0ebb6ecfe31/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
 github.com/timewise-team/timewise-models v0.0.0-20241007100424-85011bf54735 h1:vvrftvhzFiW+V49pMpqWVfW3wr/briyDxwnK1ApyY08=
 github.com/timewise-team/timewise-models v0.0.0-20241007100424-85011bf54735/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
+github.com/timewise-team/timewise-models v0.0.0-20241010084127-993a4c210fc7 h1:OaVr4tpQBD7wsmoO7wN6v4m+hlScmfHCa/Ge+7+Vzfc=
+github.com/timewise-team/timewise-models v0.0.0-20241010084127-993a4c210fc7/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
 github.com/timewise-team/timewise-models v0.0.0-20240916135532-0455864a337c h1:DvdIoYPvnLySFT+btyY53JJl9Lwbzna4GGlhbrq3P54=
 github.com/timewise-team/timewise-models v0.0.0-20240916135532-0455864a337c/go.mod h1:cfqhHkxSfbNnHHOpkRdrN6j6LVZh1A3CM5qkjeaMGiQ=
 github.com/timewise-team/timewise-models v0.0.0-20240917051704-5674acac4717 h1:slWF5iHpa6aFHZ4CWiwPwmipKiOxWqdAry+Sc3yUHJU=

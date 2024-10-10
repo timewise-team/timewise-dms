@@ -434,3 +434,67 @@ func (h *ScheduleHandler) DeleteSchedule(c *fiber.Ctx) error {
 
 	return c.SendStatus(fiber.StatusOK)
 }
+
+func (h *ScheduleHandler) GetSchedulesByBoardColumn(c *fiber.Ctx) error {
+	boardColumnID := c.Params("board_column_id")
+	if boardColumnID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid board column ID",
+		})
+	}
+	var schedules []models.TwSchedule
+	if result := h.DB.Where("board_column_id = ?", boardColumnID).Find(&schedules); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": result.Error.Error(),
+		})
+	}
+	if schedules == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Failed to get schedules",
+		})
+	}
+	return c.JSON(schedules)
+}
+
+func (h *ScheduleHandler) GetSchedulesByWorkspace(c *fiber.Ctx) error {
+	workspaceID := c.Params("workspace_id")
+	if workspaceID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid workspace ID",
+		})
+	}
+	var schedules []models.TwSchedule
+	if result := h.DB.Where("workspace_id = ?", workspaceID).Find(&schedules); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": result.Error.Error(),
+		})
+	}
+	if schedules == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Failed to get schedules",
+		})
+	}
+	return c.JSON(schedules)
+}
+
+func (h *ScheduleHandler) getSchedulesByBoardColumn(c *fiber.Ctx) error {
+	boardColumnID := c.Params("board_column_id")
+	workspaceID := c.Params("workspace_id")
+	if boardColumnID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid board column ID",
+		})
+	}
+	var schedules []models.TwSchedule
+	if result := h.DB.Where("board_column_id = ? and workspace_id = ?", boardColumnID, workspaceID).Find(&schedules); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": result.Error.Error(),
+		})
+	}
+	if schedules == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Failed to get schedules",
+		})
+	}
+	return c.JSON(schedules)
+}
