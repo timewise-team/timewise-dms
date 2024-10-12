@@ -15,6 +15,223 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/dbms/v1/board_columns": {
+            "post": {
+                "description": "Create board column",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Create board column",
+                "parameters": [
+                    {
+                        "description": "Create board column request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/board_columns_dtos.BoardColumnsRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/board_columns/{id}": {
+            "get": {
+                "description": "Get board column by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Get board column by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Board column ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update board column",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Update board column",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Board column ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update board column request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete board column",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Delete board column",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Board column ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/dbms/v1/board_columns/{id}/{field}": {
+            "get": {
+                "description": "Get board column field",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Get board column field",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Board column ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Field",
+                        "name": "field",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update board column field",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Update board column field",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Board column ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Field",
+                        "name": "field",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update board column request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/recurrence_exception": {
             "get": {
                 "description": "Get all recurrence exceptions",
@@ -1299,6 +1516,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace/{workspace_id}/board_columns": {
+            "get": {
+                "description": "Get board columns by workspace",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Get board columns by workspace",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwBoardColumn"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_log": {
             "get": {
                 "description": "Get all workspace logs",
@@ -1416,6 +1668,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/email/{email}/workspace/{workspace_id}": {
+            "get": {
+                "description": "Get workspaces by email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace"
+                ],
+                "summary": "Get workspaces by email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspace"
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Get all users",
@@ -1476,16 +1767,26 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "board_columns_dtos.BoardColumnsRequest": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "core_dtos.TwCreateScheduleRequest": {
             "type": "object",
             "properties": {
                 "all_day": {
                     "description": "Nullable field (represented by tinyint in SQL)",
                     "type": "boolean"
-                },
-                "assigned_to": {
-                    "description": "Nullable field",
-                    "type": "integer"
                 },
                 "board_column_id": {
                     "description": "Nullable field",
@@ -1527,12 +1828,19 @@ const docTemplate = `{
                     "description": "Nullable field",
                     "type": "string"
                 },
+                "video_transcript": {
+                    "description": "Nullable field",
+                    "type": "string"
+                },
                 "visibility": {
                     "description": "Nullable field",
                     "type": "string"
                 },
                 "workspace_id": {
                     "description": "Nullable field",
+                    "type": "integer"
+                },
+                "workspace_user_id": {
                     "type": "integer"
                 }
             }
@@ -1542,9 +1850,6 @@ const docTemplate = `{
             "properties": {
                 "all_day": {
                     "type": "boolean"
-                },
-                "assigned_to": {
-                    "type": "integer"
                 },
                 "board_column_id": {
                     "type": "integer"
@@ -1586,6 +1891,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "video_transcript": {
                     "type": "string"
                 },
                 "visibility": {
@@ -1680,9 +1988,6 @@ const docTemplate = `{
                 "all_day": {
                     "type": "boolean"
                 },
-                "assigned_to": {
-                    "type": "integer"
-                },
                 "board_column_id": {
                     "type": "integer"
                 },
@@ -1723,6 +2028,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "video_transcript": {
                     "type": "string"
                 },
                 "visibility": {
@@ -1739,9 +2047,6 @@ const docTemplate = `{
                 "all_day": {
                     "type": "boolean"
                 },
-                "assigned_to": {
-                    "type": "integer"
-                },
                 "board_column_id": {
                     "type": "integer"
                 },
@@ -1772,10 +2077,16 @@ const docTemplate = `{
                 "title": {
                     "type": "string"
                 },
+                "video_transcript": {
+                    "type": "string"
+                },
                 "visibility": {
                     "type": "string"
                 },
                 "workspace_id": {
+                    "type": "integer"
+                },
+                "workspace_user_id": {
                     "type": "integer"
                 }
             }
@@ -1785,9 +2096,6 @@ const docTemplate = `{
             "properties": {
                 "all_day": {
                     "type": "boolean"
-                },
-                "assigned_to": {
-                    "type": "integer"
                 },
                 "board_column_id": {
                     "type": "integer"
@@ -1829,6 +2137,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "updated_at": {
+                    "type": "string"
+                },
+                "video_transcript": {
                     "type": "string"
                 },
                 "visibility": {
@@ -1931,9 +2242,6 @@ const docTemplate = `{
             "properties": {
                 "all_day": {
                     "type": "boolean"
-                },
-                "assigned_to": {
-                    "type": "integer"
                 },
                 "boardColumn": {
                     "$ref": "#/definitions/models.TwBoardColumn"
