@@ -17,12 +17,12 @@ func RegisterBoardColumnsHandler(router fiber.Router, db *gorm.DB) {
 	}
 
 	// Register all endpoints here
-	router.Get("/workspace/:workspace_id/board_columns", boardColumnsHandler.getBoardColumnsByWorkspace)
-	router.Get("/workspace/:workspace_id/board_columns/:board_column_id", boardColumnsHandler.getBoardColumnById)
-	router.Post("/board_columns", boardColumnsHandler.createBoardColumn)
-	router.Put("/board_columns/:board_column_id", boardColumnsHandler.updateBoardColumn)
-	router.Delete("/board_columns/:board_column_id", boardColumnsHandler.deleteBoardColumn)
-	router.Get("/board_columns/:board_column_id/:field", boardColumnsHandler.getBoardColumnField)
-	router.Put("/board_columns/:board_column_id/:field", boardColumnsHandler.updateBoardColumnField)
+	router.Get("/workspace/:workspace_id", boardColumnsHandler.getBoardColumnsByWorkspace)
+	router.Get("/:board_column_id/workspace/:workspace_id", boardColumnsHandler.getBoardColumnById)
+	router.Post("", boardColumnsHandler.createBoardColumn)
+	router.Put("/:board_column_id", boardColumnsHandler.updateBoardColumn)
+	router.Delete("/:board_column_id", boardColumnsHandler.deleteBoardColumn)
+	router.Get("/:board_column_id/:field", boardColumnsHandler.getBoardColumnField)
+	router.Put("/:board_column_id/:field", boardColumnsHandler.updateBoardColumnField)
 
 }

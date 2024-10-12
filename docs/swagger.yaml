@@ -1,12 +1,18 @@
 definitions:
+  board_columns_dtos.BoardColumnsRequest:
+    properties:
+      name:
+        type: string
+      position:
+        type: integer
+      workspace_id:
+        type: integer
+    type: object
   core_dtos.TwCreateScheduleRequest:
     properties:
       all_day:
         description: Nullable field (represented by tinyint in SQL)
         type: boolean
-      assigned_to:
-        description: Nullable field
-        type: integer
       board_column_id:
         description: Nullable field
         type: integer
@@ -37,19 +43,22 @@ definitions:
       title:
         description: Nullable field
         type: string
+      video_transcript:
+        description: Nullable field
+        type: string
       visibility:
         description: Nullable field
         type: string
       workspace_id:
         description: Nullable field
         type: integer
+      workspace_user_id:
+        type: integer
     type: object
   core_dtos.TwCreateShecduleResponse:
     properties:
       all_day:
         type: boolean
-      assigned_to:
-        type: integer
       board_column_id:
         type: integer
       created_at:
@@ -77,6 +86,8 @@ definitions:
       title:
         type: string
       updated_at:
+        type: string
+      video_transcript:
         type: string
       visibility:
         type: string
@@ -138,8 +149,6 @@ definitions:
     properties:
       all_day:
         type: boolean
-      assigned_to:
-        type: integer
       board_column_id:
         type: integer
       created_at:
@@ -167,6 +176,8 @@ definitions:
       title:
         type: string
       updated_at:
+        type: string
+      video_transcript:
         type: string
       visibility:
         type: string
@@ -177,8 +188,6 @@ definitions:
     properties:
       all_day:
         type: boolean
-      assigned_to:
-        type: integer
       board_column_id:
         type: integer
       description:
@@ -199,17 +208,19 @@ definitions:
         type: string
       title:
         type: string
+      video_transcript:
+        type: string
       visibility:
         type: string
       workspace_id:
+        type: integer
+      workspace_user_id:
         type: integer
     type: object
   core_dtos.TwUpdateScheduleResponse:
     properties:
       all_day:
         type: boolean
-      assigned_to:
-        type: integer
       board_column_id:
         type: integer
       created_at:
@@ -237,6 +248,8 @@ definitions:
       title:
         type: string
       updated_at:
+        type: string
+      video_transcript:
         type: string
       visibility:
         type: string
@@ -304,8 +317,6 @@ definitions:
     properties:
       all_day:
         type: boolean
-      assigned_to:
-        type: integer
       board_column_id:
         type: integer
       boardColumn:
@@ -554,6 +565,150 @@ info:
   title: timewise-dbms
   version: "1.0"
 paths:
+  /dbms/v1/board_columns:
+    post:
+      consumes:
+      - application/json
+      description: Create board column
+      parameters:
+      - description: Create board column request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/board_columns_dtos.BoardColumnsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwBoardColumn'
+      summary: Create board column
+      tags:
+      - board_columns
+  /dbms/v1/board_columns/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete board column
+      parameters:
+      - description: Board column ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete board column
+      tags:
+      - board_columns
+    get:
+      consumes:
+      - application/json
+      description: Get board column by ID
+      parameters:
+      - description: Board column ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwBoardColumn'
+      summary: Get board column by ID
+      tags:
+      - board_columns
+    put:
+      consumes:
+      - application/json
+      description: Update board column
+      parameters:
+      - description: Board column ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update board column request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwBoardColumn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwBoardColumn'
+      summary: Update board column
+      tags:
+      - board_columns
+  /dbms/v1/board_columns/{id}/{field}:
+    get:
+      consumes:
+      - application/json
+      description: Get board column field
+      parameters:
+      - description: Board column ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Field
+        in: path
+        name: field
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwBoardColumn'
+      summary: Get board column field
+      tags:
+      - board_columns
+    put:
+      consumes:
+      - application/json
+      description: Update board column field
+      parameters:
+      - description: Board column ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Field
+        in: path
+        name: field
+        required: true
+        type: string
+      - description: Update board column request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwBoardColumn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwBoardColumn'
+      summary: Update board column field
+      tags:
+      - board_columns
   /dbms/v1/recurrence_exception:
     get:
       consumes:
@@ -1310,6 +1465,29 @@ paths:
       summary: Get workspace by ID
       tags:
       - workspace
+  /dbms/v1/workspace/{workspace_id}/board_columns:
+    get:
+      consumes:
+      - application/json
+      description: Get board columns by workspace
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwBoardColumn'
+            type: array
+      summary: Get board columns by workspace
+      tags:
+      - board_columns
   /dbms/v1/workspace/email/{email}:
     get:
       consumes:
@@ -1479,6 +1657,32 @@ paths:
       summary: Get workspace log by ID
       tags:
       - workspace_log
+  /dbms/v1/workspace_user/email/{email}/workspace/{workspace_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspaces by email
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwWorkspace'
+      summary: Get workspaces by email
+      tags:
+      - workspace
   /users:
     get:
       consumes:

@@ -3,10 +3,20 @@ package board_columns
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
+	"github.com/timewise-team/timewise-models/dtos/core_dtos/board_columns_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
 )
 
+// getBoardColumnsByWorkspace godoc
+// @Summary Get board columns by workspace
+// @Description Get board columns by workspace
+// @Tags board_columns
+// @Accept json
+// @Produce json
+// @Param workspace_id path int true "Workspace ID"
+// @Success 200 {array} models.TwBoardColumn
+// @Router /dbms/v1/workspace/{workspace_id}/board_columns [get]
 func (h *BoardColumnsHandler) getBoardColumnsByWorkspace(c *fiber.Ctx) error {
 	// Parse the request
 	workspaceID := c.Params("workspace_id")
@@ -31,6 +41,15 @@ func (h *BoardColumnsHandler) getBoardColumnsByWorkspace(c *fiber.Ctx) error {
 	return c.JSON(boardColumns)
 }
 
+// getBoardColumnById godoc
+// @Summary Get board column by ID
+// @Description Get board column by ID
+// @Tags board_columns
+// @Accept json
+// @Produce json
+// @Param id path int true "Board column ID"
+// @Success 200 {object} models.TwBoardColumn
+// @Router /dbms/v1/board_columns/{id} [get]
 func (h *BoardColumnsHandler) getBoardColumnById(c *fiber.Ctx) error {
 	var boardColumn models.TwBoardColumn
 	boardColumnId := c.Params("id")
@@ -44,6 +63,15 @@ func (h *BoardColumnsHandler) getBoardColumnById(c *fiber.Ctx) error {
 	return c.JSON(boardColumn)
 }
 
+// deleteBoardColumn godoc
+// @Summary Delete board column
+// @Description Delete board column
+// @Tags board_columns
+// @Accept json
+// @Produce json
+// @Param id path int true "Board column ID"
+// @Success 204
+// @Router /dbms/v1/board_columns/{id} [delete]
 func (h *BoardColumnsHandler) deleteBoardColumn(c *fiber.Ctx) error {
 	boardColumnId := c.Params("id")
 	var boardColumn models.TwBoardColumn
@@ -53,6 +81,16 @@ func (h *BoardColumnsHandler) deleteBoardColumn(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 }
 
+// updateBoardColumn godoc
+// @Summary Update board column
+// @Description Update board column
+// @Tags board_columns
+// @Accept json
+// @Produce json
+// @Param id path int true "Board column ID"
+// @Param body body models.TwBoardColumn true "Update board column request"
+// @Success 200 {object} models.TwBoardColumn
+// @Router /dbms/v1/board_columns/{id} [put]
 func (h *BoardColumnsHandler) updateBoardColumn(c *fiber.Ctx) error {
 	boardColumnId := c.Params("id")
 	var boardColumn models.TwBoardColumn
@@ -76,6 +114,16 @@ func (h *BoardColumnsHandler) updateBoardColumn(c *fiber.Ctx) error {
 	return c.JSON(boardColumn)
 }
 
+// getBoardColumnField godoc
+// @Summary Get board column field
+// @Description Get board column field
+// @Tags board_columns
+// @Accept json
+// @Produce json
+// @Param id path int true "Board column ID"
+// @Param field path string true "Field"
+// @Success 200 {object} models.TwBoardColumn
+// @Router /dbms/v1/board_columns/{id}/{field} [get]
 func (h *BoardColumnsHandler) getBoardColumnField(c *fiber.Ctx) error {
 	field := c.Params("field")
 	boardColumnId := c.Params("id")
@@ -121,6 +169,17 @@ func (h *BoardColumnsHandler) getBoardColumnField(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusInternalServerError).SendString("Invalid field")
 }
 
+// updateBoardColumnField godoc
+// @Summary Update board column field
+// @Description Update board column field
+// @Tags board_columns
+// @Accept json
+// @Produce json
+// @Param id path int true "Board column ID"
+// @Param field path string true "Field"
+// @Param body body models.TwBoardColumn true "Update board column request"
+// @Success 200 {object} models.TwBoardColumn
+// @Router /dbms/v1/board_columns/{id}/{field} [put]
 func (h *BoardColumnsHandler) updateBoardColumnField(c *fiber.Ctx) error {
 	field := c.Params("field")
 	boardColumnId := c.Params("id")
@@ -183,17 +242,31 @@ func (h *BoardColumnsHandler) updateBoardColumnField(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusInternalServerError).SendString("Invalid field")
 }
 
+// createBoardColumn godoc
+// @Summary Create board column
+// @Description Create board column
+// @Tags board_columns
+// @Accept json
+// @Produce json
+// @Param body body board_columns_dtos.BoardColumnsRequest true "Create board column request"
+// @Success 200 {object} models.TwBoardColumn
+// @Router /dbms/v1/board_columns [post]
 func (h *BoardColumnsHandler) createBoardColumn(c *fiber.Ctx) error {
 	// Parse the request
-	var createBoardColumnRequest models.TwBoardColumn
+	var createBoardColumnRequest board_columns_dtos.BoardColumnsRequest
 	if err := c.BodyParser(&createBoardColumnRequest); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
+	var boardColumn = models.TwBoardColumn{
+		Name:        createBoardColumnRequest.Name,
+		Position:    createBoardColumnRequest.Position,
+		WorkspaceId: createBoardColumnRequest.WorkspaceId,
+	}
 	// Create the board column
-	if result := h.DB.Create(&createBoardColumnRequest); result.Error != nil {
+	if result := h.DB.Create(&boardColumn); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
-	return c.JSON(createBoardColumnRequest)
+	return c.JSON(boardColumn)
 }

@@ -3,6 +3,7 @@ package feature
 import (
 	_ "dbms/docs"
 	"dbms/handlers/auth"
+	"dbms/handlers/board_columns"
 	"dbms/handlers/recurrence_exception"
 	"dbms/handlers/schedule"
 	"dbms/handlers/schedule_log"
@@ -33,5 +34,6 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	auth.RegisterAuthHandler(v1.Group("/auth"), db)
 	user_email.RegisterUserEmailHandler(v1.Group("/user_email"), db)
 	workspace.RegisterWorkspaceHandler(v1.Group("/workspace"), db)
+	board_columns.RegisterBoardColumnsHandler(v1.Group("/board_columns"), db)
 	return router
 }
