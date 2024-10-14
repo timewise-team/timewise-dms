@@ -3,8 +3,11 @@ package schedule_participant
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
+	"github.com/timewise-team/timewise-models/dtos/core_dtos/schedule_participant_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
+	"log"
+	"net/http"
 )
 
 // getScheduleParticipants godoc
@@ -125,4 +128,81 @@ func (h *ScheduleParticipantHandler) getScheduleParticipantByScheduleIdAndWorksp
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 	return c.JSON(scheduleParticipant)
+}
+
+// getScheduleParticipantsByScheduleId godoc
+// @Summary Get schedule participants by schedule ID
+// @Description Get schedule participants by schedule ID
+// @Tags schedule_participant
+// @Accept json
+// @Produce json
+// @Param scheduleId path string true "Schedule ID"
+// @Param workspaceId path string true "Workspace ID"
+// @Success 200 {array} schedule_participant_dtos.ScheduleParticipantInfo
+// @Router /dbms/v1/schedule_participant/workspace/{workspaceId}/schedule/{scheduleId} [get]
+func (h *ScheduleParticipantHandler) getScheduleParticipantsByScheduleId(c *fiber.Ctx) error {
+	var scheduleParticipants []schedule_participant_dtos.ScheduleParticipantInfo
+	scheduleId := c.Params("scheduleId")
+
+	if scheduleId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Schedule ID không hợp lệ",
+		})
+	}
+	workspaceId := c.Params("workspaceId")
+	if workspaceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Workspace ID không hợp lệ",
+		})
+	}
+
+	// Perform the SQL query with multiple joins
+	err := h.DB.Table("tw_schedule_participants AS sp").
+		Select(`
+            sp.id AS id,
+            sp.schedule_id,
+            sp.workspace_user_id,
+			sp.status,
+			sp.assign_at,
+			sp.assign_by,
+			sp.response_time,
+			sp.invitation_sent_at,
+			sp.invitation_status,
+			wu.role,
+			wu.status AS status_workspace_user,
+			wu.is_verified,
+			ue.id as user_id,
+			ue.email,
+			u.first_name,
+			u.last_name,
+			u.profile_picture
+            
+        `).
+		Joins("JOIN tw_workspace_users AS wu ON wu.id =sp.workspace_user_id").
+		Joins("JOIN tw_user_emails AS ue ON wu.user_email_id = ue.id").
+		Joins("JOIN tw_users AS u ON ue.user_id = u.id").
+		Where("sp.schedule_id = ?", scheduleId).
+		Where("wu.workspace_id = ?", workspaceId).
+		Where("sp.deleted_at IS NULL").
+		Where("wu.deleted_at IS NULL").
+		Where("ue.deleted_at IS NULL").
+		Where("u.deleted_at IS NULL").
+		Where("wu.is_active = true AND wu.is_verified = true AND wu.status = 'joined'").
+		Scan(&scheduleParticipants).Error
+
+	if err != nil {
+		log.Println("Error querying schedule participants:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Không thể lấy danh sách participant",
+		})
+	}
+
+	if err != nil {
+		log.Println(err)
+		return c.Status(http.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Không thể lấy workspace",
+		})
+	}
+
+	return c.JSON(scheduleParticipants)
 }

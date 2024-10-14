@@ -4,7 +4,9 @@ package workspace_user
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
+	workspaceUserDtos "github.com/timewise-team/timewise-models/dtos/core_dtos/workspace_user_dtos"
 	"github.com/timewise-team/timewise-models/models"
+
 	"gorm.io/gorm"
 	"net/http"
 	"net/url"
@@ -70,14 +72,43 @@ func (h *WorkspaceUserHandler) updateWorkspaceUser(c *fiber.Ctx) error {
 	return c.JSON(workspaceUser)
 }
 
+//func (h *WorkspaceUserHandler) getWorkspaceUsersByWorkspaceId(c *fiber.Ctx) error {
+//	var workspaceUsers []models.TwWorkspaceUser
+//	workspaceId := c.Params("workspace_id")
+//
+//	if result := h.DB.Where("workspace_id = ?", workspaceId).Find(&workspaceUsers); result.Error != nil {
+//		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+//	}
+//
+//	return c.JSON(workspaceUsers)
+//}
+
+// getWorkspaceUsersByWorkspaceId godoc
+// @Summary Get workspace users by workspace ID
+// @Description Get workspace users by workspace ID
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param workspace_id path string true "Workspace ID"
+// @Success 200 {array} workspaceUserDtos.GetWorkspaceUserListResponse
+// @Router /dbms/v1/workspace_user/workspace/{workspace_id} [get]
 func (h *WorkspaceUserHandler) getWorkspaceUsersByWorkspaceId(c *fiber.Ctx) error {
-	var workspaceUsers []models.TwWorkspaceUser
+	var workspaceUsers []workspaceUserDtos.GetWorkspaceUserListResponse
 	workspaceId := c.Params("workspace_id")
-
-	if result := h.DB.Where("workspace_id = ?", workspaceId).Find(&workspaceUsers); result.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	if workspaceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "workspace_id is required",
+		})
 	}
-
+	err := h.DB.Table("tw_workspace_users").
+		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture").
+		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
+		Joins("JOIN tw_users ON tw_user_emails.user_id = tw_users.id").
+		Where("tw_workspace_users.workspace_id = ? and tw_users.is_verified = true and tw_users.is_active = true and tw_workspace_users.status = 'joined' and tw_workspace_users.is_active = true and tw_workspace_users.is_verified=true", workspaceId).
+		Scan(&workspaceUsers).Error
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
 	return c.JSON(workspaceUsers)
 }
 
@@ -169,4 +200,24 @@ func (h *WorkspaceUserHandler) getWorkspaceUserByEmailAndWorkspace(c *fiber.Ctx)
 	}
 	return c.JSON(TWorkspaceUser)
 
+}
+
+func (h *WorkspaceUserHandler) GetWorkspaceUserInvitationList(c *fiber.Ctx) error {
+	var workspaceUsers []workspaceUserDtos.GetWorkspaceUserListResponse
+	workspaceId := c.Params("workspace_id")
+	if workspaceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "workspace_id is required",
+		})
+	}
+	err := h.DB.Table("tw_workspace_users").
+		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture").
+		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
+		Joins("JOIN tw_users ON tw_user_emails.user_id = tw_users.id").
+		Where("tw_workspace_users.workspace_id = ? and tw_users.is_verified = true and tw_users.is_active = true and tw_workspace_users.status != 'joined' and tw_workspace_users.is_active = true ", workspaceId).
+		Scan(&workspaceUsers).Error
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	return c.JSON(workspaceUsers)
 }
