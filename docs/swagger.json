@@ -224,6 +224,76 @@
                 }
             }
         },
+        "/dbms/v1/comment/schedule/{schedule_id}": {
+            "get": {
+                "description": "Get comments by schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comments"
+                ],
+                "summary": "Get comments by schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwComment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/document/schedule/{schedule_id}": {
+            "get": {
+                "description": "Get documents by schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Get documents by schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwDocument"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/recurrence_exception": {
             "get": {
                 "description": "Get all recurrence exceptions",
@@ -848,6 +918,48 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/schedule_participant/workspace/{workspaceId}/schedule/{scheduleId}": {
+            "get": {
+                "description": "Get schedule participants by schedule ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Get schedule participants by schedule ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "scheduleId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schedule_participant_dtos.ScheduleParticipantInfo"
+                            }
                         }
                     }
                 }
@@ -1699,6 +1811,41 @@
                 }
             }
         },
+        "/dbms/v1/workspace_user/workspace/{workspace_id}": {
+            "get": {
+                "description": "Get workspace users by workspace ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace users by workspace ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "description": "Get all users",
@@ -2229,6 +2376,94 @@
                 }
             }
         },
+        "models.TwComment": {
+            "type": "object",
+            "properties": {
+                "commenter": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "schedule": {
+                    "$ref": "#/definitions/models.TwSchedule"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "workspaceUser": {
+                    "$ref": "#/definitions/models.TwWorkspaceUser"
+                },
+                "workspace_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TwDocument": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "download_url": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_path": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
+                },
+                "file_type": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_deleted": {
+                    "type": "boolean"
+                },
+                "schedule": {
+                    "$ref": "#/definitions/models.TwSchedule"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "uploaded_at": {
+                    "type": "string"
+                },
+                "workspaceUser": {
+                    "$ref": "#/definitions/models.TwWorkspaceUser"
+                },
+                "workspace_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.TwSchedule": {
             "type": "object",
             "properties": {
@@ -2593,6 +2828,115 @@
                 },
                 "workspace": {
                     "$ref": "#/definitions/models.TwWorkspace"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                },
+                "workspace_key": {
+                    "type": "string"
+                }
+            }
+        },
+        "schedule_participant_dtos.ScheduleParticipantInfo": {
+            "type": "object",
+            "properties": {
+                "assign_at": {
+                    "type": "string"
+                },
+                "assign_by": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "invitation_sent_at": {
+                    "type": "string"
+                },
+                "invitation_status": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "profile_picture": {
+                    "type": "string"
+                },
+                "response_time": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "status_workspace_user": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "workspace_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "workspace_user_dtos.GetWorkspaceUserListResponse": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_active": {
+                    "type": "boolean"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "profile_picture": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_email_id": {
+                    "type": "integer"
                 },
                 "workspace_id": {
                     "type": "integer"
