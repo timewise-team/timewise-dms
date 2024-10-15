@@ -313,6 +313,64 @@ definitions:
       workspace_id:
         type: integer
     type: object
+  models.TwComment:
+    properties:
+      commenter:
+        type: string
+      content:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      is_deleted:
+        type: boolean
+      schedule:
+        $ref: '#/definitions/models.TwSchedule'
+      schedule_id:
+        type: integer
+      updated_at:
+        type: string
+      workspace_user_id:
+        type: integer
+      workspaceUser:
+        $ref: '#/definitions/models.TwWorkspaceUser'
+    type: object
+  models.TwDocument:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      download_url:
+        type: string
+      file_name:
+        type: string
+      file_path:
+        type: string
+      file_size:
+        type: integer
+      file_type:
+        type: string
+      id:
+        type: integer
+      is_deleted:
+        type: boolean
+      schedule:
+        $ref: '#/definitions/models.TwSchedule'
+      schedule_id:
+        type: integer
+      updated_at:
+        type: string
+      uploaded_at:
+        type: string
+      workspace_user_id:
+        type: integer
+      workspaceUser:
+        $ref: '#/definitions/models.TwWorkspaceUser'
+    type: object
   models.TwSchedule:
     properties:
       all_day:
@@ -559,6 +617,78 @@ definitions:
       workspace_key:
         type: string
     type: object
+  schedule_participant_dtos.ScheduleParticipantInfo:
+    properties:
+      assign_at:
+        type: string
+      assign_by:
+        type: integer
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      invitation_sent_at:
+        type: string
+      invitation_status:
+        type: string
+      is_verified:
+        type: boolean
+      last_name:
+        type: string
+      profile_picture:
+        type: string
+      response_time:
+        type: string
+      role:
+        type: string
+      schedule_id:
+        type: integer
+      status:
+        type: string
+      status_workspace_user:
+        type: string
+      user_id:
+        type: integer
+      workspace_user_id:
+        type: integer
+    type: object
+  workspace_user_dtos.GetWorkspaceUserListResponse:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      email:
+        type: string
+      extra_data:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      is_active:
+        type: boolean
+      is_verified:
+        type: boolean
+      last_name:
+        type: string
+      profile_picture:
+        type: string
+      role:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+      user_email_id:
+        type: integer
+      workspace_id:
+        type: integer
+      workspace_key:
+        type: string
+    type: object
 info:
   contact: {}
   description: Timewise database management system
@@ -709,6 +839,52 @@ paths:
       summary: Update board column field
       tags:
       - board_columns
+  /dbms/v1/comment/schedule/{schedule_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get comments by schedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwComment'
+            type: array
+      summary: Get comments by schedule
+      tags:
+      - comments
+  /dbms/v1/document/schedule/{schedule_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get documents by schedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwDocument'
+            type: array
+      summary: Get documents by schedule
+      tags:
+      - document
   /dbms/v1/recurrence_exception:
     get:
       consumes:
@@ -1191,6 +1367,34 @@ paths:
           schema:
             $ref: '#/definitions/models.TwScheduleParticipant'
       summary: Update schedule participant
+      tags:
+      - schedule_participant
+  /dbms/v1/schedule_participant/workspace/{workspaceId}/schedule/{scheduleId}:
+    get:
+      consumes:
+      - application/json
+      description: Get schedule participants by schedule ID
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: scheduleId
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schedule_participant_dtos.ScheduleParticipantInfo'
+            type: array
+      summary: Get schedule participants by schedule ID
       tags:
       - schedule_participant
   /dbms/v1/user:
@@ -1683,6 +1887,29 @@ paths:
       summary: Get workspaces by email
       tags:
       - workspace
+  /dbms/v1/workspace_user/workspace/{workspace_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspace users by workspace ID
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
+            type: array
+      summary: Get workspace users by workspace ID
+      tags:
+      - workspace_user
   /users:
     get:
       consumes:

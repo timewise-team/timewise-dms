@@ -270,3 +270,25 @@ func (h *BoardColumnsHandler) createBoardColumn(c *fiber.Ctx) error {
 	}
 	return c.JSON(boardColumn)
 }
+
+func (h *BoardColumnsHandler) GetSchedulesByBoardColumn(c *fiber.Ctx) error {
+	boardColumnId := c.Params("board_column_id")
+	workspaceId := c.Params("workspace_id")
+	if boardColumnId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid board column ID",
+		})
+	}
+	var schedules []models.TwSchedule
+	if result := h.DB.Where("board_column_id = ? and workspace_id =?", boardColumnId, workspaceId).Order("created_at").Find(&schedules); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": result.Error.Error(),
+		})
+	}
+	if schedules == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Failed to get schedules",
+		})
+	}
+	return c.JSON(schedules)
+}

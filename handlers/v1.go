@@ -4,6 +4,8 @@ import (
 	_ "dbms/docs"
 	"dbms/handlers/auth"
 	"dbms/handlers/board_columns"
+	comments "dbms/handlers/comments"
+	"dbms/handlers/document"
 	"dbms/handlers/recurrence_exception"
 	"dbms/handlers/schedule"
 	"dbms/handlers/schedule_log"
@@ -35,5 +37,7 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	user_email.RegisterUserEmailHandler(v1.Group("/user_email"), db)
 	workspace.RegisterWorkspaceHandler(v1.Group("/workspace"), db)
 	board_columns.RegisterBoardColumnsHandler(v1.Group("/board_columns"), db)
+	document.RegisterDocumentHandler(v1.Group("/document"), db)
+	comments.RegisterCommentsHandler(v1.Group("/comment"), db)
 	return router
 }
