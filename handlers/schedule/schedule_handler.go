@@ -6,6 +6,7 @@ import (
 	"github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
+	"strconv"
 	"time"
 )
 
@@ -233,22 +234,22 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	}
 
 	schedule := models.TwSchedule{
-		WorkspaceId:       *scheduleDTO.WorkspaceID,
-		BoardColumnId:     *scheduleDTO.BoardColumnID,
-		Title:             *scheduleDTO.Title,
-		Description:       *scheduleDTO.Description,
-		StartTime:         *scheduleDTO.StartTime,
-		EndTime:           *scheduleDTO.EndTime,
-		Location:          *scheduleDTO.Location,
-		CreatedBy:         *scheduleDTO.WorkspaceUserID,
-		CreatedAt:         time.Now(),
-		UpdatedAt:         time.Now(),
-		Status:            *scheduleDTO.Status,
-		AllDay:            *scheduleDTO.AllDay,
-		Visibility:        *scheduleDTO.Visibility,
-		ExtraData:         *scheduleDTO.ExtraData,
-		IsDeleted:         false,
-		RecurrencePattern: *scheduleDTO.RecurrencePattern,
+		WorkspaceId:   *scheduleDTO.WorkspaceID,
+		BoardColumnId: *scheduleDTO.BoardColumnID,
+		Title:         *scheduleDTO.Title,
+		//Description:   *scheduleDTO.Description,
+		//StartTime:         *scheduleDTO.StartTime,
+		//EndTime:           *scheduleDTO.EndTime,
+		//Location:          *scheduleDTO.Location,
+		CreatedBy: *scheduleDTO.WorkspaceUserID,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		//Status:            *scheduleDTO.Status,
+		//AllDay:            *scheduleDTO.AllDay,
+		//Visibility:        *scheduleDTO.Visibility,
+		//ExtraData:         *scheduleDTO.ExtraData,
+		//IsDeleted:         false,
+		//RecurrencePattern: *scheduleDTO.RecurrencePattern,
 	}
 
 	if result := h.DB.Create(&schedule); result.Error != nil {
@@ -318,7 +319,13 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	}
 
 	var schedule models.TwSchedule
+
 	scheduleId := c.Params("schedule_id")
+	workspaceUserIdStr := c.Params("workspace_user_id")
+	workspaceUserId, err := strconv.Atoi(workspaceUserIdStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid workspace_user_id")
+	}
 
 	if err := h.DB.Where("id = ?", scheduleId).First(&schedule).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -327,61 +334,89 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
-	// Update the fields if they are provided (not nil)
+	// Tạo danh sách các log khi trường được cập nhật
+	var logs []models.TwScheduleLog
+
+	// So sánh từng trường và thêm log nếu có thay đổi
+	checkAndLog := func(field, oldValue, newValue string) {
+		if oldValue != newValue {
+			logs = append(logs, models.TwScheduleLog{
+				ScheduleId:      schedule.ID,
+				WorkspaceUserId: workspaceUserId,
+				Action:          "update schedule",
+				FieldChanged:    field,
+				OldValue:        oldValue,
+				NewValue:        newValue,
+			})
+		}
+	}
+
+	// Kiểm tra và cập nhật các trường nếu có thay đổi
 	if scheduleDTO.BoardColumnID != nil {
+		checkAndLog("board_column_id", strconv.Itoa(schedule.BoardColumnId), strconv.Itoa(*scheduleDTO.BoardColumnID))
 		schedule.BoardColumnId = *scheduleDTO.BoardColumnID
 	}
 	if scheduleDTO.Title != nil {
+		checkAndLog("title", schedule.Title, *scheduleDTO.Title)
 		schedule.Title = *scheduleDTO.Title
 	}
 	if scheduleDTO.Description != nil {
+		checkAndLog("description", schedule.Description, *scheduleDTO.Description)
 		schedule.Description = *scheduleDTO.Description
 	}
 	if scheduleDTO.StartTime != nil {
+		checkAndLog("start_time", schedule.StartTime.String(), scheduleDTO.StartTime.String())
 		schedule.StartTime = *scheduleDTO.StartTime
 	}
 	if scheduleDTO.EndTime != nil {
+		checkAndLog("end_time", schedule.EndTime.String(), scheduleDTO.EndTime.String())
 		schedule.EndTime = *scheduleDTO.EndTime
 	}
 	if scheduleDTO.Location != nil {
+		checkAndLog("location", schedule.Location, *scheduleDTO.Location)
 		schedule.Location = *scheduleDTO.Location
 	}
 	if scheduleDTO.Status != nil {
+		checkAndLog("status", schedule.Status, *scheduleDTO.Status)
 		schedule.Status = *scheduleDTO.Status
 	}
 	if scheduleDTO.AllDay != nil {
+		checkAndLog("all_day", strconv.FormatBool(schedule.AllDay), strconv.FormatBool(*scheduleDTO.AllDay))
 		schedule.AllDay = *scheduleDTO.AllDay
 	}
 	if scheduleDTO.Visibility != nil {
+		checkAndLog("visibility", schedule.Visibility, *scheduleDTO.Visibility)
 		schedule.Visibility = *scheduleDTO.Visibility
 	}
 	if scheduleDTO.ExtraData != nil {
+		checkAndLog("extra_data", schedule.ExtraData, *scheduleDTO.ExtraData)
 		schedule.ExtraData = *scheduleDTO.ExtraData
 	}
 	if scheduleDTO.IsDeleted != nil {
+		checkAndLog("is_deleted", strconv.FormatBool(schedule.IsDeleted), strconv.FormatBool(*scheduleDTO.IsDeleted))
 		schedule.IsDeleted = *scheduleDTO.IsDeleted
 	}
 	if scheduleDTO.RecurrencePattern != nil {
+		checkAndLog("recurrence_pattern", schedule.RecurrencePattern, *scheduleDTO.RecurrencePattern)
 		schedule.RecurrencePattern = *scheduleDTO.RecurrencePattern
 	}
 
 	// Update the timestamp
 	schedule.UpdatedAt = time.Now()
 
+	// Save the updated schedule
 	if result := h.DB.Omit("deleted_at").Save(&schedule); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
-	newScheduleLog := models.TwScheduleLog{
-		ScheduleId:      schedule.ID,
-		WorkspaceUserId: schedule.WorkspaceId,
-		Action:          "update schedule",
+	// Thêm tất cả các log vào cơ sở dữ liệu
+	if len(logs) > 0 {
+		if result := h.DB.Create(&logs); result.Error != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+		}
 	}
 
-	if result := h.DB.Create(&newScheduleLog); result.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
-	}
-
+	// Trả về kết quả cập nhật thành công
 	return c.JSON(core_dtos.TwUpdateScheduleResponse{
 		ID:                schedule.ID,
 		WorkspaceID:       schedule.WorkspaceId,
@@ -414,6 +449,11 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 // @Router /dbms/v1/schedule/{schedule_id} [delete]
 func (h *ScheduleHandler) DeleteSchedule(c *fiber.Ctx) error {
 	scheduleId := c.Params("schedule_id")
+	workspaceUserIdStr := c.Params("workspace_user_id")
+	workspaceUserId, err := strconv.Atoi(workspaceUserIdStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid workspace_user_id")
+	}
 
 	var schedule models.TwSchedule
 	if err := h.DB.Where("id = ?", scheduleId).First(&schedule).Error; err != nil {
@@ -429,6 +469,16 @@ func (h *ScheduleHandler) DeleteSchedule(c *fiber.Ctx) error {
 	schedule.DeletedAt = time.Now()
 
 	if result := h.DB.Save(&schedule); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	newScheduleLog := models.TwScheduleLog{
+		ScheduleId:      schedule.ID,
+		WorkspaceUserId: workspaceUserId,
+		Action:          "delete schedule",
+	}
+
+	if result := h.DB.Create(&newScheduleLog); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
