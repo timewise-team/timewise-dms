@@ -1819,6 +1819,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/invitation/workspace/{workspace_id}": {
+            "get": {
+                "description": "Get workspace user invitation list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace user invitation list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/workspace/{workspace_id}": {
             "get": {
                 "description": "Get workspace users by workspace ID",

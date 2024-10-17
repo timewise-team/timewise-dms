@@ -15,4 +15,5 @@ func RegisterWorkspaceLogHandler(router fiber.Router, db *gorm.DB) {
 	router.Get("/", workspaceLogHandler.getWorkspaceLog)
 	router.Get("/:workspace_log_id", workspaceLogHandler.getWorkspaceLogById)
 	router.Delete("/:workspace_log_id", workspaceLogHandler.removeWorkspaceLogById)
+	router.Post("/", workspaceLogHandler.createWorkspaceLog)
 }
