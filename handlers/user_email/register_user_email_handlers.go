@@ -22,4 +22,5 @@ func RegisterUserEmailHandler(router fiber.Router, db *gorm.DB) {
 	router.Post("/", userEmailHandler.createUserEmail)
 	//router.Put("/:email_id", userEmailHandler.updateUserEmail)
 	router.Delete("/:email_id", userEmailHandler.deleteUserEmail)
+	router.Get("/search/:query", userEmailHandler.searchUserEmail)
 }

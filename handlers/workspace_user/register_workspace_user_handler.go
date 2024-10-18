@@ -25,4 +25,5 @@ func RegisterWorkspaceUserHandler(router fiber.Router, db *gorm.DB) {
 	router.Get("/email/:email/workspace/:workspace_id", workspaceUserHandler.getWorkspaceUserByEmailAndWorkspace)
 	router.Get("/invitation/workspace/:workspace_id", workspaceUserHandler.GetWorkspaceUserInvitationList)
 	router.Put("/:workspace_user_id/workspace/:workspace_id/", workspaceUserHandler.DeleteWorkspaceUser)
+	router.Put("/role/workspace/:workspace_id", workspaceUserHandler.UpdateRole)
 }

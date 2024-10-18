@@ -264,3 +264,50 @@ func (h *WorkspaceUserHandler) DeleteWorkspaceUser(c *fiber.Ctx) error {
 		"message": "User deleted successfully",
 	})
 }
+
+// UpdateRole godoc
+// @Summary Update role of workspace user
+// @Description Update role of workspace user
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param workspace_id path string true "Workspace ID"
+// @Param workspace_user body workspaceUserDtos.UpdateWorkspaceUserRoleRequest true "Update role request"
+// @Success 200 {object} fiber.Map
+// @Router /dbms/v1/workspace_user/role/workspace/{workspace_id} [put]
+func (h *WorkspaceUserHandler) UpdateRole(c *fiber.Ctx) error {
+	workspaceId := c.Params("workspace_id")
+	if workspaceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Workspace is required",
+		})
+	}
+	var workspaceUserRequest workspaceUserDtos.UpdateWorkspaceUserRoleRequest
+	if err := c.BodyParser(&workspaceUserRequest); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	var workspaceUser models.TwWorkspaceUser
+	err := h.DB.Where("email = ? and workspace_id = ?", workspaceUserRequest.Email, workspaceId).
+		Where("deleted_at IS NULL").
+		First(&workspaceUser).Error
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	if workspaceUser.ID == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Workspace User not found",
+		})
+	}
+
+	if result := h.DB.Model(&workspaceUser).
+		Updates(map[string]interface{}{
+			"role":       workspaceUserRequest.Role,
+			"updated_at": gorm.Expr("NOW()"),
+		}); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Role updated successfully",
+	})
+}
