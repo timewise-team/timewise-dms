@@ -771,7 +771,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/models.TwBoardColumn'
+          $ref: '#/definitions/board_columns_dtos.BoardColumnsRequest'
       produces:
       - application/json
       responses:
