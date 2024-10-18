@@ -294,6 +294,9 @@ definitions:
       message:
         type: string
     type: object
+  fiber.Map:
+    additionalProperties: true
+    type: object
   models.TwBoardColumn:
     properties:
       created_at:
@@ -654,6 +657,19 @@ definitions:
       workspace_user_id:
         type: integer
     type: object
+  user_email_dtos.SearchUserEmailResponse:
+    properties:
+      email:
+        type: string
+      first_name:
+        type: string
+      id:
+        type: integer
+      last_name:
+        type: string
+      profile_picture:
+        type: string
+    type: object
   workspace_user_dtos.GetWorkspaceUserListResponse:
     properties:
       created_at:
@@ -687,6 +703,13 @@ definitions:
       workspace_id:
         type: integer
       workspace_key:
+        type: string
+    type: object
+  workspace_user_dtos.UpdateWorkspaceUserRoleRequest:
+    properties:
+      email:
+        type: string
+      role:
         type: string
     type: object
 info:
@@ -1548,6 +1571,29 @@ paths:
       summary: Get user emails by email
       tags:
       - user_email
+  /dbms/v1/user_email/search/{query}:
+    get:
+      consumes:
+      - application/json
+      description: Search user email
+      parameters:
+      - description: Query
+        in: path
+        name: query
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/user_email_dtos.SearchUserEmailResponse'
+            type: array
+      summary: Search user email
+      tags:
+      - user_email
   /dbms/v1/user_email/user/{user_id}:
     get:
       consumes:
@@ -1908,6 +1954,33 @@ paths:
               $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
             type: array
       summary: Get workspace user invitation list
+      tags:
+      - workspace_user
+  /dbms/v1/workspace_user/role/workspace/{workspace_id}:
+    put:
+      consumes:
+      - application/json
+      description: Update role of workspace user
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      - description: Update role request
+        in: body
+        name: workspace_user
+        required: true
+        schema:
+          $ref: '#/definitions/workspace_user_dtos.UpdateWorkspaceUserRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+      summary: Update role of workspace user
       tags:
       - workspace_user
   /dbms/v1/workspace_user/workspace/{workspace_id}:

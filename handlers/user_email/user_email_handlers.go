@@ -4,7 +4,9 @@ import (
 	"errors"
 	"github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
+	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_email_dtos"
 	"github.com/timewise-team/timewise-models/models"
+	"log"
 	"net/url"
 )
 
@@ -157,4 +159,42 @@ func (h *UserEmailHandler) getUserEmailByEmail(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(userEmails)
+}
+
+// @Summary Search user email
+// @Description Search user email
+// @Tags user_email
+// @Accept json
+// @Produce json
+// @Param query path string true "Query"
+// @Success 200 {array} user_email_dtos.SearchUserEmailResponse
+// @Router /dbms/v1/user_email/search/{query} [get]
+func (h *UserEmailHandler) searchUserEmail(c *fiber.Ctx) error {
+	query := c.Params("query")
+	queryFix, err := url.QueryUnescape(query)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	var userEmailInfo []user_email_dtos.SearchUserEmailResponse
+
+	err = h.DB.
+		Table("tw_user_emails").
+		Select("tw_user_emails.id, tw_user_emails.email, tw_users.first_name, tw_users.last_name, tw_users.profile_picture").
+		Joins("JOIN tw_users ON tw_user_emails.email = tw_users.email").
+		Where("tw_user_emails.email LIKE ? OR tw_users.first_name LIKE ? OR tw_users.last_name LIKE ?", "%"+queryFix+"%", "%"+queryFix+"%", "%"+queryFix+"%").
+		Where("tw_user_emails.deleted_at IS NULL").
+		Where("tw_users.deleted_at IS NULL").
+		Scan(&userEmailInfo).Error
+
+	if err != nil {
+		log.Println(err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Không thể lấy dữ liệu người dùng",
+		})
+	}
+
+	return c.JSON(userEmailInfo)
 }

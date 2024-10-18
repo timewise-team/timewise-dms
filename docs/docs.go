@@ -1272,6 +1272,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/user_email/search/{query}": {
+            "get": {
+                "description": "Search user email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Search user email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Query",
+                        "name": "query",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/user_email_dtos.SearchUserEmailResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/user_email/user/{user_id}": {
             "get": {
                 "description": "Get user emails by user ID",
@@ -1854,6 +1889,47 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/role/workspace/{workspace_id}": {
+            "put": {
+                "description": "Update role of workspace user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Update role of workspace user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update role request",
+                        "name": "workspace_user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/workspace_user_dtos.UpdateWorkspaceUserRoleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/workspace/{workspace_id}": {
             "get": {
                 "description": "Get workspace users by workspace ID",
@@ -2389,6 +2465,10 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "fiber.Map": {
+            "type": "object",
+            "additionalProperties": true
         },
         "models.TwBoardColumn": {
             "type": "object",
@@ -2936,6 +3016,26 @@ const docTemplate = `{
                 }
             }
         },
+        "user_email_dtos.SearchUserEmailResponse": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "profile_picture": {
+                    "type": "string"
+                }
+            }
+        },
         "workspace_user_dtos.GetWorkspaceUserListResponse": {
             "type": "object",
             "properties": {
@@ -2985,6 +3085,17 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "workspace_key": {
+                    "type": "string"
+                }
+            }
+        },
+        "workspace_user_dtos.UpdateWorkspaceUserRoleRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "role": {
                     "type": "string"
                 }
             }
