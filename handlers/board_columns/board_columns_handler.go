@@ -6,6 +6,7 @@ import (
 	"github.com/timewise-team/timewise-models/dtos/core_dtos/board_columns_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
+	"time"
 )
 
 // getBoardColumnsByWorkspace godoc
@@ -52,7 +53,7 @@ func (h *BoardColumnsHandler) getBoardColumnsByWorkspace(c *fiber.Ctx) error {
 // @Router /dbms/v1/board_columns/{id} [get]
 func (h *BoardColumnsHandler) getBoardColumnById(c *fiber.Ctx) error {
 	var boardColumn models.TwBoardColumn
-	boardColumnId := c.Params("id")
+	boardColumnId := c.Params("board_column_id")
 
 	if err := h.DB.Where("id = ?", boardColumnId).First(&boardColumn).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -73,7 +74,7 @@ func (h *BoardColumnsHandler) getBoardColumnById(c *fiber.Ctx) error {
 // @Success 204
 // @Router /dbms/v1/board_columns/{id} [delete]
 func (h *BoardColumnsHandler) deleteBoardColumn(c *fiber.Ctx) error {
-	boardColumnId := c.Params("id")
+	boardColumnId := c.Params("board_column_id")
 	var boardColumn models.TwBoardColumn
 	if result := h.DB.Where("id = ?", boardColumnId).Delete(&boardColumn); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
@@ -88,11 +89,11 @@ func (h *BoardColumnsHandler) deleteBoardColumn(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param id path int true "Board column ID"
-// @Param body body models.TwBoardColumn true "Update board column request"
+// @Param body body board_columns_dtos.BoardColumnsRequest true "Update board column request"
 // @Success 200 {object} models.TwBoardColumn
 // @Router /dbms/v1/board_columns/{id} [put]
 func (h *BoardColumnsHandler) updateBoardColumn(c *fiber.Ctx) error {
-	boardColumnId := c.Params("id")
+	boardColumnId := c.Params("board_column_id")
 	var boardColumn models.TwBoardColumn
 	if err := h.DB.Where("id = ?", boardColumnId).First(&boardColumn).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -101,16 +102,25 @@ func (h *BoardColumnsHandler) updateBoardColumn(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 	// Parse the request
-	var updateBoardColumnRequest models.TwBoardColumn
+	var updateBoardColumnRequest board_columns_dtos.BoardColumnsRequest
 	if err := c.BodyParser(&updateBoardColumnRequest); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
-	// Update the board column
-	if result := h.DB.Model(&boardColumn).Updates(updateBoardColumnRequest); result.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	boardColumn.Name = updateBoardColumnRequest.Name
+	boardColumn.Position = updateBoardColumnRequest.Position
+	boardColumn.UpdatedAt = time.Now()
+
+	if err := h.DB.Model(&boardColumn).
+		Updates(map[string]interface{}{
+			"name":       boardColumn.Name,
+			"position":   boardColumn.Position,
+			"updated_at": gorm.Expr("NOW()"),
+		}).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
+
 	return c.JSON(boardColumn)
 }
 
@@ -126,7 +136,7 @@ func (h *BoardColumnsHandler) updateBoardColumn(c *fiber.Ctx) error {
 // @Router /dbms/v1/board_columns/{id}/{field} [get]
 func (h *BoardColumnsHandler) getBoardColumnField(c *fiber.Ctx) error {
 	field := c.Params("field")
-	boardColumnId := c.Params("id")
+	boardColumnId := c.Params("board_column_id")
 	if boardColumnId == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid board column ID",
@@ -182,7 +192,7 @@ func (h *BoardColumnsHandler) getBoardColumnField(c *fiber.Ctx) error {
 // @Router /dbms/v1/board_columns/{id}/{field} [put]
 func (h *BoardColumnsHandler) updateBoardColumnField(c *fiber.Ctx) error {
 	field := c.Params("field")
-	boardColumnId := c.Params("id")
+	boardColumnId := c.Params("board_column_id")
 	if boardColumnId == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid board column ID",
