@@ -103,7 +103,7 @@ func (h *WorkspaceUserHandler) getWorkspaceUsersByWorkspaceId(c *fiber.Ctx) erro
 	err := h.DB.Table("tw_workspace_users").
 		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
-		Joins("JOIN tw_users ON tw_user_emails.user_id = tw_users.id").
+		Joins("JOIN tw_users ON tw_user_emails.email = tw_users.email").
 		Where("tw_workspace_users.deleted_at IS NULL").
 		Where("tw_user_emails.deleted_at IS NULL").
 		Where("tw_users.deleted_at IS NULL").
@@ -225,7 +225,7 @@ func (h *WorkspaceUserHandler) GetWorkspaceUserInvitationList(c *fiber.Ctx) erro
 	err := h.DB.Table("tw_workspace_users").
 		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
-		Joins("JOIN tw_users ON tw_user_emails.user_id = tw_users.id").
+		Joins("JOIN tw_users ON tw_user_emails.email = tw_users.email").
 		Where("tw_workspace_users.workspace_id = ? and tw_users.is_verified = true and tw_users.is_active = true and tw_workspace_users.status != 'joined' and tw_workspace_users.is_active = true ", workspaceId).
 		Scan(&workspaceUsers).Error
 	if err != nil {
