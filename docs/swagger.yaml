@@ -908,6 +908,31 @@ paths:
       summary: Get documents by schedule
       tags:
       - document
+  /dbms/v1/email_synced/{email}:
+    get:
+      consumes:
+      - application/json
+      description: Get all emails synced with an email
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of emails synced with the email
+          schema:
+            $ref: '#/definitions/models.TwUserEmail'
+        "400":
+          description: Email is not synced any other emails
+          schema:
+            $ref: '#/definitions/fiber.Map'
+      summary: Get all emails synced with an email
+      tags:
+      - Email Synced
   /dbms/v1/recurrence_exception:
     get:
       consumes:
