@@ -6,6 +6,7 @@ import (
 	"dbms/handlers/board_columns"
 	comments "dbms/handlers/comments"
 	"dbms/handlers/document"
+	"dbms/handlers/email_synced"
 	"dbms/handlers/recurrence_exception"
 	"dbms/handlers/schedule"
 	"dbms/handlers/schedule_log"
@@ -39,5 +40,6 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	board_columns.RegisterBoardColumnsHandler(v1.Group("/board_columns"), db)
 	document.RegisterDocumentHandler(v1.Group("/document"), db)
 	comments.RegisterCommentsHandler(v1.Group("/comment"), db)
+	email_synced.RegisterEmailSyncedHandler(v1.Group("/email_synced"), db)
 	return router
 }

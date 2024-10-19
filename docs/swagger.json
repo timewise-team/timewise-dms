@@ -294,6 +294,44 @@
                 }
             }
         },
+        "/dbms/v1/email_synced/{email}": {
+            "get": {
+                "description": "Get all emails synced with an email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Email Synced"
+                ],
+                "summary": "Get all emails synced with an email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of emails synced with the email",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    },
+                    "400": {
+                        "description": "Email is not synced any other emails",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/recurrence_exception": {
             "get": {
                 "description": "Get all recurrence exceptions",
