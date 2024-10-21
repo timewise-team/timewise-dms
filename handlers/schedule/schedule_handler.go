@@ -208,6 +208,7 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 		Status:            schedule.Status,
 		AllDay:            schedule.AllDay,
 		Visibility:        schedule.Visibility,
+		VideoTranscript:   &schedule.VideoTranscript,
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
