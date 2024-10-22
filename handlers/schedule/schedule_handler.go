@@ -234,6 +234,11 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
+	var existingSchedules []models.TwSchedule
+	if err := h.DB.Where("board_column_id = ?", *scheduleDTO.BoardColumnID).Find(&existingSchedules).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
 	schedule := models.TwSchedule{
 		WorkspaceId:   *scheduleDTO.WorkspaceID,
 		BoardColumnId: *scheduleDTO.BoardColumnID,
@@ -251,6 +256,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		//ExtraData:         *scheduleDTO.ExtraData,
 		//IsDeleted:         false,
 		//RecurrencePattern: *scheduleDTO.RecurrencePattern,
+		Position: len(existingSchedules) + 1,
 	}
 
 	if result := h.DB.Create(&schedule); result.Error != nil {
@@ -283,23 +289,11 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	}
 
 	return c.Status(fiber.StatusCreated).JSON(core_dtos.TwCreateShecduleResponse{
-		ID:                schedule.ID,
-		WorkspaceID:       schedule.WorkspaceId,
-		BoardColumnID:     schedule.BoardColumnId,
-		Title:             schedule.Title,
-		Description:       schedule.Description,
-		StartTime:         schedule.StartTime,
-		EndTime:           schedule.EndTime,
-		Location:          schedule.Location,
-		CreatedBy:         schedule.CreatedBy,
-		CreatedAt:         schedule.CreatedAt,
-		UpdatedAt:         schedule.UpdatedAt,
-		Status:            schedule.Status,
-		AllDay:            schedule.AllDay,
-		Visibility:        schedule.Visibility,
-		ExtraData:         schedule.ExtraData,
-		IsDeleted:         schedule.IsDeleted,
-		RecurrencePattern: schedule.RecurrencePattern,
+		ID:            schedule.ID,
+		WorkspaceID:   schedule.WorkspaceId,
+		BoardColumnID: schedule.BoardColumnId,
+		Title:         schedule.Title,
+		Position:      schedule.Position,
 	})
 }
 
@@ -338,7 +332,7 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	// Tạo danh sách các log khi trường được cập nhật
 	var logs []models.TwScheduleLog
 
-	// So sánh từng trường và thêm log nếu có thay đổi
+	// Hàm phụ: Kiểm tra và ghi log nếu có thay đổi
 	checkAndLog := func(field, oldValue, newValue string) {
 		if oldValue != newValue {
 			logs = append(logs, models.TwScheduleLog{
@@ -402,15 +396,25 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		schedule.RecurrencePattern = *scheduleDTO.RecurrencePattern
 	}
 
-	// Update the timestamp
+	// **Kiểm tra và cập nhật trường position và priority nếu có thay đổi**
+	if scheduleDTO.Position != nil {
+		checkAndLog("position", strconv.Itoa(schedule.Position), strconv.Itoa(*scheduleDTO.Position))
+		schedule.Position = *scheduleDTO.Position
+	}
+	if scheduleDTO.Priority != nil {
+		checkAndLog("priority", schedule.Priority, *scheduleDTO.Priority)
+		schedule.Priority = *scheduleDTO.Priority
+	}
+
+	// Update timestamp
 	schedule.UpdatedAt = time.Now()
 
-	// Save the updated schedule
+	// Lưu schedule đã cập nhật
 	if result := h.DB.Omit("deleted_at").Save(&schedule); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
-	// Thêm tất cả các log vào cơ sở dữ liệu
+	// Thêm các log vào cơ sở dữ liệu
 	if len(logs) > 0 {
 		if result := h.DB.Create(&logs); result.Error != nil {
 			return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
@@ -436,6 +440,8 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
+		Position:          schedule.Position,
+		Priority:          schedule.Priority,
 	})
 }
 
@@ -464,13 +470,25 @@ func (h *ScheduleHandler) DeleteSchedule(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
-	// Soft delete by setting IsDeleted to true
 	schedule.IsDeleted = true
 	schedule.UpdatedAt = time.Now()
 	schedule.DeletedAt = time.Now()
 
-	if result := h.DB.Save(&schedule); result.Error != nil {
+	if result := h.DB.Omit("start_time,end_time").Save(&schedule); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	var schedulesToUpdate []models.TwSchedule
+	if err := h.DB.Where("board_column_id = ? AND position > ? AND is_deleted != 1", schedule.BoardColumnId, schedule.Position).
+		Order("position ASC").Find(&schedulesToUpdate).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	for i := range schedulesToUpdate {
+		schedulesToUpdate[i].Position -= 1
+		if err := h.DB.Omit("deleted_at,start_time,end_time").Save(&schedulesToUpdate[i]).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
 	}
 
 	newScheduleLog := models.TwScheduleLog{
