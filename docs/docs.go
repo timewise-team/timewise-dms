@@ -267,6 +267,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/comment/schedule_id/{schedule_id}": {
+            "get": {
+                "description": "Get comments by schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comments"
+                ],
+                "summary": "Get comments by schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwComment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/document/schedule/{schedule_id}": {
             "get": {
                 "description": "Get documents by schedule",
@@ -969,6 +1004,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/schedule_participant/schedule/{scheduleId}": {
+            "get": {
+                "description": "Get schedule participants by schedule ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Get schedule participants by schedule ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "scheduleId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schedule_participant_dtos.ScheduleParticipantInfo"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/schedule_participant/workspace/{workspaceId}/schedule/{scheduleId}": {
             "get": {
                 "description": "Get schedule participants by schedule ID",
@@ -1146,6 +1223,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/user-email": {
+            "post": {
+                "description": "Create a new user email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Create a new user email",
+                "parameters": [
+                    {
+                        "description": "User Email",
+                        "name": "email",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/user/{id}": {
             "put": {
                 "description": "Update user by ID",
@@ -1238,38 +1349,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.TwUserEmail"
                             }
-                        }
-                    }
-                }
-            },
-            "post": {
-                "description": "Create a new user email",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user_email"
-                ],
-                "summary": "Create a new user email",
-                "parameters": [
-                    {
-                        "description": "User Email",
-                        "name": "email",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.TwUserEmail"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TwUserEmail"
                         }
                     }
                 }
@@ -2029,6 +2108,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/{email}": {
+            "get": {
+                "description": "Get user by email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get user by email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUser"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{id}": {
             "get": {
                 "description": "Get user by ID",
@@ -2659,6 +2770,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "location": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
                     "type": "string"
                 },
                 "recurrence_pattern": {

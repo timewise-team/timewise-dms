@@ -53,6 +53,29 @@ func (h *UserHandler) getUserById(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
+// GET /users/{email}
+// getUserByEmail godoc
+// @Summary Get user by email
+// @Description Get user by email
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param email path string true "User Email"
+// @Success 200 {object} models.TwUser
+// @Router /users/{email} [get]
+func (h *UserHandler) getUserByEmail(c *fiber.Ctx) error {
+	var user models.TwUser
+	email := c.Params("email")
+
+	if err := h.DB.Where("email = ?", email).First(&user).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("User not found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	return c.JSON(user)
+}
+
 // POST /users
 // createUser godoc
 // @Summary Create a new user

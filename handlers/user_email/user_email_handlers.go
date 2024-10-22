@@ -63,7 +63,7 @@ func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
 // @Produce json
 // @Param email body models.TwUserEmail true "User Email"
 // @Success 200 {object} models.TwUserEmail
-// @Router /dbms/v1/user_email [post]
+// @Router /dbms/v1/user-email [post]
 func (h *UserEmailHandler) createUserEmail(ctx *fiber.Ctx) error {
 	userEmail := new(models.TwUserEmail)
 	if err := ctx.BodyParser(userEmail); err != nil {
