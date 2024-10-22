@@ -18,5 +18,6 @@ func RegisterCommentsHandler(router fiber.Router, db *gorm.DB) {
 
 	// Register all endpoints here
 	router.Get("/schedule/:schedule_id", commentHandler.getCommentsBySchedule)
+	router.Get("/schedule_id/:schedule_id", commentHandler.getCommentsByScheduleID)
 
 }

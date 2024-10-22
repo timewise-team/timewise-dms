@@ -18,5 +18,5 @@ func RegisterDocumentHandler(router fiber.Router, db *gorm.DB) {
 
 	// Register all endpoints here
 	router.Get("/schedule/:schedule_id", documentHandler.getDocumentsBySchedule)
-
+	router.Get("/schedule_id/:schedule_id", documentHandler.getDocumentsByScheduleID)
 }

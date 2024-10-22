@@ -3,8 +3,10 @@ package schedule_log
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
+	"github.com/timewise-team/timewise-models/dtos/core_dtos/schedule_log_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
+	"log"
 )
 
 // getScheduleLogs godoc
@@ -112,4 +114,58 @@ func (h *ScheduleLogHandler) createScheduleLog(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return c.JSON(scheduleLog)
+}
+
+func (h *ScheduleLogHandler) getScheduleLogsByScheduleID(c *fiber.Ctx) error {
+	var scheduleLogs []schedule_log_dtos.TwScheduleLogResponse
+	scheduleId := c.Params("scheduleId")
+
+	if scheduleId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Schedule ID không hợp lệ",
+		})
+	}
+
+	// Perform the SQL query with multiple joins
+	err := h.DB.Table("tw_schedule_logs AS sl").
+		Select(`
+            sl.id AS id,
+            sl.created_at,
+            sl.updated_at,
+			sl.schedule_id,
+			sl.workspace_user_id,
+			sl.action,
+			sl.field_changed,
+			sl.old_value,
+			sl.new_value,
+			sl.description,
+			wu.role,
+			wu.status AS status_workspace_user,
+			wu.is_verified,
+			ue.id as user_id,
+			ue.email,
+			u.first_name,
+			u.last_name,
+			u.profile_picture
+            
+        `).
+		Joins("JOIN tw_workspace_users AS wu ON wu.id =sl.workspace_user_id").
+		Joins("JOIN tw_user_emails AS ue ON wu.user_email_id = ue.id").
+		Joins("JOIN tw_users AS u ON ue.user_id = u.id").
+		Where("sl.schedule_id = ?", scheduleId).
+		Where("sl.deleted_at IS NULL").
+		Where("wu.deleted_at IS NULL").
+		Where("ue.deleted_at IS NULL").
+		Where("u.deleted_at IS NULL").
+		Where("wu.is_active = true AND wu.is_verified = true AND wu.status = 'joined'").
+		Scan(&scheduleLogs).Error
+
+	if err != nil {
+		log.Println("Error querying schedule participants:", err)
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Không thể lấy danh sách participant",
+		})
+	}
+
+	return c.JSON(scheduleLogs)
 }
