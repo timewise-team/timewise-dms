@@ -7,7 +7,7 @@ require (
 	github.com/gofiber/swagger v1.1.0
 	github.com/spf13/viper v1.19.0
 	github.com/swaggo/swag v1.16.3
-	github.com/timewise-team/timewise-models v0.0.0-20241021154049-97d4bd98ac49
+	github.com/timewise-team/timewise-models v0.0.0-20241021165954-ec79f81e361a
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.11
 )
