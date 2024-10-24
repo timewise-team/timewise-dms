@@ -267,6 +267,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/comment/schedule_id/{schedule_id}": {
+            "get": {
+                "description": "Get comments by schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comments"
+                ],
+                "summary": "Get comments by schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwComment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/document/schedule/{schedule_id}": {
             "get": {
                 "description": "Get documents by schedule",
@@ -964,6 +999,48 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/schedule_participant/schedule/{scheduleId}": {
+            "get": {
+                "description": "Get schedule participants by schedule ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Get schedule participants by schedule ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "scheduleId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schedule_participant_dtos.ScheduleParticipantInfo"
+                            }
                         }
                     }
                 }
@@ -1853,6 +1930,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/disprove-invitation/workspace/{workspace_id}/email/{email}": {
+            "put": {
+                "description": "Disprove member's request invitation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Disprove member's request invitation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/email/{email}/workspace/{workspace_id}": {
             "get": {
                 "description": "Get workspaces by email",
@@ -1968,6 +2084,139 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/update-status/email/{email}/workspace/{workspace_id}/status/{status}/isActive/{isActive}": {
+            "put": {
+                "description": "Update workspace user status by email and workspace",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Update workspace user status by email and workspace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status",
+                        "name": "status",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Is Active",
+                        "name": "isActive",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceUser"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_user/update-status/{workspace_user_id}": {
+            "put": {
+                "description": "Update workspace user status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Update workspace user status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace User ID",
+                        "name": "workspace_user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update status request",
+                        "name": "workspace_user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceUser"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_user/verify-invitation/workspace/{workspace_id}/email/{email}": {
+            "put": {
+                "description": "Verify member's request invitation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Verify member's request invitation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/workspace/{workspace_id}": {
             "get": {
                 "description": "Get workspace users by workspace ID",
@@ -1998,6 +2247,38 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_user/{workspace_user_id}/info": {
+            "get": {
+                "description": "Get workspace user info by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace user info by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace User ID",
+                        "name": "workspace_user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
                         }
                     }
                 }
@@ -2108,6 +2389,12 @@ const docTemplate = `{
                     "description": "Nullable field",
                     "type": "string"
                 },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "string"
+                },
                 "recurrence_pattern": {
                     "description": "Nullable field",
                     "type": "string"
@@ -2144,55 +2431,16 @@ const docTemplate = `{
         "core_dtos.TwCreateShecduleResponse": {
             "type": "object",
             "properties": {
-                "all_day": {
-                    "type": "boolean"
-                },
                 "board_column_id": {
                     "type": "integer"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "created_by": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "end_time": {
-                    "type": "string"
-                },
-                "extra_data": {
-                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "is_deleted": {
-                    "type": "boolean"
-                },
-                "location": {
-                    "type": "string"
-                },
-                "recurrence_pattern": {
-                    "type": "string"
-                },
-                "start_time": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
+                "position": {
+                    "type": "integer"
                 },
                 "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "video_transcript": {
-                    "type": "string"
-                },
-                "visibility": {
                     "type": "string"
                 },
                 "workspace_id": {
@@ -2311,6 +2559,12 @@ const docTemplate = `{
                 "location": {
                     "type": "string"
                 },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "string"
+                },
                 "recurrence_pattern": {
                     "type": "string"
                 },
@@ -2359,6 +2613,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "location": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
                     "type": "string"
                 },
                 "recurrence_pattern": {
@@ -2418,6 +2678,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "location": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
                     "type": "string"
                 },
                 "recurrence_pattern": {
@@ -2659,6 +2925,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "location": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
                     "type": "string"
                 },
                 "recurrence_pattern": {
