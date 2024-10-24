@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	workspaceUserDtos "github.com/timewise-team/timewise-models/dtos/core_dtos/workspace_user_dtos"
 	"github.com/timewise-team/timewise-models/models"
+	"strconv"
 
 	"gorm.io/gorm"
 	"net/http"
@@ -195,6 +196,8 @@ func (h *WorkspaceUserHandler) getWorkspaceUserByEmailAndWorkspace(c *fiber.Ctx)
 		Table("tw_workspace_users").
 		Select("tw_workspace_users.id, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key, tw_workspace_users.role, tw_workspace_users.status, tw_workspace_users.is_active,tw_workspace_users.is_verified,tw_workspace_users.extra_data").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
+		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_user_emails.deleted_at IS NULL").
 		Where("tw_user_emails.email = ? and tw_workspace_users.workspace_id=? ", emailFix, workspaceId).
 		Scan(&TWorkspaceUser).Error
 
@@ -310,4 +313,246 @@ func (h *WorkspaceUserHandler) UpdateRole(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Role updated successfully",
 	})
+}
+
+// verifyMemberInvitationRequest godoc
+// @Summary Verify member's request invitation
+// @Description Verify member's request invitation
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param email path string true "Email"
+// @Param workspace_id path string true "Workspace ID"
+// @Success 200 {object} fiber.Map
+// @Router /dbms/v1/workspace_user/verify-invitation/workspace/{workspace_id}/email/{email} [put]
+func (h *WorkspaceUserHandler) VerifyMemberInvitationRequest(c *fiber.Ctx) error {
+	workspaceId := c.Params("workspace_id")
+	if workspaceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Workspace is required",
+		})
+	}
+	email := c.Params("email")
+	if email == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email is required",
+		})
+	}
+	var workspaceUser models.TwWorkspaceUser
+	err := h.DB.Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
+		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", email, workspaceId).
+		Where("tw_workspace_users.deleted_at IS NULL").
+		First(&workspaceUser).Error
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	if workspaceUser.ID == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Workspace User not found",
+		})
+	}
+
+	if result := h.DB.Model(&workspaceUser).
+		Updates(map[string]interface{}{
+			"is_verified": true,
+			"updated_at":  gorm.Expr("NOW()"),
+		}); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Invitation verified successfully",
+	})
+}
+
+// disproveMemberInvitationRequest godoc
+// @Summary Disprove member's request invitation
+// @Description Disprove member's request invitation
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param email path string true "Email"
+// @Param workspace_id path string true "Workspace ID"
+// @Success 200 {object} fiber.Map
+// @Router /dbms/v1/workspace_user/disprove-invitation/workspace/{workspace_id}/email/{email} [put]
+func (h *WorkspaceUserHandler) DisproveMemberInvitationRequest(c *fiber.Ctx) error {
+	workspaceId := c.Params("workspace_id")
+	if workspaceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Workspace is required",
+		})
+	}
+	email := c.Params("email")
+	if email == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email is required",
+		})
+	}
+	var workspaceUser models.TwWorkspaceUser
+	err := h.DB.Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
+		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", email, workspaceId).
+		Where("tw_workspace_users.deleted_at IS NULL").
+		First(&workspaceUser).Error
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	if workspaceUser.ID == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Workspace User not found",
+		})
+	}
+
+	if result := h.DB.Model(&workspaceUser).
+		Updates(map[string]interface{}{
+			"is_verified": false,
+			"status":      "removed",
+			"updated_at":  gorm.Expr("NOW()"),
+		}); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"message": "Invitation disproved successfully",
+	})
+}
+
+// UpdateWorkspaceUserStatus godoc
+// @Summary Update workspace user status
+// @Description Update workspace user status
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param workspace_user_id path string true "Workspace User ID"
+// @Param workspace_user body models.TwWorkspaceUser true "Update status request"
+// @Success 200 {object} models.TwWorkspaceUser
+// @Router /dbms/v1/workspace_user/update-status/{workspace_user_id} [put]
+func (h *WorkspaceUserHandler) UpdateWorkspaceUserStatus(ctx *fiber.Ctx) error {
+	workspace_user_id := ctx.Params("workspace_user_id")
+	if workspace_user_id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "workspace_user_id is required",
+		})
+	}
+	var workspaceUser models.TwWorkspaceUser
+	if err := h.DB.Where("id = ?", workspace_user_id).First(&workspaceUser).Error; err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	if workspaceUser.ID == 0 {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Workspace User not found",
+		})
+	}
+	var workspaceUserRequest models.TwWorkspaceUser
+	if err := ctx.BodyParser(&workspaceUserRequest); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	if result := h.DB.Model(&workspaceUser).
+		Updates(map[string]interface{}{
+			"status":     workspaceUserRequest.Status,
+			"updated_at": gorm.Expr("NOW()"),
+			"role":       workspaceUserRequest.Role,
+		}); result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return ctx.Status(fiber.StatusOK).JSON(workspaceUser)
+
+}
+
+// GetWorkspaceUserInfoById godoc
+// @Summary Get workspace user info by ID
+// @Description Get workspace user info by ID
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param workspace_user_id path string true "Workspace User ID"
+// @Success 200 {object} workspaceUserDtos.GetWorkspaceUserListResponse
+// @Router /dbms/v1/workspace_user/{workspace_user_id}/info [get]
+func (h *WorkspaceUserHandler) GetWorkspaceUserInfoById(ctx *fiber.Ctx) error {
+
+	workspace_user_id := ctx.Params("workspace_user_id")
+	if workspace_user_id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "workspace_user_id is required",
+		})
+	}
+	var workspaceUser workspaceUserDtos.GetWorkspaceUserListResponse
+	err := h.DB.Table("tw_workspace_users").
+		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture").
+		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
+		Joins("JOIN tw_users ON tw_user_emails.email = tw_users.email").
+		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_user_emails.deleted_at IS NULL").
+		Where("tw_users.deleted_at IS NULL").
+		Where("tw_workspace_users.id = ? and tw_users.is_verified = true and tw_users.is_active = true and tw_workspace_users.status = 'joined' and tw_workspace_users.is_active = true ", workspace_user_id).
+		Scan(&workspaceUser).Error
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	return ctx.JSON(workspaceUser)
+}
+
+// UpdateWorkspaceUserStatusByEmailAndWorkspace godoc
+// @Summary Update workspace user status by email and workspace
+// @Description Update workspace user status by email and workspace
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param email path string true "Email"
+// @Param workspace_id path string true "Workspace ID"
+// @Param status path string true "Status"
+// @Param isActive path string true "Is Active"
+// @Success 200 {object} models.TwWorkspaceUser
+// @Router /dbms/v1/workspace_user/update-status/email/{email}/workspace/{workspace_id}/status/{status}/isActive/{isActive} [put]
+func (h *WorkspaceUserHandler) UpdateWorkspaceUserStatusByEmailAndWorkspace(ctx *fiber.Ctx) error {
+	email := ctx.Params("email")
+	if email == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "email is required",
+		})
+	}
+	workspace_id := ctx.Params("workspace_id")
+	if workspace_id == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "workspace_id is required",
+		})
+	}
+	status := ctx.Params("status")
+	if status == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "status is required",
+		})
+	}
+	isActive := ctx.Params("isActive")
+	if isActive == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "isActive is required",
+		})
+	}
+	isActiveBool, err := strconv.ParseBool(isActive)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "isActive must be a boolean",
+		})
+	}
+	var workspaceUser models.TwWorkspaceUser
+	err = h.DB.Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
+		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", email, workspace_id).
+		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_user_emails.deleted_at IS NULL").
+		First(&workspaceUser).Error
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	if workspaceUser.ID == 0 {
+		return ctx.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"error": "Workspace User not found",
+		})
+	}
+	if result := h.DB.Model(&workspaceUser).
+		Updates(map[string]interface{}{
+			"status":     status,
+			"updated_at": gorm.Expr("NOW()"),
+			"is_active":  isActiveBool,
+		}); result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return ctx.JSON(workspaceUser)
 }
