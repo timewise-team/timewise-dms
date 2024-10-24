@@ -1853,6 +1853,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/disprove-invitation/workspace/{workspace_id}/email/{email}": {
+            "put": {
+                "description": "Disprove member's request invitation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Disprove member's request invitation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/email/{email}/workspace/{workspace_id}": {
             "get": {
                 "description": "Get workspaces by email",
@@ -1968,6 +2007,139 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/update-status/email/{email}/workspace/{workspace_id}/status/{status}/isActive/{isActive}": {
+            "put": {
+                "description": "Update workspace user status by email and workspace",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Update workspace user status by email and workspace",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status",
+                        "name": "status",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Is Active",
+                        "name": "isActive",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceUser"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_user/update-status/{workspace_user_id}": {
+            "put": {
+                "description": "Update workspace user status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Update workspace user status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace User ID",
+                        "name": "workspace_user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Update status request",
+                        "name": "workspace_user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwWorkspaceUser"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_user/verify-invitation/workspace/{workspace_id}/email/{email}": {
+            "put": {
+                "description": "Verify member's request invitation",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Verify member's request invitation",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/workspace/{workspace_id}": {
             "get": {
                 "description": "Get workspace users by workspace ID",
@@ -1998,6 +2170,38 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_user/{workspace_user_id}/info": {
+            "get": {
+                "description": "Get workspace user info by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace user info by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace User ID",
+                        "name": "workspace_user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
                         }
                     }
                 }
@@ -2659,6 +2863,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "location": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
                     "type": "string"
                 },
                 "recurrence_pattern": {

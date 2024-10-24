@@ -398,6 +398,10 @@ definitions:
         type: boolean
       location:
         type: string
+      position:
+        type: integer
+      priority:
+        type: string
       recurrence_pattern:
         type: string
       start_time:
@@ -1932,6 +1936,53 @@ paths:
       summary: Get workspace log by ID
       tags:
       - workspace_log
+  /dbms/v1/workspace_user/{workspace_user_id}/info:
+    get:
+      consumes:
+      - application/json
+      description: Get workspace user info by ID
+      parameters:
+      - description: Workspace User ID
+        in: path
+        name: workspace_user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
+      summary: Get workspace user info by ID
+      tags:
+      - workspace_user
+  /dbms/v1/workspace_user/disprove-invitation/workspace/{workspace_id}/email/{email}:
+    put:
+      consumes:
+      - application/json
+      description: Disprove member's request invitation
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+      summary: Disprove member's request invitation
+      tags:
+      - workspace_user
   /dbms/v1/workspace_user/email/{email}/workspace/{workspace_id}:
     get:
       consumes:
@@ -2006,6 +2057,95 @@ paths:
           schema:
             $ref: '#/definitions/fiber.Map'
       summary: Update role of workspace user
+      tags:
+      - workspace_user
+  /dbms/v1/workspace_user/update-status/{workspace_user_id}:
+    put:
+      consumes:
+      - application/json
+      description: Update workspace user status
+      parameters:
+      - description: Workspace User ID
+        in: path
+        name: workspace_user_id
+        required: true
+        type: string
+      - description: Update status request
+        in: body
+        name: workspace_user
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwWorkspaceUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwWorkspaceUser'
+      summary: Update workspace user status
+      tags:
+      - workspace_user
+  /dbms/v1/workspace_user/update-status/email/{email}/workspace/{workspace_id}/status/{status}/isActive/{isActive}:
+    put:
+      consumes:
+      - application/json
+      description: Update workspace user status by email and workspace
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      - description: Status
+        in: path
+        name: status
+        required: true
+        type: string
+      - description: Is Active
+        in: path
+        name: isActive
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwWorkspaceUser'
+      summary: Update workspace user status by email and workspace
+      tags:
+      - workspace_user
+  /dbms/v1/workspace_user/verify-invitation/workspace/{workspace_id}/email/{email}:
+    put:
+      consumes:
+      - application/json
+      description: Verify member's request invitation
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+      summary: Verify member's request invitation
       tags:
       - workspace_user
   /dbms/v1/workspace_user/workspace/{workspace_id}:
