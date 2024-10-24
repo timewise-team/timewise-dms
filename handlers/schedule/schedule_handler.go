@@ -114,12 +114,12 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 			BoardColumnID:     schedule.BoardColumnId,
 			Title:             schedule.Title,
 			Description:       schedule.Description,
-			StartTime:         schedule.StartTime,
-			EndTime:           schedule.EndTime,
+			StartTime:         *schedule.StartTime,
+			EndTime:           *schedule.EndTime,
 			Location:          schedule.Location,
 			CreatedBy:         schedule.CreatedBy,
-			CreatedAt:         schedule.CreatedAt,
-			UpdatedAt:         schedule.UpdatedAt,
+			CreatedAt:         *schedule.CreatedAt,
+			UpdatedAt:         *schedule.UpdatedAt,
 			Status:            schedule.Status,
 			AllDay:            schedule.AllDay,
 			Visibility:        schedule.Visibility,
@@ -154,12 +154,12 @@ func (h *ScheduleHandler) GetSchedules(c *fiber.Ctx) error {
 			BoardColumnID:     schedule.BoardColumnId,
 			Title:             schedule.Title,
 			Description:       schedule.Description,
-			StartTime:         schedule.StartTime,
-			EndTime:           schedule.EndTime,
+			StartTime:         *schedule.StartTime,
+			EndTime:           *schedule.EndTime,
 			Location:          schedule.Location,
 			CreatedBy:         schedule.CreatedBy,
-			CreatedAt:         schedule.CreatedAt,
-			UpdatedAt:         schedule.UpdatedAt,
+			CreatedAt:         *schedule.CreatedAt,
+			UpdatedAt:         *schedule.UpdatedAt,
 			Status:            schedule.Status,
 			AllDay:            schedule.AllDay,
 			Visibility:        schedule.Visibility,
@@ -199,12 +199,12 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 		BoardColumnID:     schedule.BoardColumnId,
 		Title:             schedule.Title,
 		Description:       schedule.Description,
-		StartTime:         schedule.StartTime,
-		EndTime:           schedule.EndTime,
+		StartTime:         *schedule.StartTime,
+		EndTime:           *schedule.EndTime,
 		Location:          schedule.Location,
 		CreatedBy:         schedule.CreatedBy,
-		CreatedAt:         schedule.CreatedAt,
-		UpdatedAt:         schedule.UpdatedAt,
+		CreatedAt:         *schedule.CreatedAt,
+		UpdatedAt:         *schedule.UpdatedAt,
 		Status:            schedule.Status,
 		AllDay:            schedule.AllDay,
 		Visibility:        schedule.Visibility,
@@ -239,6 +239,8 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
+	now := time.Now()
+
 	schedule := models.TwSchedule{
 		WorkspaceId:   *scheduleDTO.WorkspaceID,
 		BoardColumnId: *scheduleDTO.BoardColumnID,
@@ -248,8 +250,8 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		//EndTime:           *scheduleDTO.EndTime,
 		//Location:          *scheduleDTO.Location,
 		CreatedBy: *scheduleDTO.WorkspaceUserID,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: &now,
+		UpdatedAt: &now,
 		//Status:            *scheduleDTO.Status,
 		//AllDay:            *scheduleDTO.AllDay,
 		//Visibility:        *scheduleDTO.Visibility,
@@ -361,11 +363,11 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	}
 	if scheduleDTO.StartTime != nil {
 		checkAndLog("start_time", schedule.StartTime.String(), scheduleDTO.StartTime.String())
-		schedule.StartTime = *scheduleDTO.StartTime
+		schedule.StartTime = scheduleDTO.StartTime
 	}
 	if scheduleDTO.EndTime != nil {
 		checkAndLog("end_time", schedule.EndTime.String(), scheduleDTO.EndTime.String())
-		schedule.EndTime = *scheduleDTO.EndTime
+		schedule.EndTime = scheduleDTO.EndTime
 	}
 	if scheduleDTO.Location != nil {
 		checkAndLog("location", schedule.Location, *scheduleDTO.Location)
@@ -407,7 +409,8 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	}
 
 	// Update timestamp
-	schedule.UpdatedAt = time.Now()
+	now := time.Now()
+	schedule.UpdatedAt = &now
 
 	// Lưu schedule đã cập nhật
 	if result := h.DB.Omit("deleted_at").Save(&schedule); result.Error != nil {
@@ -428,12 +431,12 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		BoardColumnID:     schedule.BoardColumnId,
 		Title:             schedule.Title,
 		Description:       schedule.Description,
-		StartTime:         schedule.StartTime,
-		EndTime:           schedule.EndTime,
+		StartTime:         *schedule.StartTime,
+		EndTime:           *schedule.EndTime,
 		Location:          schedule.Location,
 		CreatedBy:         schedule.CreatedBy,
-		CreatedAt:         schedule.CreatedAt,
-		UpdatedAt:         schedule.UpdatedAt,
+		CreatedAt:         *schedule.CreatedAt,
+		UpdatedAt:         *schedule.UpdatedAt,
 		Status:            schedule.Status,
 		AllDay:            schedule.AllDay,
 		Visibility:        schedule.Visibility,
@@ -470,9 +473,11 @@ func (h *ScheduleHandler) DeleteSchedule(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
+	now := time.Now()
+
 	schedule.IsDeleted = true
-	schedule.UpdatedAt = time.Now()
-	schedule.DeletedAt = time.Now()
+	schedule.UpdatedAt = &now
+	schedule.DeletedAt = &now
 
 	if result := h.DB.Omit("start_time,end_time").Save(&schedule); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
@@ -566,4 +571,51 @@ func (h *ScheduleHandler) getSchedulesByBoardColumn(c *fiber.Ctx) error {
 		})
 	}
 	return c.JSON(schedules)
+}
+
+func (h *ScheduleHandler) UpdateTranscriptBySchedule(ctx *fiber.Ctx) error {
+	// get an api_key from params
+	apiKey := ctx.Get("x_api_key")
+	if apiKey != "667qwsrUlyVa" {
+		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+
+	// Parse schedule_id from params
+	scheduleId := ctx.Params("schedule_id")
+	if scheduleId == "" {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Schedule ID is required")
+	}
+
+	// Parse request body
+	var scheduleDTO core_dtos.TwUpdateScheduleRequest
+	if err := ctx.BodyParser(&scheduleDTO); err != nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	// Fetch the schedule from the database
+	var schedule models.TwSchedule
+	if err := h.DB.Where("id = ?", scheduleId).First(&schedule).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.Status(fiber.StatusNotFound).SendString("Schedule not found")
+		}
+		return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// Update the VideoTranscript field if provided
+	if scheduleDTO.VideoTranscript != nil {
+		schedule.VideoTranscript = *scheduleDTO.VideoTranscript
+
+		now := time.Now()
+		schedule.UpdatedAt = &now
+	}
+
+	// Save the updated schedule back to the database
+	if result := h.DB.Save(&schedule); result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	// Return the updated schedule in the response
+	return ctx.JSON("Updated successfully")
 }

@@ -267,6 +267,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/comment/schedule_id/{schedule_id}": {
+            "get": {
+                "description": "Get comments by schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "comments"
+                ],
+                "summary": "Get comments by schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwComment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/document/schedule/{schedule_id}": {
             "get": {
                 "description": "Get documents by schedule",
@@ -964,6 +999,48 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.TwScheduleParticipant"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/schedule_participant/schedule/{scheduleId}": {
+            "get": {
+                "description": "Get schedule participants by schedule ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Get schedule participants by schedule ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "scheduleId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspaceId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/schedule_participant_dtos.ScheduleParticipantInfo"
+                            }
                         }
                     }
                 }
@@ -2312,6 +2389,12 @@ const docTemplate = `{
                     "description": "Nullable field",
                     "type": "string"
                 },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "string"
+                },
                 "recurrence_pattern": {
                     "description": "Nullable field",
                     "type": "string"
@@ -2348,55 +2431,16 @@ const docTemplate = `{
         "core_dtos.TwCreateShecduleResponse": {
             "type": "object",
             "properties": {
-                "all_day": {
-                    "type": "boolean"
-                },
                 "board_column_id": {
                     "type": "integer"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "created_by": {
-                    "type": "integer"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "end_time": {
-                    "type": "string"
-                },
-                "extra_data": {
-                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "is_deleted": {
-                    "type": "boolean"
-                },
-                "location": {
-                    "type": "string"
-                },
-                "recurrence_pattern": {
-                    "type": "string"
-                },
-                "start_time": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
+                "position": {
+                    "type": "integer"
                 },
                 "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "type": "string"
-                },
-                "video_transcript": {
-                    "type": "string"
-                },
-                "visibility": {
                     "type": "string"
                 },
                 "workspace_id": {
@@ -2515,6 +2559,12 @@ const docTemplate = `{
                 "location": {
                     "type": "string"
                 },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
+                    "type": "string"
+                },
                 "recurrence_pattern": {
                     "type": "string"
                 },
@@ -2563,6 +2613,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "location": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
                     "type": "string"
                 },
                 "recurrence_pattern": {
@@ -2622,6 +2678,12 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "location": {
+                    "type": "string"
+                },
+                "position": {
+                    "type": "integer"
+                },
+                "priority": {
                     "type": "string"
                 },
                 "recurrence_pattern": {
