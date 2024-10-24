@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/go-sql-driver/mysql"
 	"github.com/gofiber/fiber/v2"
+	"github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_email_dtos"
 	"github.com/timewise-team/timewise-models/models"
 	"log"
@@ -87,6 +88,29 @@ func (h *UserEmailHandler) createUserEmail(ctx *fiber.Ctx) error {
 	userEmail.User = user
 
 	return ctx.JSON(userEmail)
+}
+
+// linkEmailToAnotherUser godoc
+// @Summary Link email to another user
+// @Description Link email to another user
+// @Tags user_email
+// @Accept json
+// @Produce json
+// @Param email body core_dtos.LinkEmailRequestDto true "Link Email Request"
+// @Success 200 {string} string
+// @Router /dbms/v1/user_email/link-email [post]
+func (h *UserEmailHandler) linkEmailToAnotherUser(c *fiber.Ctx) error {
+	requestDto := new(core_dtos.LinkEmailRequestDto)
+	// Lấy thông tin user từ cơ sở dữ liệu dựa trên email
+	var user models.TwUser
+	if err := h.DB.Where("email = ?", requestDto.Email).First(&user).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).SendString("User not found")
+	}
+	// change userId of record in user_email table
+	if result := h.DB.Model(&models.TwUserEmail{}).Where("email = ?", requestDto.Email).Update("user_id", user.ID); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return nil
 }
 
 //func (h *UserEmailHandler) updateUserEmail(c *fiber.Ctx) error {

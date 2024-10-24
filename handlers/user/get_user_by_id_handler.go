@@ -18,9 +18,24 @@ import (
 // @Tags user
 // @Accept json
 // @Produce json
+// @Param email query string false "Email"
 // @Success 200 {array} models.TwUser
-// @Router /users [get]
+// @Router /dbms/v1/user [get]
 func (h *UserHandler) getUsers(c *fiber.Ctx) error {
+	email := c.Query("email")
+
+	if email != "" {
+		var user models.TwUser
+		result := h.DB.Where("email = ?", email).First(&user)
+
+		if result.Error != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "User not found with the given email",
+			})
+		}
+
+		return c.Status(fiber.StatusOK).JSON(user)
+	}
 	var users []models.TwUser
 	if result := h.DB.Find(&users); result.Error != nil {
 		// handle error
@@ -45,29 +60,6 @@ func (h *UserHandler) getUserById(c *fiber.Ctx) error {
 	userId := c.Params("user_id")
 
 	if err := h.DB.Where("id = ?", userId).First(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).SendString("User not found")
-		}
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-	}
-	return c.JSON(user)
-}
-
-// GET /users/{email}
-// getUserByEmail godoc
-// @Summary Get user by email
-// @Description Get user by email
-// @Tags user
-// @Accept json
-// @Produce json
-// @Param email path string true "User Email"
-// @Success 200 {object} models.TwUser
-// @Router /users/{email} [get]
-func (h *UserHandler) getUserByEmail(c *fiber.Ctx) error {
-	var user models.TwUser
-	email := c.Params("email")
-
-	if err := h.DB.Where("email = ?", email).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).SendString("User not found")
 		}
