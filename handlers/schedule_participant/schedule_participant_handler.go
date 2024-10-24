@@ -276,3 +276,14 @@ func (h *ScheduleParticipantHandler) getScheduleParticipantsBySchedule(c *fiber.
 
 	return c.JSON(scheduleParticipants)
 }
+
+func (h *ScheduleParticipantHandler) inviteToSchedule(c *fiber.Ctx) error {
+	var scheduleParticipants models.TwScheduleParticipant
+	if err := c.BodyParser(&scheduleParticipants); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	if result := h.DB.Create(&scheduleParticipants); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return c.JSON(scheduleParticipants)
+}
