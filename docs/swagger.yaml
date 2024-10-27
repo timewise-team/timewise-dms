@@ -1998,6 +1998,32 @@ paths:
       summary: Get workspace user info by ID
       tags:
       - workspace_user
+  /dbms/v1/workspace_user/{workspace_user_id}/workspace/{workspace_id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete workspace user
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      - description: Workspace User ID
+        in: path
+        name: workspace_user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fiber.Map'
+      summary: Delete workspace user
+      tags:
+      - workspace_user
   /dbms/v1/workspace_user/disprove-invitation/workspace/{workspace_id}/email/{email}:
     put:
       consumes:
@@ -2050,29 +2076,6 @@ paths:
       summary: Get workspaces by email
       tags:
       - workspace
-  /dbms/v1/workspace_user/invitation-not-verified/workspace/{workspace_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get workspace user invitation not verified list
-      parameters:
-      - description: Workspace ID
-        in: path
-        name: workspace_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
-            type: array
-      summary: Get workspace user invitation not verified list
-      tags:
-      - workspace_user
   /dbms/v1/workspace_user/invitation/workspace/{workspace_id}:
     get:
       consumes:
@@ -2094,6 +2097,29 @@ paths:
               $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
             type: array
       summary: Get workspace user invitation list
+      tags:
+      - workspace_user
+  /dbms/v1/workspace_user/invitation_not_verified/workspace/{workspace_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspace user invitation not verified list
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
+            type: array
+      summary: Get workspace user invitation not verified list
       tags:
       - workspace_user
   /dbms/v1/workspace_user/role/workspace/{workspace_id}:
