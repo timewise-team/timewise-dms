@@ -31,6 +31,10 @@ definitions:
       location:
         description: Nullable field
         type: string
+      position:
+        type: integer
+      priority:
+        type: string
       recurrence_pattern:
         description: Nullable field
         type: string
@@ -57,39 +61,13 @@ definitions:
     type: object
   core_dtos.TwCreateShecduleResponse:
     properties:
-      all_day:
-        type: boolean
       board_column_id:
         type: integer
-      created_at:
-        type: string
-      created_by:
-        type: integer
-      description:
-        type: string
-      end_time:
-        type: string
-      extra_data:
-        type: string
       id:
         type: integer
-      is_deleted:
-        type: boolean
-      location:
-        type: string
-      recurrence_pattern:
-        type: string
-      start_time:
-        type: string
-      status:
-        type: string
+      position:
+        type: integer
       title:
-        type: string
-      updated_at:
-        type: string
-      video_transcript:
-        type: string
-      visibility:
         type: string
       workspace_id:
         type: integer
@@ -167,6 +145,10 @@ definitions:
         type: boolean
       location:
         type: string
+      position:
+        type: integer
+      priority:
+        type: string
       recurrence_pattern:
         type: string
       start_time:
@@ -199,6 +181,10 @@ definitions:
       is_deleted:
         type: boolean
       location:
+        type: string
+      position:
+        type: integer
+      priority:
         type: string
       recurrence_pattern:
         type: string
@@ -238,6 +224,10 @@ definitions:
       is_deleted:
         type: boolean
       location:
+        type: string
+      position:
+        type: integer
+      priority:
         type: string
       recurrence_pattern:
         type: string
@@ -889,6 +879,29 @@ paths:
       summary: Get comments by schedule
       tags:
       - comments
+  /dbms/v1/comment/schedule_id/{schedule_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get comments by schedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwComment'
+            type: array
+      summary: Get comments by schedule
+      tags:
+      - comments
   /dbms/v1/document/schedule/{schedule_id}:
     get:
       consumes:
@@ -1419,6 +1432,34 @@ paths:
           schema:
             $ref: '#/definitions/models.TwScheduleParticipant'
       summary: Update schedule participant
+      tags:
+      - schedule_participant
+  /dbms/v1/schedule_participant/schedule/{scheduleId}:
+    get:
+      consumes:
+      - application/json
+      description: Get schedule participants by schedule ID
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: scheduleId
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspaceId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/schedule_participant_dtos.ScheduleParticipantInfo'
+            type: array
+      summary: Get schedule participants by schedule ID
       tags:
       - schedule_participant
   /dbms/v1/schedule_participant/workspace/{workspaceId}/schedule/{scheduleId}:
@@ -2009,6 +2050,29 @@ paths:
       summary: Get workspaces by email
       tags:
       - workspace
+  /dbms/v1/workspace_user/invitation-not-verified/workspace/{workspace_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspace user invitation not verified list
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
+            type: array
+      summary: Get workspace user invitation not verified list
+      tags:
+      - workspace_user
   /dbms/v1/workspace_user/invitation/workspace/{workspace_id}:
     get:
       consumes:

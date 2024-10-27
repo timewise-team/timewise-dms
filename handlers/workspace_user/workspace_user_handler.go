@@ -229,7 +229,7 @@ func (h *WorkspaceUserHandler) GetWorkspaceUserInvitationList(c *fiber.Ctx) erro
 		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
 		Joins("JOIN tw_users ON tw_user_emails.email = tw_users.email").
-		Where("tw_workspace_users.workspace_id = ? and tw_users.is_verified = true and tw_users.is_active = true and tw_workspace_users.status != 'joined' and tw_workspace_users.is_active = true ", workspaceId).
+		Where("tw_workspace_users.workspace_id = ? and tw_users.is_verified = true and tw_users.is_active = false and tw_workspace_users.status != 'joined' and tw_workspace_users.is_active = true ", workspaceId).
 		Scan(&workspaceUsers).Error
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -342,6 +342,7 @@ func (h *WorkspaceUserHandler) VerifyMemberInvitationRequest(c *fiber.Ctx) error
 	err := h.DB.Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
 		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", email, workspaceId).
 		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_user_emails.deleted_at IS NULL").
 		First(&workspaceUser).Error
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -356,6 +357,7 @@ func (h *WorkspaceUserHandler) VerifyMemberInvitationRequest(c *fiber.Ctx) error
 		Updates(map[string]interface{}{
 			"is_verified": true,
 			"updated_at":  gorm.Expr("NOW()"),
+			"status":      "pending",
 		}); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
@@ -391,6 +393,7 @@ func (h *WorkspaceUserHandler) DisproveMemberInvitationRequest(c *fiber.Ctx) err
 	err := h.DB.Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
 		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", email, workspaceId).
 		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_user_emails.deleted_at IS NULL").
 		First(&workspaceUser).Error
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -555,4 +558,37 @@ func (h *WorkspaceUserHandler) UpdateWorkspaceUserStatusByEmailAndWorkspace(ctx 
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return ctx.JSON(workspaceUser)
+}
+
+// GetWorkspaceUserInvitationNotVerifiedList godoc
+// @Summary Get workspace user invitation not verified list
+// @Description Get workspace user invitation not verified list
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param workspace_id path string true "Workspace ID"
+// @Success 200 {array} workspaceUserDtos.GetWorkspaceUserListResponse
+// @Router /dbms/v1/workspace_user/invitation-not-verified/workspace/{workspace_id} [get]
+func (h *WorkspaceUserHandler) GetWorkspaceUserInvitationNotVerifiedList(ctx *fiber.Ctx) error {
+
+	var workspaceUsers []workspaceUserDtos.GetWorkspaceUserListResponse
+	workspaceId := ctx.Params("workspace_id")
+	if workspaceId == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "workspace_id is required",
+		})
+	}
+	err := h.DB.Table("tw_workspace_users").
+		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture").
+		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
+		Joins("JOIN tw_users ON tw_user_emails.email = tw_users.email").
+		Where("tw_workspace_users.workspace_id = ? and tw_users.is_verified = false and tw_users.is_active = false and tw_workspace_users.status = 'pending' and tw_workspace_users.is_active = true ", workspaceId).
+		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_user_emails.deleted_at IS NULL").
+		Where("tw_users.deleted_at IS NULL").
+		Scan(&workspaceUsers).Error
+	if err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	return ctx.JSON(workspaceUsers)
 }

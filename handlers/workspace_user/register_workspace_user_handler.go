@@ -31,4 +31,5 @@ func RegisterWorkspaceUserHandler(router fiber.Router, db *gorm.DB) {
 	router.Put("/update-status/:workspace_user_id", workspaceUserHandler.UpdateWorkspaceUserStatus)
 	router.Get("/:workspace_user_id/info", workspaceUserHandler.GetWorkspaceUserInfoById)
 	router.Put("/update-status/email/:email/workspace/:workspace_id/status/:status/is_active/:isActive", workspaceUserHandler.UpdateWorkspaceUserStatusByEmailAndWorkspace)
+	router.Get("/invitation_not_verified/workspace/:workspace_id", workspaceUserHandler.GetWorkspaceUserInvitationNotVerifiedList)
 }
