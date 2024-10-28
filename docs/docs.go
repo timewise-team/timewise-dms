@@ -2043,6 +2043,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/invitation_not_verified/workspace/{workspace_id}": {
+            "get": {
+                "description": "Get workspace user invitation not verified list",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace user invitation not verified list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/role/workspace/{workspace_id}": {
             "put": {
                 "description": "Update role of workspace user",
@@ -2279,6 +2314,45 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_user/{workspace_user_id}/workspace/{workspace_id}": {
+            "delete": {
+                "description": "Delete workspace user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Delete workspace user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace User ID",
+                        "name": "workspace_user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
                         }
                     }
                 }
