@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"time"
 )
 
 // getScheduleParticipants godoc
@@ -59,19 +60,64 @@ func (h *ScheduleParticipantHandler) getScheduleParticipantById(c *fiber.Ctx) er
 // @Param schedule_participant body models.TwScheduleParticipant true "Schedule participant object"
 // @Success 200 {object} models.TwScheduleParticipant
 // @Router /dbms/v1/schedule_participant/{id} [put]
-func (h *ScheduleParticipantHandler) updateScheduleParticipant(c *fiber.Ctx) error {
-	var scheduleParticipants models.TwScheduleParticipant
-	if result := h.DB.First(&scheduleParticipants, c.Params("id")); result.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
-	}
-	if err := c.BodyParser(&scheduleParticipants); err != nil {
+func (h *ScheduleParticipantHandler) UpdateScheduleParticipant(c *fiber.Ctx) error {
+	var participantDTO schedule_participant_dtos.ScheduleParticipantRequest
+	if err := c.BodyParser(&participantDTO); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
-	if result := h.DB.Save(&scheduleParticipants); result.Error != nil {
+
+	var participant models.TwScheduleParticipant
+	participantID := c.Params("id")
+
+	// Tìm participant theo ID
+	if err := h.DB.Where("id = ?", participantID).First(&participant).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("Participant not found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// Kiểm tra và cập nhật từng trường
+	if participantDTO.Status != nil {
+		participant.Status = *participantDTO.Status
+	}
+	if participantDTO.AssignAt != nil {
+		participant.AssignAt = participantDTO.AssignAt
+	}
+	if participantDTO.AssignBy != nil {
+		participant.AssignBy = *participantDTO.AssignBy
+	}
+	if participantDTO.ResponseTime != nil {
+		participant.ResponseTime = participantDTO.ResponseTime
+	}
+	if participantDTO.InvitationSentAt != nil {
+		participant.InvitationSentAt = participantDTO.InvitationSentAt
+	}
+	if participantDTO.InvitationStatus != nil {
+		participant.InvitationStatus = *participantDTO.InvitationStatus
+	}
+
+	// Cập nhật timestamp
+	now := time.Now()
+	participant.UpdatedAt = now
+
+	// Lưu participant đã cập nhật
+	if result := h.DB.Omit("deleted_at").Save(&participant); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
-	return c.JSON(scheduleParticipants)
 
+	// Trả về participant đã cập nhật
+	return c.JSON(schedule_participant_dtos.ScheduleParticipantResponse{
+		ID:               participant.ID,
+		ScheduleId:       participant.ScheduleId,
+		WorkspaceUserId:  participant.WorkspaceUserId,
+		Status:           participant.Status,
+		AssignAt:         participant.AssignAt,
+		AssignBy:         participant.AssignBy,
+		ResponseTime:     participant.ResponseTime,
+		InvitationSentAt: participant.InvitationSentAt,
+		InvitationStatus: participant.InvitationStatus,
+	})
 }
 
 // deleteScheduleParticipant godoc
@@ -113,7 +159,18 @@ func (h *ScheduleParticipantHandler) createScheduleParticipant(c *fiber.Ctx) err
 	if result := h.DB.Create(&scheduleParticipants); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
-	return c.JSON(scheduleParticipants)
+	createSchedule := schedule_participant_dtos.ScheduleParticipantResponse{
+		ID:               scheduleParticipants.ID,
+		ScheduleId:       scheduleParticipants.ScheduleId,
+		WorkspaceUserId:  scheduleParticipants.WorkspaceUserId,
+		Status:           scheduleParticipants.Status,
+		AssignAt:         scheduleParticipants.AssignAt,
+		AssignBy:         scheduleParticipants.AssignBy,
+		ResponseTime:     scheduleParticipants.ResponseTime,
+		InvitationSentAt: scheduleParticipants.InvitationSentAt,
+		InvitationStatus: scheduleParticipants.InvitationStatus,
+	}
+	return c.JSON(createSchedule)
 }
 
 func (h *ScheduleParticipantHandler) getScheduleParticipantByScheduleIdAndWorkspaceUserId(c *fiber.Ctx) error {
@@ -121,12 +178,18 @@ func (h *ScheduleParticipantHandler) getScheduleParticipantByScheduleIdAndWorksp
 	scheduleId := c.Params("scheduleId")
 	workspaceUserId := c.Params("workspaceUserId")
 
+	// Truy vấn database
 	if err := h.DB.Where("workspace_user_id = ? AND schedule_id = ?", workspaceUserId, scheduleId).First(&scheduleParticipant).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).SendString("ScheduleParticipant not found")
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "record not found",
+			})
 		}
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
+
 	return c.JSON(scheduleParticipant)
 }
 
@@ -274,5 +337,16 @@ func (h *ScheduleParticipantHandler) getScheduleParticipantsBySchedule(c *fiber.
 		})
 	}
 
+	return c.JSON(scheduleParticipants)
+}
+
+func (h *ScheduleParticipantHandler) inviteToSchedule(c *fiber.Ctx) error {
+	var scheduleParticipants models.TwScheduleParticipant
+	if err := c.BodyParser(&scheduleParticipants); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	if result := h.DB.Create(&scheduleParticipants); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
 	return c.JSON(scheduleParticipants)
 }
