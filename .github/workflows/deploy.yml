@@ -51,6 +51,7 @@ jobs:
               --name timewise-dms \
               -dp 8089:8089 \
               -e ENV=production \
+              --restart always \
               -v /home/khanhhn.hoang/env_files/.dms_env:/.env \
               ${{ secrets.DOCKER_USERNAME }}/${{ github.event.repository.name }}:latest
           EOF
