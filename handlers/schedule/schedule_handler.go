@@ -193,18 +193,33 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
+	var startTime, endTime, createdAt, updatedAt time.Time
+
+	if schedule.StartTime != nil {
+		startTime = *schedule.StartTime
+	}
+	if schedule.EndTime != nil {
+		endTime = *schedule.EndTime
+	}
+	if schedule.CreatedAt != nil {
+		createdAt = *schedule.CreatedAt
+	}
+	if schedule.UpdatedAt != nil {
+		updatedAt = *schedule.UpdatedAt
+	}
+
 	scheduleDTO := core_dtos.TwScheduleResponse{
 		ID:                int(schedule.ID),
 		WorkspaceID:       schedule.WorkspaceId,
 		BoardColumnID:     schedule.BoardColumnId,
 		Title:             schedule.Title,
 		Description:       schedule.Description,
-		StartTime:         *schedule.StartTime,
-		EndTime:           *schedule.EndTime,
+		StartTime:         startTime,
+		EndTime:           endTime,
 		Location:          schedule.Location,
 		CreatedBy:         schedule.CreatedBy,
-		CreatedAt:         *schedule.CreatedAt,
-		UpdatedAt:         *schedule.UpdatedAt,
+		CreatedAt:         createdAt,
+		UpdatedAt:         updatedAt,
 		Status:            schedule.Status,
 		AllDay:            schedule.AllDay,
 		Visibility:        schedule.Visibility,
@@ -275,14 +290,15 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
+	now = time.Now()
 	newScheduleParticipant := models.TwScheduleParticipant{
 		ScheduleId:       schedule.ID,
 		WorkspaceUserId:  *scheduleDTO.WorkspaceUserID,
-		AssignAt:         time.Now(),
+		AssignAt:         &now,
 		AssignBy:         *scheduleDTO.WorkspaceUserID,
 		Status:           "participant",
-		ResponseTime:     time.Now(),
-		InvitationSentAt: time.Now(),
+		ResponseTime:     &now,
+		InvitationSentAt: &now,
 		InvitationStatus: "joined",
 	}
 
