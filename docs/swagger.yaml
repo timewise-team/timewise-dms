@@ -1559,6 +1559,27 @@ paths:
       summary: Update user by ID
       tags:
       - user
+  /dbms/v1/user/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get user by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwUser'
+      summary: Get user by ID
+      tags:
+      - user
   /dbms/v1/user_email:
     get:
       consumes:
@@ -2276,27 +2297,6 @@ paths:
               $ref: '#/definitions/models.TwUser'
             type: array
       summary: Get all users
-      tags:
-      - user
-  /users/{id}:
-    get:
-      consumes:
-      - application/json
-      description: Get user by ID
-      parameters:
-      - description: User ID
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.TwUser'
-      summary: Get user by ID
       tags:
       - user
 swagger: "2.0"
