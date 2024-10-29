@@ -141,7 +141,8 @@ func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	if userDTO.Role != "" {
 		user.Role = userDTO.Role
 	}
-
+	// temporary setting deleted_at to nil
+	user.DeletedAt = nil
 	// Update the timestamp
 	user.UpdatedAt = time.Now()
 
