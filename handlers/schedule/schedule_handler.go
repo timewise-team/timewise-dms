@@ -108,25 +108,43 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 
 	var scheduleDTOs []core_dtos.TwScheduleResponse
 	for _, schedule := range schedules {
-		scheduleDTOs = append(scheduleDTOs, core_dtos.TwScheduleResponse{
+		scheduleDTO := core_dtos.TwScheduleResponse{
 			ID:                int(schedule.ID),
 			WorkspaceID:       schedule.WorkspaceId,
 			BoardColumnID:     schedule.BoardColumnId,
 			Title:             schedule.Title,
 			Description:       schedule.Description,
-			StartTime:         *schedule.StartTime,
-			EndTime:           *schedule.EndTime,
 			Location:          schedule.Location,
 			CreatedBy:         schedule.CreatedBy,
-			CreatedAt:         *schedule.CreatedAt,
-			UpdatedAt:         *schedule.UpdatedAt,
 			Status:            schedule.Status,
 			AllDay:            schedule.AllDay,
 			Visibility:        schedule.Visibility,
 			ExtraData:         schedule.ExtraData,
 			IsDeleted:         schedule.IsDeleted,
 			RecurrencePattern: schedule.RecurrencePattern,
-		})
+		}
+
+		// Check if StartTime is not nil before dereferencing
+		if schedule.StartTime != nil {
+			scheduleDTO.StartTime = *schedule.StartTime
+		}
+
+		// Check if EndTime is not nil before dereferencing
+		if schedule.EndTime != nil {
+			scheduleDTO.EndTime = *schedule.EndTime
+		}
+
+		// Check if CreatedAt is not nil before dereferencing
+		if schedule.CreatedAt != nil {
+			scheduleDTO.CreatedAt = *schedule.CreatedAt
+		}
+
+		// Check if UpdatedAt is not nil before dereferencing
+		if schedule.UpdatedAt != nil {
+			scheduleDTO.UpdatedAt = *schedule.UpdatedAt
+		}
+
+		scheduleDTOs = append(scheduleDTOs, scheduleDTO)
 	}
 
 	return c.JSON(scheduleDTOs)
