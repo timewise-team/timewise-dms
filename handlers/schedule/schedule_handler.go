@@ -594,7 +594,7 @@ func (h *ScheduleHandler) getSchedulesByBoardColumn(c *fiber.Ctx) error {
 		})
 	}
 	var schedules []models.TwSchedule
-	if result := h.DB.Where("board_column_id = ? and workspace_id = ?", boardColumnID, workspaceID).Find(&schedules); result.Error != nil {
+	if result := h.DB.Where("board_column_id = ? and workspace_id = ? and is_deleted = 0", boardColumnID, workspaceID).Find(&schedules); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error.Error(),
 		})
