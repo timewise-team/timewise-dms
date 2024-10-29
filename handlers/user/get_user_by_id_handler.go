@@ -39,7 +39,7 @@ func (h *UserHandler) getUsers(c *fiber.Ctx) error {
 // @Produce json
 // @Param id path int true "User ID"
 // @Success 200 {object} models.TwUser
-// @Router dbms/v1/user/{id} [get]
+// @Router /dbms/v1/user/{user_id} [get]
 func (h *UserHandler) getUserById(c *fiber.Ctx) error {
 	var user models.TwUser
 	userId := c.Params("user_id")
