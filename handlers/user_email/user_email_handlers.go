@@ -6,8 +6,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos/user_email_dtos"
 	"github.com/timewise-team/timewise-models/models"
+	"gorm.io/gorm"
 	"log"
 	"net/url"
+	"strconv"
 )
 
 // @Summary Get all user emails
@@ -89,33 +91,41 @@ func (h *UserEmailHandler) createUserEmail(ctx *fiber.Ctx) error {
 	return ctx.JSON(userEmail)
 }
 
-//func (h *UserEmailHandler) updateUserEmail(c *fiber.Ctx) error {
-//	var userEmailDTO dtos.UpdateUserEmailRequest
-//	if err := c.BodyParser(&userEmailDTO); err != nil {
-//		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
-//	}
-//
-//	var userEmail models.TwUserEmail
-//	emailId := c.Params("email_id")
-//
-//	if err := h.DB.Where("id = ?", emailId).First(&userEmail).Error; err != nil {
-//		if errors.Is(err, gorm.ErrRecordNotFound) {
-//			return c.Status(fiber.StatusNotFound).SendString("Email not found")
-//		}
-//		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-//	}
-//
-//	// Update the fields if they are provided (not nil)
-//	if userEmailDTO.Email != "" {
-//		userEmail.Email = userEmailDTO.Email
-//	}
-//
-//	if result := h.DB.Save(&userEmail); result.Error != nil {
-//		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
-//	}
-//
-//	return c.JSON(userEmail)
-//}
+// updateUserIdInUserEmail godoc
+// @Summary Update user_id in tw_user_email by email
+// @Description Update user_id in tw_user_email by email
+// @Tags user_email
+// @Accept json
+// @Produce json
+// @Param email query string true "Email"
+// @Param user_id query string true "User ID"
+// @Success 200 {object} models.TwUserEmail
+// @Router /dbms/v1/user_email [patch]
+func (h *UserEmailHandler) updateUserIdInUserEmail(c *fiber.Ctx) error {
+	var userEmail models.TwUserEmail
+	email := c.Query("email")
+	userIdStr := c.Query("user_id")
+
+	if err := h.DB.Where("email = ?", email).First(&userEmail).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("Email not found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	// Update userId in userEmail
+	userId, ok := strconv.Atoi(userIdStr)
+	if ok != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(ok.Error())
+	}
+	userEmail.UserId = userId
+	userEmail.DeletedAt = nil
+	if result := h.DB.Save(&userEmail); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	return c.JSON(userEmail)
+}
 
 // @Summary Delete user email by ID
 // @Description Delete user email by ID

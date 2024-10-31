@@ -18,10 +18,18 @@ import (
 // @Tags user
 // @Accept json
 // @Produce json
+// @Param email query string false "Email"
 // @Success 200 {array} models.TwUser
-// @Router /users [get]
+// @Router /dbms/v1/user [get]
 func (h *UserHandler) getUsers(c *fiber.Ctx) error {
 	var users []models.TwUser
+	email := c.Query("email")
+	if email != "" {
+		if result := h.DB.Where("email = ?", email).Find(&users); result.Error != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+		}
+		return c.JSON(users)
+	}
 	if result := h.DB.Find(&users); result.Error != nil {
 		// handle error
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
