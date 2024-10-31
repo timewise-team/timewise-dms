@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"gorm.io/gorm"
-	"net/http"
 	"net/url"
 )
 
@@ -61,16 +60,44 @@ func (h *WorkspaceUserHandler) createWorkspaceUser(c *fiber.Ctx) error {
 }
 
 func (h *WorkspaceUserHandler) updateWorkspaceUser(c *fiber.Ctx) error {
+	workspaceUserId := c.Params("workspace_user_id")
+
 	workspaceUser := new(models.TwWorkspaceUser)
 	if err := c.BodyParser(workspaceUser); err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid request body",
+		})
 	}
 
-	if result := h.DB.Save(workspaceUser); result.Error != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	var existingUser models.TwWorkspaceUser
+	if err := h.DB.First(&existingUser, "id = ?", workspaceUserId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Workspace user not found",
+			})
+		}
+		// For any other error, return a 500 status
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
 	}
 
-	return c.JSON(workspaceUser)
+	existingUser.UserEmailId = workspaceUser.UserEmailId
+	existingUser.WorkspaceId = workspaceUser.WorkspaceId
+	existingUser.WorkspaceKey = workspaceUser.WorkspaceKey
+	existingUser.Role = workspaceUser.Role
+	existingUser.Status = workspaceUser.Status
+	existingUser.IsActive = workspaceUser.IsActive
+	existingUser.IsVerified = workspaceUser.IsVerified
+	existingUser.ExtraData = workspaceUser.ExtraData
+
+	if err := h.DB.Omit("deleted_at").Save(&existingUser).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": "Failed to update workspace user",
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(existingUser)
 }
 
 //func (h *WorkspaceUserHandler) getWorkspaceUsersByWorkspaceId(c *fiber.Ctx) error {
@@ -174,12 +201,16 @@ func (h *WorkspaceUserHandler) getWorkspaceUsersByIsActive(c *fiber.Ctx) error {
 func (h *WorkspaceUserHandler) getWorkspaceUserByEmailAndWorkspace(c *fiber.Ctx) error {
 	workspaceId := c.Params("workspace_id")
 	email := c.Params("email")
+
+	// Decode the email parameter to handle special characters
 	emailFix, err1 := url.QueryUnescape(email)
 	if err1 != nil {
-		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid email",
 		})
 	}
+
+	// Check required parameters
 	if workspaceId == "" {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "workspace_id is required",
@@ -190,22 +221,29 @@ func (h *WorkspaceUserHandler) getWorkspaceUserByEmailAndWorkspace(c *fiber.Ctx)
 			"error": "email is required",
 		})
 	}
+
 	var TWorkspaceUser models.TwWorkspaceUser
 
+	// Perform the database query
 	err := h.DB.
 		Table("tw_workspace_users").
-		Select("tw_workspace_users.id, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key, tw_workspace_users.role, tw_workspace_users.status, tw_workspace_users.is_active,tw_workspace_users.is_verified,tw_workspace_users.extra_data").
-		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
+		Select("tw_workspace_users.id, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key, tw_workspace_users.role, tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified, tw_workspace_users.extra_data").
+		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
 		Where("tw_workspace_users.deleted_at IS NULL").
 		Where("tw_user_emails.deleted_at IS NULL").
-		Where("tw_user_emails.email = ? and tw_workspace_users.workspace_id=? ", emailFix, workspaceId).
+		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", emailFix, workspaceId).
 		Scan(&TWorkspaceUser).Error
 
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Record not found",
+			})
+		}
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
-	return c.JSON(TWorkspaceUser)
 
+	return c.JSON(TWorkspaceUser)
 }
 
 // GetWorkspaceUserInvitationList godoc
