@@ -116,38 +116,38 @@ func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	}
 
 	// Update the fields if they are provided (not nil)
-	if userDTO.FirstName != "" {
-		user.FirstName = userDTO.FirstName
+	if userDTO.FirstName != nil {
+		user.FirstName = *userDTO.FirstName
 	}
-	if userDTO.LastName != "" {
-		user.LastName = userDTO.LastName
+	if userDTO.LastName != nil {
+		user.LastName = *userDTO.LastName
 	}
-	if userDTO.Email != "" {
-		user.Email = userDTO.Email
+	if userDTO.Email != nil {
+		user.Email = *userDTO.Email
 	}
-	if userDTO.ProfilePicture != "" {
-		user.ProfilePicture = userDTO.ProfilePicture
+	if userDTO.ProfilePicture != nil {
+		user.ProfilePicture = *userDTO.ProfilePicture
 	}
-	if userDTO.Timezone != "" {
-		user.Timezone = userDTO.Timezone
+	if userDTO.Timezone != nil {
+		user.Timezone = *userDTO.Timezone
 	}
-	if userDTO.Locale != "" {
-		user.Locale = userDTO.Locale
+	if userDTO.Locale != nil {
+		user.Locale = *userDTO.Locale
 	}
-	if userDTO.IsVerified {
-		user.IsVerified = userDTO.IsVerified
+	if userDTO.IsVerified != nil {
+		user.IsVerified = *userDTO.IsVerified
 	}
-	if userDTO.IsActive {
-		user.IsActive = userDTO.IsActive
+	if userDTO.IsActive != nil {
+		user.IsActive = *userDTO.IsActive
 	}
-	if userDTO.NotificationSettings != "" {
-		user.NotificationSettings = userDTO.NotificationSettings
+	if userDTO.NotificationSettings != nil {
+		user.NotificationSettings = *userDTO.NotificationSettings
 	}
-	if userDTO.CalendarSettings != "" {
-		user.CalendarSettings = userDTO.CalendarSettings
+	if userDTO.CalendarSettings != nil {
+		user.CalendarSettings = *userDTO.CalendarSettings
 	}
-	if userDTO.Role != "" {
-		user.Role = userDTO.Role
+	if userDTO.Role != nil {
+		user.Role = *userDTO.Role
 	}
 	// temporary setting deleted_at to nil
 	user.DeletedAt = nil
