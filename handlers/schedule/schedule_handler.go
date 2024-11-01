@@ -245,6 +245,8 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 		ExtraData:         schedule.ExtraData,
 		IsDeleted:         schedule.IsDeleted,
 		RecurrencePattern: schedule.RecurrencePattern,
+		Position:          schedule.Position,
+		Priority:          schedule.Priority,
 		//AssignedTo:        []int{schedule.AssignedTo},
 	}
 
