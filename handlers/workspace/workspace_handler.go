@@ -1,6 +1,7 @@
 package workspace
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
@@ -63,10 +64,30 @@ func (handler *WorkspaceHandler) getWorkspaceById(c *fiber.Ctx) error {
 // @Router /dbms/v1/workspace/{workspace_id} [delete]
 func (handler *WorkspaceHandler) removeWorkspaceById(c *fiber.Ctx) error {
 	workspaceId := c.Params("workspace_id")
-	if result := handler.DB.Delete(&models.TwWorkspace{}, workspaceId); result.Error != nil {
+	if workspaceId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Workspace ID is required",
+		})
+	}
+
+	var workspace models.TwWorkspace
+	if err := handler.DB.Where("id = ?", workspaceId).First(&workspace).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Workspace not found",
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	if result := handler.DB.Model(&workspace).Updates(map[string]interface{}{
+		"deleted_at": gorm.Expr("NOW()"),
+		"is_deleted": true,
+	}); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
-	return c.SendStatus(fiber.StatusNoContent)
+
+	return c.SendStatus(fiber.StatusOK)
 }
 
 // POST /workspaces
@@ -108,7 +129,12 @@ func (handler *WorkspaceHandler) updateWorkspace(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
 
-	if result := handler.DB.Save(workspace); result.Error != nil {
+	// Set the UpdatedAt field to the current timestamp using gorm.Expr("NOW()")
+	if result := handler.DB.Model(workspace).Update("updated_at", gorm.Expr("NOW()")); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	if result := handler.DB.Omit("deleted_at", "created_at").Save(workspace); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 
@@ -138,6 +164,11 @@ func (handler *WorkspaceHandler) getWorkspacesByUserId(c *fiber.Ctx) error {
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
 		Joins("JOIN tw_users ON tw_user_emails.user_id = tw_users.id").
 		Where("tw_users.id = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'guest' and tw_workspace_users.status ='joined'", userId).
+		Where("tw_workspaces.deleted_at IS NULL").
+		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_user_emails.deleted_at IS NULL").
+		Where("tw_users.deleted_at IS NULL").
+		Where("tw_workspaces.is_deleted = false").
 		Scan(&workspaces).Error
 
 	if err != nil {
@@ -216,6 +247,9 @@ func (handler *WorkspaceHandler) getWorkspacesByEmail(c *fiber.Ctx) error {
 		Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
 		Where("tw_user_emails.email = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'Guest' and tw_workspace_users.status ='joined'", emails).
+		Where("tw_workspaces.deleted_at IS NULL").
+		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_user_emails.deleted_at IS NULL").
 		Scan(&workspaces).Error
 
 	if err != nil {
@@ -227,4 +261,60 @@ func (handler *WorkspaceHandler) getWorkspacesByEmail(c *fiber.Ctx) error {
 
 	return c.Status(http.StatusOK).JSON(workspaces)
 
+}
+
+// filterWorkspaces godoc
+// @Summary Filter workspaces
+// @Description Filter workspaces
+// @Tags workspace
+// @Accept json
+// @Produce json
+// @Param email query string false "Email"
+// @Param role query string false "Role"
+// @Param search query string false "Search"
+// @Param sortBy query string false "Sort by"
+// @Param order query string false "Order"
+// @Success 200 {object} []models.TwWorkspace
+// @Router /dbms/v1/workspace/filter/workspace [get]
+func (handler *WorkspaceHandler) filterWorkspaces(c *fiber.Ctx) error {
+	var workspaces []models.TwWorkspace
+	query := handler.DB
+
+	// Filter by email
+	if email := c.Query("email"); email != "" {
+		query = query.Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
+			Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
+			Where("tw_workspaces.deleted_at IS NULL").
+			Where("tw_workspace_users.is_active = true").
+			Where("tw_workspace_users.is_verified = true").
+			Where("tw_workspace_users.status = 'joined'").
+			Where("tw_workspace_users.role != 'guest'").
+			Where("tw_workspace_users.role != 'Guest'").
+			Where("tw_workspace_users.deleted_at IS NULL").
+			Where("tw_user_emails.email = ?", email)
+	}
+
+	// Filter by role
+	if role := c.Query("role"); role != "" {
+		query = query.
+			Where("tw_workspace_users.role = ?", role)
+	}
+
+	// Search by keyword
+	if search := c.Query("search"); search != "" {
+		query = query.Where("tw_workspaces.title LIKE ? ", "%"+search+"%", "%"+search+"%")
+	}
+
+	// Sort by field
+	if sortBy := c.Query("sortBy"); sortBy != "" {
+		order := c.Query("order", "asc")
+		query = query.Order(sortBy + " " + order)
+	}
+
+	// Execute the query
+	if err := query.Find(&workspaces).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	return c.JSON(workspaces)
 }

@@ -1898,6 +1898,44 @@ paths:
       summary: Get workspaces by email
       tags:
       - workspace
+  /dbms/v1/workspace/filter/workspace:
+    get:
+      consumes:
+      - application/json
+      description: Filter workspaces
+      parameters:
+      - description: Email
+        in: query
+        name: email
+        type: string
+      - description: Role
+        in: query
+        name: role
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
+      - description: Sort by
+        in: query
+        name: sortBy
+        type: string
+      - description: Order
+        in: query
+        name: order
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwWorkspace'
+            type: array
+      summary: Filter workspaces
+      tags:
+      - workspace
   /dbms/v1/workspace/is_active/{is_active}:
     get:
       consumes:
