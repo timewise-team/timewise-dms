@@ -31,6 +31,28 @@ func (h *CommentHandler) getCommentsBySchedule(c *fiber.Ctx) error {
 	return c.JSON(Comments)
 }
 
+func (h *CommentHandler) getCommentsById(c *fiber.Ctx) error {
+	commentId := c.Params("id")
+	if commentId == "" {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+
+	var comment models.TwComment
+	result := h.DB.
+		Where("id = ?", commentId).
+		Where("deleted_at IS NULL").
+		First(&comment)
+
+	if result.RowsAffected == 0 {
+		return c.SendStatus(fiber.StatusNotFound)
+	}
+
+	if result.Error != nil {
+		return c.SendStatus(fiber.StatusInternalServerError)
+	}
+	return c.JSON(comment)
+}
+
 // getCommentsBySchedule godoc
 // @Summary Get comments by schedule
 // @Description Get comments by schedule
@@ -90,4 +112,89 @@ func (h *CommentHandler) getCommentsByScheduleID(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(scheduleComments)
+}
+
+func (h *CommentHandler) createComment(c *fiber.Ctx) error {
+	var comment models.TwComment
+	if err := c.BodyParser(&comment); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	if result := h.DB.Create(&comment); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return c.JSON(comment)
+}
+
+func (h *CommentHandler) updateComment(c *fiber.Ctx) error {
+	var comment models.TwComment
+	commentId := c.Params("id")
+	result := h.DB.Where("id = ?", commentId).Find(&comment)
+	if result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": result.Error.Error(),
+		})
+	}
+
+	if result.RowsAffected == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "record not found",
+		})
+	}
+
+	if err := c.BodyParser(&comment); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	if result := h.DB.Omit("deleted_at").Save(&comment); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	updateComment := models.TwComment{
+		ID:              comment.ID,
+		CreatedAt:       comment.CreatedAt,
+		UpdatedAt:       comment.UpdatedAt,
+		DeletedAt:       comment.DeletedAt,
+		ScheduleId:      comment.ScheduleId,
+		WorkspaceUserId: comment.WorkspaceUserId,
+		Commenter:       comment.Commenter,
+		Content:         comment.Content,
+		IsDeleted:       comment.IsDeleted,
+	}
+	return c.JSON(updateComment)
+}
+
+func (h *CommentHandler) deleteComment(c *fiber.Ctx) error {
+	var comment models.TwComment
+	commentId := c.Params("id")
+	result := h.DB.Where("id = ?", commentId).Find(&comment)
+	if result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": result.Error.Error(),
+		})
+	}
+
+	if result.RowsAffected == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "record not found",
+		})
+	}
+
+	if err := c.BodyParser(&comment); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	if result := h.DB.Save(&comment); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	updateComment := models.TwComment{
+		ID:              comment.ID,
+		CreatedAt:       comment.CreatedAt,
+		UpdatedAt:       comment.UpdatedAt,
+		DeletedAt:       comment.DeletedAt,
+		ScheduleId:      comment.ScheduleId,
+		WorkspaceUserId: comment.WorkspaceUserId,
+		Commenter:       comment.Commenter,
+		Content:         comment.Content,
+		IsDeleted:       comment.IsDeleted,
+	}
+	return c.JSON(updateComment)
 }
