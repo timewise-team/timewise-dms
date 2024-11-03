@@ -398,13 +398,23 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		schedule.Description = *scheduleDTO.Description
 	}
 	if scheduleDTO.StartTime != nil {
-		checkAndLog("start_time", schedule.StartTime.String(), scheduleDTO.StartTime.String())
+		oldStartTime := ""
+		if schedule.StartTime != nil {
+			oldStartTime = schedule.StartTime.String()
+		}
+		checkAndLog("start_time", oldStartTime, scheduleDTO.StartTime.String())
 		schedule.StartTime = scheduleDTO.StartTime
 	}
+
 	if scheduleDTO.EndTime != nil {
-		checkAndLog("end_time", schedule.EndTime.String(), scheduleDTO.EndTime.String())
+		oldEndTime := ""
+		if schedule.EndTime != nil {
+			oldEndTime = schedule.EndTime.String()
+		}
+		checkAndLog("end_time", oldEndTime, scheduleDTO.EndTime.String())
 		schedule.EndTime = scheduleDTO.EndTime
 	}
+
 	if scheduleDTO.Location != nil {
 		checkAndLog("location", schedule.Location, *scheduleDTO.Location)
 		schedule.Location = *scheduleDTO.Location
@@ -425,16 +435,10 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		checkAndLog("extra_data", schedule.ExtraData, *scheduleDTO.ExtraData)
 		schedule.ExtraData = *scheduleDTO.ExtraData
 	}
-	if scheduleDTO.IsDeleted != nil {
-		checkAndLog("is_deleted", strconv.FormatBool(schedule.IsDeleted), strconv.FormatBool(*scheduleDTO.IsDeleted))
-		schedule.IsDeleted = *scheduleDTO.IsDeleted
-	}
 	if scheduleDTO.RecurrencePattern != nil {
 		checkAndLog("recurrence_pattern", schedule.RecurrencePattern, *scheduleDTO.RecurrencePattern)
 		schedule.RecurrencePattern = *scheduleDTO.RecurrencePattern
 	}
-
-	// **Kiểm tra và cập nhật trường position và priority nếu có thay đổi**
 	if scheduleDTO.Position != nil {
 		checkAndLog("position", strconv.Itoa(schedule.Position), strconv.Itoa(*scheduleDTO.Position))
 		schedule.Position = *scheduleDTO.Position
@@ -443,6 +447,7 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		checkAndLog("priority", schedule.Priority, *scheduleDTO.Priority)
 		schedule.Priority = *scheduleDTO.Priority
 	}
+	schedule.CreatedBy = workspaceUserId
 
 	// Update timestamp
 	now := time.Now()
