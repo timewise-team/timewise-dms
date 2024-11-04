@@ -15,6 +15,40 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/notification": {
+            "post": {
+                "description": "Create a new notification",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification"
+                ],
+                "summary": "Create a new notification",
+                "parameters": [
+                    {
+                        "description": "Create notification request",
+                        "name": "createNotificationRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.PushNotificationDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.PushNotificationDto"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/board_columns": {
             "post": {
                 "description": "Create board column",
@@ -332,44 +366,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.TwDocument"
                             }
-                        }
-                    }
-                }
-            }
-        },
-        "/dbms/v1/email_synced/{email}": {
-            "get": {
-                "description": "Get all emails synced with an email",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Email Synced"
-                ],
-                "summary": "Get all emails synced with an email",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Email",
-                        "name": "email",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of emails synced with the email",
-                        "schema": {
-                            "$ref": "#/definitions/models.TwUserEmail"
-                        }
-                    },
-                    "400": {
-                        "description": "Email is not synced any other emails",
-                        "schema": {
-                            "$ref": "#/definitions/fiber.Map"
                         }
                     }
                 }
@@ -2533,6 +2529,40 @@ const docTemplate = `{
                 }
             }
         },
+        "core_dtos.PushNotificationDto": {
+            "type": "object",
+            "required": [
+                "message",
+                "type",
+                "user_email_id"
+            ],
+            "properties": {
+                "extra_data": {
+                    "description": "Optional: Additional data",
+                    "type": "string"
+                },
+                "message": {
+                    "description": "Required for the notification content",
+                    "type": "string"
+                },
+                "related_item_id": {
+                    "description": "Optional: ID of related item",
+                    "type": "integer"
+                },
+                "related_item_type": {
+                    "description": "Optional: Type of related item",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "Required to specify the notification type",
+                    "type": "string"
+                },
+                "user_email_id": {
+                    "description": "Required to specify the recipient",
+                    "type": "integer"
+                }
+            }
+        },
         "core_dtos.TwCreateScheduleRequest": {
             "type": "object",
             "properties": {
@@ -2784,9 +2814,6 @@ const docTemplate = `{
                 "extra_data": {
                     "type": "string"
                 },
-                "is_deleted": {
-                    "type": "boolean"
-                },
                 "location": {
                     "type": "string"
                 },
@@ -2815,9 +2842,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "workspace_id": {
-                    "type": "integer"
-                },
-                "workspace_user_id": {
                     "type": "integer"
                 }
             }

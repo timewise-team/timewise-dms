@@ -8,6 +8,31 @@ definitions:
       workspace_id:
         type: integer
     type: object
+  core_dtos.PushNotificationDto:
+    properties:
+      extra_data:
+        description: 'Optional: Additional data'
+        type: string
+      message:
+        description: Required for the notification content
+        type: string
+      related_item_id:
+        description: 'Optional: ID of related item'
+        type: integer
+      related_item_type:
+        description: 'Optional: Type of related item'
+        type: string
+      type:
+        description: Required to specify the notification type
+        type: string
+      user_email_id:
+        description: Required to specify the recipient
+        type: integer
+    required:
+    - message
+    - type
+    - user_email_id
+    type: object
   core_dtos.TwCreateScheduleRequest:
     properties:
       all_day:
@@ -178,8 +203,6 @@ definitions:
         type: string
       extra_data:
         type: string
-      is_deleted:
-        type: boolean
       location:
         type: string
       position:
@@ -199,8 +222,6 @@ definitions:
       visibility:
         type: string
       workspace_id:
-        type: integer
-      workspace_user_id:
         type: integer
     type: object
   core_dtos.TwUpdateScheduleResponse:
@@ -712,6 +733,28 @@ info:
   title: timewise-dbms
   version: "1.0"
 paths:
+  /api/v1/notification:
+    post:
+      consumes:
+      - application/json
+      description: Create a new notification
+      parameters:
+      - description: Create notification request
+        in: body
+        name: createNotificationRequest
+        required: true
+        schema:
+          $ref: '#/definitions/core_dtos.PushNotificationDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/core_dtos.PushNotificationDto'
+      summary: Create a new notification
+      tags:
+      - notification
   /dbms/v1/board_columns:
     post:
       consumes:
@@ -925,31 +968,6 @@ paths:
       summary: Get documents by schedule
       tags:
       - document
-  /dbms/v1/email_synced/{email}:
-    get:
-      consumes:
-      - application/json
-      description: Get all emails synced with an email
-      parameters:
-      - description: Email
-        in: path
-        name: email
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: List of emails synced with the email
-          schema:
-            $ref: '#/definitions/models.TwUserEmail'
-        "400":
-          description: Email is not synced any other emails
-          schema:
-            $ref: '#/definitions/fiber.Map'
-      summary: Get all emails synced with an email
-      tags:
-      - Email Synced
   /dbms/v1/recurrence_exception:
     get:
       consumes:
