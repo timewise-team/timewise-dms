@@ -1754,6 +1754,13 @@ const docTemplate = `{
                         "description": "Order",
                         "name": "order",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "userid",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {

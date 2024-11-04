@@ -274,23 +274,30 @@ func (handler *WorkspaceHandler) getWorkspacesByEmail(c *fiber.Ctx) error {
 // @Param search query string false "Search"
 // @Param sortBy query string false "Sort by"
 // @Param order query string false "Order"
+// @Param userid query string true "User ID"
 // @Success 200 {object} []models.TwWorkspace
 // @Router /dbms/v1/workspace/filter/workspace [get]
 func (handler *WorkspaceHandler) filterWorkspaces(c *fiber.Ctx) error {
 	var workspaces []models.TwWorkspace
 	query := handler.DB
-
+	if c.Query("userid") == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid user ID"})
+	}
+	query = query.Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
+		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
+		Joins("JOIN tw_users ON tw_user_emails.user_id = tw_users.id").
+		Where("tw_users.deleted_at IS NULL").
+		Where("tw_workspaces.deleted_at IS NULL").
+		Where("tw_workspace_users.is_active = true").
+		Where("tw_workspace_users.is_verified = true").
+		Where("tw_workspace_users.status = 'joined'").
+		Where("tw_workspace_users.role != 'guest'").
+		Where("tw_workspace_users.role != 'Guest'").
+		Where("tw_workspace_users.deleted_at IS NULL").
+		Where("tw_users.id = ?", c.Query("userid"))
 	// Filter by email
 	if email := c.Query("email"); email != "" {
-		query = query.Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
-			Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
-			Where("tw_workspaces.deleted_at IS NULL").
-			Where("tw_workspace_users.is_active = true").
-			Where("tw_workspace_users.is_verified = true").
-			Where("tw_workspace_users.status = 'joined'").
-			Where("tw_workspace_users.role != 'guest'").
-			Where("tw_workspace_users.role != 'Guest'").
-			Where("tw_workspace_users.deleted_at IS NULL").
+		query = query.
 			Where("tw_user_emails.email = ?", email)
 	}
 
@@ -302,7 +309,7 @@ func (handler *WorkspaceHandler) filterWorkspaces(c *fiber.Ctx) error {
 
 	// Search by keyword
 	if search := c.Query("search"); search != "" {
-		query = query.Where("tw_workspaces.title LIKE ? ", "%"+search+"%", "%"+search+"%")
+		query = query.Where("tw_workspaces.title LIKE ? ", "%"+search+"%")
 	}
 
 	// Sort by field
