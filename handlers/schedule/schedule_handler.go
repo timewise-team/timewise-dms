@@ -312,11 +312,13 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 
 	now = time.Now()
 	newScheduleParticipant := models.TwScheduleParticipant{
+		CreatedAt:        now,
+		UpdatedAt:        now,
 		ScheduleId:       schedule.ID,
 		WorkspaceUserId:  *scheduleDTO.WorkspaceUserID,
 		AssignAt:         &now,
 		AssignBy:         *scheduleDTO.WorkspaceUserID,
-		Status:           "participant",
+		Status:           "creator",
 		ResponseTime:     &now,
 		InvitationSentAt: &now,
 		InvitationStatus: "joined",
