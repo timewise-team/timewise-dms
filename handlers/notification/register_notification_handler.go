@@ -12,5 +12,7 @@ func RegisterNotificationHandler(router fiber.Router, db *gorm.DB) {
 	}
 	common.RegisterHandler(router, db, func(handler common.Handler) {
 		handler.Router.Post("/", notification.CreateNotification)
+		handler.Router.Get("/", notification.GetUnsentNotifications)
+		handler.Router.Put("/:notification_id", notification.updateNotificationToSent)
 	})
 }

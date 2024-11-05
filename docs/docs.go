@@ -15,40 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/notification": {
-            "post": {
-                "description": "Create a new notification",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "notification"
-                ],
-                "summary": "Create a new notification",
-                "parameters": [
-                    {
-                        "description": "Create notification request",
-                        "name": "createNotificationRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/core_dtos.PushNotificationDto"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/core_dtos.PushNotificationDto"
-                        }
-                    }
-                }
-            }
-        },
         "/dbms/v1/board_columns": {
             "post": {
                 "description": "Create board column",
@@ -366,6 +332,96 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.TwDocument"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/notification": {
+            "get": {
+                "description": "Get unsent notifications",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification"
+                ],
+                "summary": "Get unsent notifications",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwNotifications"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new notification",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification"
+                ],
+                "summary": "Create a new notification",
+                "parameters": [
+                    {
+                        "description": "Create notification request",
+                        "name": "createNotificationRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.PushNotificationDto"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/core_dtos.PushNotificationDto"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/notification/{notification_id}": {
+            "put": {
+                "description": "Update notification to sent",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification"
+                ],
+                "summary": "Update notification to sent",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Notification ID",
+                        "name": "notification_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
                         }
                     }
                 }
@@ -3097,6 +3153,53 @@ const docTemplate = `{
                 }
             }
         },
+        "models.TwNotifications": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_read": {
+                    "type": "boolean"
+                },
+                "is_sent": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "notified_at": {
+                    "type": "string"
+                },
+                "related_item_id": {
+                    "type": "integer"
+                },
+                "related_item_type": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "userEmail": {
+                    "$ref": "#/definitions/models.TwUserEmail"
+                },
+                "user_email_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "models.TwSchedule": {
             "type": "object",
             "properties": {
@@ -3338,6 +3441,9 @@ const docTemplate = `{
                 },
                 "id": {
                     "type": "integer"
+                },
+                "status": {
+                    "type": "string"
                 },
                 "updated_at": {
                     "type": "string"
