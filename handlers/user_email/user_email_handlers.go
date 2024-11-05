@@ -43,12 +43,19 @@ func (h *UserEmailHandler) getUserEmails(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param user_id path int true "User ID"
+// @Param status query string false "Status"
 // @Success 200 {array} models.TwUserEmail
 // @Router /dbms/v1/user_email/user/{user_id} [get]
 func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
 	var userEmails []models.TwUserEmail
 	userId := c.Params("user_id")
-
+	status := c.Query("email")
+	if status != "" {
+		if err := h.DB.Where("user_id = ? AND status = ?", userId, status).Find(&userEmails).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		}
+		return c.JSON(userEmails)
+	}
 	if err := h.DB.Where("user_id = ?", userId).Find(&userEmails).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
@@ -105,7 +112,7 @@ func (h *UserEmailHandler) updateUserIdInUserEmail(c *fiber.Ctx) error {
 	var userEmail models.TwUserEmail
 	email := c.Query("email")
 	userIdStr := c.Query("user_id")
-
+	status := c.Query("status")
 	if err := h.DB.Where("email = ?", email).First(&userEmail).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).SendString("Email not found")
@@ -119,6 +126,7 @@ func (h *UserEmailHandler) updateUserIdInUserEmail(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(ok.Error())
 	}
 	userEmail.UserId = userId
+	userEmail.Status = status
 	userEmail.DeletedAt = nil
 	if result := h.DB.Save(&userEmail); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
