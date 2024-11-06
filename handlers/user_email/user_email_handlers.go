@@ -106,6 +106,7 @@ func (h *UserEmailHandler) createUserEmail(ctx *fiber.Ctx) error {
 // @Produce json
 // @Param email query string true "Email"
 // @Param user_id query string true "User ID"
+// @Param status query string true "Status"
 // @Success 200 {object} models.TwUserEmail
 // @Router /dbms/v1/user_email [patch]
 func (h *UserEmailHandler) updateUserIdInUserEmail(c *fiber.Ctx) error {
@@ -126,7 +127,12 @@ func (h *UserEmailHandler) updateUserIdInUserEmail(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusBadRequest).SendString(ok.Error())
 	}
 	userEmail.UserId = userId
-	userEmail.Status = status
+	// if status = "", then set null to status
+	if status == "" {
+		userEmail.Status = nil
+	} else {
+		userEmail.Status = &status
+	}
 	userEmail.DeletedAt = nil
 	if result := h.DB.Save(&userEmail); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())

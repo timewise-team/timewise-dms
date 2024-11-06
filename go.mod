@@ -9,7 +9,7 @@ require (
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/viper v1.19.0
 	github.com/swaggo/swag v1.16.3
-	github.com/timewise-team/timewise-models v0.0.0-20241105150444-2b754dffdb97
+	github.com/timewise-team/timewise-models v0.0.0-20241106183249-df53e21126ac
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/gorm v1.25.11
 )
