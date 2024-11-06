@@ -28,7 +28,10 @@ func (h *BoardColumnsHandler) getBoardColumnsByWorkspace(c *fiber.Ctx) error {
 	}
 	var boardColumns []models.TwBoardColumn
 	// Get the board columns
-	if result := h.DB.Where("workspace_id = ?", workspaceID).Find(&boardColumns); result.Error != nil {
+	if result := h.DB.Where("workspace_id = ?", workspaceID).
+		Where("deleted_at IS NULL").
+		Order("position").
+		Find(&boardColumns); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": result.Error.Error(),
 		})
