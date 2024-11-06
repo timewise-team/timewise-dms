@@ -18,6 +18,7 @@ func RegisterUserHandler(router fiber.Router, db *gorm.DB) {
 
 	// Register all endpoints here
 	router.Get("/", userHandler.getUsers)
+	router.Get("/get", userHandler.getUserByEmail)
 	router.Get("/:user_id", userHandler.getUserById)
 	router.Post("/", userHandler.createUser)
 	router.Put("/:user_id", userHandler.updateUser)
