@@ -1491,6 +1491,50 @@ const docTemplate = `{
                     }
                 }
             },
+            "delete": {
+                "description": "Delete user email by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Delete user email by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "status",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "patch": {
                 "description": "Update user_id in tw_user_email by email",
                 "consumes": [
@@ -1635,38 +1679,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.TwUserEmail"
                             }
-                        }
-                    }
-                }
-            }
-        },
-        "/dbms/v1/user_email/{email_id}": {
-            "delete": {
-                "description": "Delete user email by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user_email"
-                ],
-                "summary": "Delete user email by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Email ID",
-                        "name": "email_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
                         }
                     }
                 }

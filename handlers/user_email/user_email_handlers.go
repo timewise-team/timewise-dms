@@ -153,7 +153,7 @@ func (h *UserEmailHandler) deleteUserEmail(ctx *fiber.Ctx) error {
 	if result := h.DB.Where("user_id = ? AND email = ? AND status = ?", userId, email, status).First(&userEmail); result.Error != nil {
 		return ctx.Status(fiber.StatusNotFound).SendString("User email not found")
 	}
-	if result := h.DB.Delete(&models.TwUserEmail{}, "email = ?", email); result.Error != nil {
+	if result := h.DB.Delete(&models.TwUserEmail{}, "email = ? AND status = 'pending'", email); result.Error != nil {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return ctx.SendString("Email deleted successfully")

@@ -1706,6 +1706,36 @@ paths:
       tags:
       - user
   /dbms/v1/user_email:
+    delete:
+      consumes:
+      - application/json
+      description: Delete user email by ID
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: integer
+      - description: Email
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: status
+        in: query
+        name: status
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete user email by ID
+      tags:
+      - user_email
     get:
       consumes:
       - application/json
@@ -1766,27 +1796,6 @@ paths:
           schema:
             $ref: '#/definitions/models.TwUserEmail'
       summary: Create a new user email
-      tags:
-      - user_email
-  /dbms/v1/user_email/{email_id}:
-    delete:
-      consumes:
-      - application/json
-      description: Delete user email by ID
-      parameters:
-      - description: Email ID
-        in: path
-        name: email_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Delete user email by ID
       tags:
       - user_email
   /dbms/v1/user_email/email/{email}:
