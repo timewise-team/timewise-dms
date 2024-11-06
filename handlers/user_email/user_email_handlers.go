@@ -49,7 +49,7 @@ func (h *UserEmailHandler) getUserEmails(c *fiber.Ctx) error {
 func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
 	var userEmails []models.TwUserEmail
 	userId := c.Params("user_id")
-	status := c.Query("email")
+	status := c.Query("status")
 	if status != "" {
 		if err := h.DB.Where("user_id = ? AND status = ?", userId, status).Find(&userEmails).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
@@ -140,12 +140,20 @@ func (h *UserEmailHandler) updateUserIdInUserEmail(c *fiber.Ctx) error {
 // @Tags user_email
 // @Accept json
 // @Produce json
-// @Param email_id path int true "Email ID"
+// @Param user_id query int true "User ID"
+// @Param email query string true "Email"
+// @Param status query string true "status"
 // @Success 200 {string} string
-// @Router /dbms/v1/user_email/{email_id} [delete]
+// @Router /dbms/v1/user_email [delete]
 func (h *UserEmailHandler) deleteUserEmail(ctx *fiber.Ctx) error {
-	emailId := ctx.Params("email_id")
-	if result := h.DB.Delete(&models.TwUserEmail{}, emailId); result.Error != nil {
+	userId := ctx.Query("user_id")
+	email := ctx.Query("email")
+	status := ctx.Query("status")
+	var userEmail models.TwUserEmail
+	if result := h.DB.Where("user_id = ? AND email = ? AND status = ?", userId, email, status).First(&userEmail); result.Error != nil {
+		return ctx.Status(fiber.StatusNotFound).SendString("User email not found")
+	}
+	if result := h.DB.Delete(&models.TwUserEmail{}, "email = ?", email); result.Error != nil {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return ctx.SendString("Email deleted successfully")
