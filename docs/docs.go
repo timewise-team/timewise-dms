@@ -1614,6 +1614,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/user_email/check": {
+            "get": {
+                "description": "Get user email to check before link",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Get user email to check before link",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/user_email/email/{email}": {
             "get": {
                 "description": "Get user emails by email",
