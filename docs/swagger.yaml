@@ -47,6 +47,8 @@ definitions:
       workspace_id:
         description: Nullable field
         type: integer
+      workspace_user_id:
+        type: integer
     type: object
   core_dtos.TwCreateShecduleResponse:
     properties:
@@ -941,6 +943,28 @@ paths:
               $ref: '#/definitions/models.TwDocument'
             type: array
       summary: Get documents by schedule
+      tags:
+      - document
+  /dbms/v1/document/upload:
+    post:
+      consumes:
+      - application/json
+      description: Create document
+      parameters:
+      - description: Document object
+        in: body
+        name: document
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwDocument'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwDocument'
+      summary: Create document
       tags:
       - document
   /dbms/v1/notification:

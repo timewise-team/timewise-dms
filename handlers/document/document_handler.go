@@ -89,3 +89,23 @@ func (h *DocumentHandler) getDocumentsByScheduleID(c *fiber.Ctx) error {
 
 	return c.JSON(documents)
 }
+
+// createDocument godoc
+// @Summary Create document
+// @Description Create document
+// @Tags document
+// @Accept json
+// @Produce json
+// @Param document body models.TwDocument true "Document object"
+// @Success 200 {object} models.TwDocument
+// @Router /dbms/v1/document/upload [post]
+func (h *DocumentHandler) createDocument(c *fiber.Ctx) error {
+	var document models.TwDocument
+	if err := c.BodyParser(&document); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	if err := h.DB.Create(&document).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	return c.JSON(document)
+}
