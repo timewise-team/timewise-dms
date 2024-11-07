@@ -1,4 +1,20 @@
 definitions:
+  board_columns.RageRequest:
+    properties:
+      position1:
+        type: integer
+      position2:
+        type: integer
+      workspace_id:
+        type: integer
+    type: object
+  board_columns.RequestBody:
+    properties:
+      position:
+        type: integer
+      workspace_id:
+        type: integer
+    type: object
   board_columns_dtos.BoardColumnsRequest:
     properties:
       name:
@@ -874,6 +890,70 @@ paths:
           schema:
             $ref: '#/definitions/models.TwBoardColumn'
       summary: Update board column field
+      tags:
+      - board_columns
+  /dbms/v1/board_columns/rage/position:
+    get:
+      consumes:
+      - application/json
+      description: Get rage
+      parameters:
+      - description: Get rage request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/board_columns.RageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwBoardColumn'
+            type: array
+      summary: Get rage
+      tags:
+      - board_columns
+  /dbms/v1/board_columns/update_position/position:
+    put:
+      consumes:
+      - application/json
+      description: Update position
+      parameters:
+      - description: Update position request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwBoardColumn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update position
+      tags:
+      - board_columns
+  /dbms/v1/board_columns/update_position_after_deletion:
+    put:
+      consumes:
+      - application/json
+      description: Update position after deletion
+      parameters:
+      - description: Update position after deletion request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/board_columns.RequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update position after deletion
       tags:
       - board_columns
   /dbms/v1/comment/schedule/{schedule_id}:

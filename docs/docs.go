@@ -49,6 +49,105 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/board_columns/rage/position": {
+            "get": {
+                "description": "Get rage",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Get rage",
+                "parameters": [
+                    {
+                        "description": "Get rage request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/board_columns.RageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwBoardColumn"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/board_columns/update_position/position": {
+            "put": {
+                "description": "Update position",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Update position",
+                "parameters": [
+                    {
+                        "description": "Update position request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/dbms/v1/board_columns/update_position_after_deletion": {
+            "put": {
+                "description": "Update position after deletion",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Update position after deletion",
+                "parameters": [
+                    {
+                        "description": "Update position after deletion request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/board_columns.RequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/dbms/v1/board_columns/{id}": {
             "get": {
                 "description": "Get board column by ID",
@@ -2700,6 +2799,31 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "board_columns.RageRequest": {
+            "type": "object",
+            "properties": {
+                "position1": {
+                    "type": "integer"
+                },
+                "position2": {
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "board_columns.RequestBody": {
+            "type": "object",
+            "properties": {
+                "position": {
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "board_columns_dtos.BoardColumnsRequest": {
             "type": "object",
             "properties": {
