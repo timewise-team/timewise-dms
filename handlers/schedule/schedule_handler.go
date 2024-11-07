@@ -270,7 +270,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	}
 
 	var existingSchedules []models.TwSchedule
-	if err := h.DB.Where("board_column_id = ?", *scheduleDTO.BoardColumnID).Find(&existingSchedules).Error; err != nil {
+	if err := h.DB.Where("board_column_id = ? and is_deleted = false", *scheduleDTO.BoardColumnID).Find(&existingSchedules).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
@@ -280,20 +280,11 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		WorkspaceId:   *scheduleDTO.WorkspaceID,
 		BoardColumnId: *scheduleDTO.BoardColumnID,
 		Title:         *scheduleDTO.Title,
-		//Description:   *scheduleDTO.Description,
-		//StartTime:         *scheduleDTO.StartTime,
-		//EndTime:           *scheduleDTO.EndTime,
-		//Location:          *scheduleDTO.Location,
-		//CreatedBy: *scheduleDTO.WorkspaceUserID,
-		CreatedAt: &now,
-		UpdatedAt: &now,
-		//Status:            *scheduleDTO.Status,
-		//AllDay:            *scheduleDTO.AllDay,
-		//Visibility:        *scheduleDTO.Visibility,
-		//ExtraData:         *scheduleDTO.ExtraData,
-		//IsDeleted:         false,
-		//RecurrencePattern: *scheduleDTO.RecurrencePattern,
-		Position: len(existingSchedules) + 1,
+		Description:   *scheduleDTO.Description,
+		CreatedBy:     *scheduleDTO.WorkspaceUserID,
+		CreatedAt:     &now,
+		UpdatedAt:     &now,
+		Position:      len(existingSchedules) + 1,
 	}
 
 	if result := h.DB.Create(&schedule); result.Error != nil {
@@ -301,9 +292,9 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	}
 
 	newScheduleLog := models.TwScheduleLog{
-		ScheduleId: schedule.ID,
-		//WorkspaceUserId: *scheduleDTO.WorkspaceUserID,
-		Action: "create schedule",
+		ScheduleId:      schedule.ID,
+		WorkspaceUserId: *scheduleDTO.WorkspaceUserID,
+		Action:          "create schedule",
 	}
 
 	if result := h.DB.Create(&newScheduleLog); result.Error != nil {
@@ -312,12 +303,12 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 
 	now = time.Now()
 	newScheduleParticipant := models.TwScheduleParticipant{
-		CreatedAt:  now,
-		UpdatedAt:  now,
-		ScheduleId: schedule.ID,
-		//WorkspaceUserId:  *scheduleDTO.WorkspaceUserID,
-		AssignAt: &now,
-		//AssignBy:         *scheduleDTO.WorkspaceUserID,
+		CreatedAt:        now,
+		UpdatedAt:        now,
+		ScheduleId:       schedule.ID,
+		WorkspaceUserId:  *scheduleDTO.WorkspaceUserID,
+		AssignAt:         &now,
+		AssignBy:         *scheduleDTO.WorkspaceUserID,
 		Status:           "creator",
 		ResponseTime:     &now,
 		InvitationSentAt: &now,
@@ -333,6 +324,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		WorkspaceID:   schedule.WorkspaceId,
 		BoardColumnID: schedule.BoardColumnId,
 		Title:         schedule.Title,
+		Description:   schedule.Description,
 		Position:      schedule.Position,
 	})
 }
@@ -386,11 +378,6 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		}
 	}
 
-	// Kiểm tra và cập nhật các trường nếu có thay đổi
-	//if scheduleDTO.BoardColumnID != nil {
-	//	checkAndLog("board_column_id", strconv.Itoa(schedule.BoardColumnId), strconv.Itoa(*scheduleDTO.BoardColumnID))
-	//	schedule.BoardColumnId = *scheduleDTO.BoardColumnID
-	//}
 	if scheduleDTO.Title != nil {
 		checkAndLog("title", schedule.Title, *scheduleDTO.Title)
 		schedule.Title = *scheduleDTO.Title
@@ -441,15 +428,161 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		checkAndLog("recurrence_pattern", schedule.RecurrencePattern, *scheduleDTO.RecurrencePattern)
 		schedule.RecurrencePattern = *scheduleDTO.RecurrencePattern
 	}
-	//if scheduleDTO.Position != nil {
-	//	checkAndLog("position", strconv.Itoa(schedule.Position), strconv.Itoa(*scheduleDTO.Position))
-	//	schedule.Position = *scheduleDTO.Position
-	//}
 	if scheduleDTO.Priority != nil {
 		checkAndLog("priority", schedule.Priority, *scheduleDTO.Priority)
 		schedule.Priority = *scheduleDTO.Priority
 	}
 	schedule.CreatedBy = workspaceUserId
+
+	// Update timestamp
+	now := time.Now()
+	schedule.UpdatedAt = &now
+
+	// Lưu schedule đã cập nhật
+	if result := h.DB.Omit("deleted_at").Save(&schedule); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	// Thêm các log vào cơ sở dữ liệu
+	if len(logs) > 0 {
+		if result := h.DB.Create(&logs); result.Error != nil {
+			return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+		}
+	}
+
+	// Trả về kết quả cập nhật thành công
+	return c.JSON(core_dtos.TwUpdateScheduleResponse{
+		ID:                schedule.ID,
+		WorkspaceID:       schedule.WorkspaceId,
+		BoardColumnID:     schedule.BoardColumnId,
+		Title:             schedule.Title,
+		Description:       schedule.Description,
+		StartTime:         *schedule.StartTime,
+		EndTime:           *schedule.EndTime,
+		Location:          schedule.Location,
+		CreatedBy:         schedule.CreatedBy,
+		CreatedAt:         *schedule.CreatedAt,
+		UpdatedAt:         *schedule.UpdatedAt,
+		Status:            schedule.Status,
+		AllDay:            schedule.AllDay,
+		Visibility:        schedule.Visibility,
+		ExtraData:         schedule.ExtraData,
+		IsDeleted:         schedule.IsDeleted,
+		RecurrencePattern: schedule.RecurrencePattern,
+		Position:          schedule.Position,
+		Priority:          schedule.Priority,
+	})
+}
+
+func (h *ScheduleHandler) UpdateSchedulePosition(c *fiber.Ctx) error {
+	var scheduleDTO core_dtos.TwUpdateSchedulePosition
+	if err := c.BodyParser(&scheduleDTO); err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+
+	var schedule models.TwSchedule
+
+	scheduleId := c.Params("schedule_id")
+	workspaceUserIdStr := c.Params("workspace_user_id")
+	workspaceUserId, err := strconv.Atoi(workspaceUserIdStr)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString("Invalid workspace_user_id")
+	}
+
+	if err := h.DB.Where("id = ?", scheduleId).First(&schedule).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("Schedule not found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	var logs []models.TwScheduleLog
+
+	checkAndLog := func(field, oldValue, newValue string) {
+		if oldValue != newValue {
+			logs = append(logs, models.TwScheduleLog{
+				ScheduleId:      schedule.ID,
+				WorkspaceUserId: workspaceUserId,
+				Action:          "update schedule",
+				FieldChanged:    field,
+				OldValue:        oldValue,
+				NewValue:        newValue,
+			})
+		}
+	}
+
+	if scheduleDTO.BoardColumnID != nil {
+		if *scheduleDTO.BoardColumnID == schedule.BoardColumnId {
+			if *scheduleDTO.Position < schedule.Position {
+				var schedulesToUpdate []models.TwSchedule
+				if err := h.DB.Where("board_column_id = ? AND position < ? AND position >= ? AND is_deleted != 1", schedule.BoardColumnId, schedule.Position, scheduleDTO.Position).
+					Order("position ASC").Find(&schedulesToUpdate).Error; err != nil {
+					return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+				}
+
+				for i := range schedulesToUpdate {
+					schedulesToUpdate[i].Position += 1
+					if err := h.DB.Omit("deleted_at,start_time,end_time").Save(&schedulesToUpdate[i]).Error; err != nil {
+						return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+					}
+				}
+			} else if *scheduleDTO.Position > schedule.Position {
+				var schedulesToUpdate []models.TwSchedule
+				if err := h.DB.Where("board_column_id = ? AND position > ? AND position <= ? AND is_deleted != 1", schedule.BoardColumnId, schedule.Position, scheduleDTO.Position).
+					Order("position ASC").Find(&schedulesToUpdate).Error; err != nil {
+					return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+				}
+
+				for i := range schedulesToUpdate {
+					schedulesToUpdate[i].Position -= 1
+					if err := h.DB.Omit("deleted_at,start_time,end_time").Save(&schedulesToUpdate[i]).Error; err != nil {
+						return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+					}
+				}
+			}
+			checkAndLog("position", strconv.Itoa(schedule.Position), strconv.Itoa(*scheduleDTO.Position))
+			schedule.Position = *scheduleDTO.Position
+		} else if *scheduleDTO.BoardColumnID != schedule.BoardColumnId {
+			var schedulesToUpdate []models.TwSchedule
+			if err := h.DB.Where("board_column_id = ? AND position > ? AND is_deleted != 1", schedule.BoardColumnId, schedule.Position).
+				Order("position ASC").Find(&schedulesToUpdate).Error; err != nil {
+				return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			}
+
+			for i := range schedulesToUpdate {
+				schedulesToUpdate[i].Position -= 1
+				if err := h.DB.Omit("deleted_at,start_time,end_time").Save(&schedulesToUpdate[i]).Error; err != nil {
+					return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+				}
+			}
+			var schedulesInBoardColumnToUpdate []models.TwSchedule
+			if err := h.DB.Where("board_column_id = ? AND position >= ? AND is_deleted != 1", scheduleDTO.BoardColumnID, scheduleDTO.Position).
+				Order("position ASC").Find(&schedulesInBoardColumnToUpdate).Error; err != nil {
+				return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+			}
+			if len(schedulesInBoardColumnToUpdate) == 0 {
+				var maxPosition int
+				if err := h.DB.Model(&models.TwSchedule{}).
+					Where("board_column_id = ? AND is_deleted != 1", scheduleDTO.BoardColumnID).
+					Select("COALESCE(MAX(position), 0)").Scan(&maxPosition).Error; err != nil {
+					return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+				}
+				checkAndLog("position", strconv.Itoa(schedule.Position), strconv.Itoa(*scheduleDTO.Position))
+				schedule.Position = maxPosition + 1
+			} else {
+				for i := range schedulesInBoardColumnToUpdate {
+					schedulesInBoardColumnToUpdate[i].Position += 1
+					if err := h.DB.Omit("deleted_at,start_time,end_time").Save(&schedulesInBoardColumnToUpdate[i]).Error; err != nil {
+						return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+					}
+				}
+				checkAndLog("position", strconv.Itoa(schedule.Position), strconv.Itoa(*scheduleDTO.Position))
+				schedule.Position = *scheduleDTO.Position
+			}
+		}
+		checkAndLog("board_column_id", strconv.Itoa(schedule.BoardColumnId), strconv.Itoa(*scheduleDTO.BoardColumnID))
+		schedule.BoardColumnId = *scheduleDTO.BoardColumnID
+	}
 
 	// Update timestamp
 	now := time.Now()
