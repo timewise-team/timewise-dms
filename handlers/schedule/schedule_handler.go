@@ -284,7 +284,7 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		//StartTime:         *scheduleDTO.StartTime,
 		//EndTime:           *scheduleDTO.EndTime,
 		//Location:          *scheduleDTO.Location,
-		CreatedBy: *scheduleDTO.WorkspaceUserID,
+		//CreatedBy: *scheduleDTO.WorkspaceUserID,
 		CreatedAt: &now,
 		UpdatedAt: &now,
 		//Status:            *scheduleDTO.Status,
@@ -301,9 +301,9 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	}
 
 	newScheduleLog := models.TwScheduleLog{
-		ScheduleId:      schedule.ID,
-		WorkspaceUserId: *scheduleDTO.WorkspaceUserID,
-		Action:          "create schedule",
+		ScheduleId: schedule.ID,
+		//WorkspaceUserId: *scheduleDTO.WorkspaceUserID,
+		Action: "create schedule",
 	}
 
 	if result := h.DB.Create(&newScheduleLog); result.Error != nil {
@@ -312,12 +312,12 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 
 	now = time.Now()
 	newScheduleParticipant := models.TwScheduleParticipant{
-		CreatedAt:        now,
-		UpdatedAt:        now,
-		ScheduleId:       schedule.ID,
-		WorkspaceUserId:  *scheduleDTO.WorkspaceUserID,
-		AssignAt:         &now,
-		AssignBy:         *scheduleDTO.WorkspaceUserID,
+		CreatedAt:  now,
+		UpdatedAt:  now,
+		ScheduleId: schedule.ID,
+		//WorkspaceUserId:  *scheduleDTO.WorkspaceUserID,
+		AssignAt: &now,
+		//AssignBy:         *scheduleDTO.WorkspaceUserID,
 		Status:           "creator",
 		ResponseTime:     &now,
 		InvitationSentAt: &now,
@@ -387,10 +387,10 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 	}
 
 	// Kiểm tra và cập nhật các trường nếu có thay đổi
-	if scheduleDTO.BoardColumnID != nil {
-		checkAndLog("board_column_id", strconv.Itoa(schedule.BoardColumnId), strconv.Itoa(*scheduleDTO.BoardColumnID))
-		schedule.BoardColumnId = *scheduleDTO.BoardColumnID
-	}
+	//if scheduleDTO.BoardColumnID != nil {
+	//	checkAndLog("board_column_id", strconv.Itoa(schedule.BoardColumnId), strconv.Itoa(*scheduleDTO.BoardColumnID))
+	//	schedule.BoardColumnId = *scheduleDTO.BoardColumnID
+	//}
 	if scheduleDTO.Title != nil {
 		checkAndLog("title", schedule.Title, *scheduleDTO.Title)
 		schedule.Title = *scheduleDTO.Title
@@ -441,10 +441,10 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		checkAndLog("recurrence_pattern", schedule.RecurrencePattern, *scheduleDTO.RecurrencePattern)
 		schedule.RecurrencePattern = *scheduleDTO.RecurrencePattern
 	}
-	if scheduleDTO.Position != nil {
-		checkAndLog("position", strconv.Itoa(schedule.Position), strconv.Itoa(*scheduleDTO.Position))
-		schedule.Position = *scheduleDTO.Position
-	}
+	//if scheduleDTO.Position != nil {
+	//	checkAndLog("position", strconv.Itoa(schedule.Position), strconv.Itoa(*scheduleDTO.Position))
+	//	schedule.Position = *scheduleDTO.Position
+	//}
 	if scheduleDTO.Priority != nil {
 		checkAndLog("priority", schedule.Priority, *scheduleDTO.Priority)
 		schedule.Priority = *scheduleDTO.Priority
