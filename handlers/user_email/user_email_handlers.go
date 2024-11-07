@@ -216,7 +216,7 @@ func (h *UserEmailHandler) getUserEmailToCheckBeforeLink(c *fiber.Ctx) error {
 	email := c.Query("email")
 	userId := c.Query("user_id")
 
-	if err := h.DB.Where("email = ? AND user_id = ? AND status is not null", email, userId).Find(&userEmails).Error; err != nil {
+	if err := h.DB.Where("email = ? AND user_id = ? AND status is not null", email, userId).First(&userEmails).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).SendString("Email not found and ok to be linked")
 		}
