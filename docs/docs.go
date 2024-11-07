@@ -337,6 +337,40 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/document/upload": {
+            "post": {
+                "description": "Create document",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Create document",
+                "parameters": [
+                    {
+                        "description": "Document object",
+                        "name": "document",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwDocument"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwDocument"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/notification": {
             "get": {
                 "description": "Get unsent notifications",
@@ -2692,6 +2726,9 @@ const docTemplate = `{
                 },
                 "workspace_id": {
                     "description": "Nullable field",
+                    "type": "integer"
+                },
+                "workspace_user_id": {
                     "type": "integer"
                 }
             }
