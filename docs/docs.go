@@ -1254,14 +1254,6 @@ const docTemplate = `{
                     "user"
                 ],
                 "summary": "Get all users",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Email",
-                        "name": "email",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -1295,6 +1287,38 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.TwUser"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUser"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/user/get": {
+            "get": {
+                "description": "Get user by email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Get user by email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -1467,6 +1491,50 @@ const docTemplate = `{
                     }
                 }
             },
+            "delete": {
+                "description": "Delete user email by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Delete user email by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "status",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
             "patch": {
                 "description": "Update user_id in tw_user_email by email",
                 "consumes": [
@@ -1491,6 +1559,13 @@ const docTemplate = `{
                         "type": "string",
                         "description": "User ID",
                         "name": "user_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status",
+                        "name": "status",
                         "in": "query",
                         "required": true
                     }
@@ -1595,6 +1670,12 @@ const docTemplate = `{
                         "name": "user_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status",
+                        "name": "status",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1605,38 +1686,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.TwUserEmail"
                             }
-                        }
-                    }
-                }
-            }
-        },
-        "/dbms/v1/user_email/{email_id}": {
-            "delete": {
-                "description": "Delete user email by ID",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "user_email"
-                ],
-                "summary": "Delete user email by ID",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Email ID",
-                        "name": "email_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "string"
                         }
                     }
                 }
@@ -2629,49 +2678,11 @@ const docTemplate = `{
         "core_dtos.TwCreateScheduleRequest": {
             "type": "object",
             "properties": {
-                "all_day": {
-                    "description": "Nullable field (represented by tinyint in SQL)",
-                    "type": "boolean"
-                },
                 "board_column_id": {
                     "description": "Nullable field",
                     "type": "integer"
                 },
-                "created_by": {
-                    "description": "Required field",
-                    "type": "integer"
-                },
                 "description": {
-                    "description": "Nullable field",
-                    "type": "string"
-                },
-                "end_time": {
-                    "description": "Nullable field",
-                    "type": "string"
-                },
-                "extra_data": {
-                    "description": "Nullable field",
-                    "type": "string"
-                },
-                "location": {
-                    "description": "Nullable field",
-                    "type": "string"
-                },
-                "position": {
-                    "type": "integer"
-                },
-                "priority": {
-                    "type": "string"
-                },
-                "recurrence_pattern": {
-                    "description": "Nullable field",
-                    "type": "string"
-                },
-                "start_time": {
-                    "description": "Nullable field",
-                    "type": "string"
-                },
-                "status": {
                     "description": "Nullable field",
                     "type": "string"
                 },
@@ -2679,19 +2690,8 @@ const docTemplate = `{
                     "description": "Nullable field",
                     "type": "string"
                 },
-                "video_transcript": {
-                    "description": "Nullable field",
-                    "type": "string"
-                },
-                "visibility": {
-                    "description": "Nullable field",
-                    "type": "string"
-                },
                 "workspace_id": {
                     "description": "Nullable field",
-                    "type": "integer"
-                },
-                "workspace_user_id": {
                     "type": "integer"
                 }
             }
@@ -2701,6 +2701,9 @@ const docTemplate = `{
             "properties": {
                 "board_column_id": {
                     "type": "integer"
+                },
+                "description": {
+                    "type": "string"
                 },
                 "id": {
                     "type": "integer"
@@ -2865,9 +2868,6 @@ const docTemplate = `{
                 "all_day": {
                     "type": "boolean"
                 },
-                "board_column_id": {
-                    "type": "integer"
-                },
                 "description": {
                     "type": "string"
                 },
@@ -2880,10 +2880,8 @@ const docTemplate = `{
                 "location": {
                     "type": "string"
                 },
-                "position": {
-                    "type": "integer"
-                },
                 "priority": {
+                    "description": "Position          *int       ` + "`" + `json:\"position,omitempty\"` + "`" + `",
                     "type": "string"
                 },
                 "recurrence_pattern": {
@@ -2896,6 +2894,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "title": {
+                    "description": "BoardColumnID     *int       ` + "`" + `json:\"board_column_id,omitempty\"` + "`" + `",
                     "type": "string"
                 },
                 "video_transcript": {
