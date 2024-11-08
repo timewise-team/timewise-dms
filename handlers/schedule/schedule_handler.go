@@ -51,7 +51,7 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 	assignedTo := c.Query("assigned_to")
 
 	if workspaceID != "" {
-		query = query.Where("workspace_id = ?", workspaceID)
+		query = query.Where("workspace_id IN (?)", workspaceID)
 	}
 
 	if boardColumnID != "" {
