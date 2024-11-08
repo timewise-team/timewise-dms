@@ -1040,6 +1040,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/schedule/{schedule_id}/transcript": {
+            "put": {
+                "description": "Update transcript by schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule"
+                ],
+                "summary": "Update transcript by schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key",
+                        "name": "x_api_key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Video transcript",
+                        "name": "video_transcript",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully"
+                    }
+                }
+            }
+        },
         "/dbms/v1/schedule_log": {
             "get": {
                 "description": "Get all schedule logs",
