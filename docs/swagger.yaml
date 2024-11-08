@@ -1357,6 +1357,35 @@ paths:
       summary: Update an existing schedule
       tags:
       - schedule
+  /dbms/v1/schedule/{schedule_id}/transcript:
+    put:
+      consumes:
+      - application/json
+      description: Update transcript by schedule
+      parameters:
+      - description: API Key
+        in: header
+        name: x_api_key
+        required: true
+        type: string
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: string
+      - description: Video transcript
+        in: formData
+        name: video_transcript
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated successfully
+      summary: Update transcript by schedule
+      tags:
+      - schedule
   /dbms/v1/schedule/schedules/filter:
     get:
       consumes:

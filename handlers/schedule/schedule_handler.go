@@ -1,6 +1,7 @@
 package schedule
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos"
@@ -751,6 +752,17 @@ func (h *ScheduleHandler) getSchedulesByBoardColumn(c *fiber.Ctx) error {
 	return c.JSON(schedules)
 }
 
+// UpdateTranscriptBySchedule godoc
+// @Summary Update transcript by schedule
+// @Description Update transcript by schedule
+// @Tags schedule
+// @Accept json
+// @Produce json
+// @Param x_api_key header string true "API Key"
+// @Param schedule_id path string true "Schedule ID"
+// @Param video_transcript formData string true "Video transcript"
+// @Success 200 "Updated successfully"
+// @Router /dbms/v1/schedule/{schedule_id}/transcript [put]
 func (h *ScheduleHandler) UpdateTranscriptBySchedule(ctx *fiber.Ctx) error {
 	// get an api_key from params
 	apiKey := ctx.Get("x_api_key")
@@ -766,10 +778,16 @@ func (h *ScheduleHandler) UpdateTranscriptBySchedule(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).SendString("Schedule ID is required")
 	}
 
-	// Parse request body
-	var scheduleDTO core_dtos.TwUpdateScheduleRequest
-	if err := ctx.BodyParser(&scheduleDTO); err != nil {
-		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
+	// Get video_transcript from body data
+	bodyDataStr := ctx.BodyRaw()
+	var bodyData map[string]interface{}
+	_ = json.Unmarshal(bodyDataStr, &bodyData)
+	videoTranscript, ok := bodyData["video_transcript"].(map[string]interface{})
+	if !ok {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Video transcript is required")
+	}
+	if videoTranscript == nil {
+		return ctx.Status(fiber.StatusBadRequest).SendString("Video transcript is required")
 	}
 
 	// Fetch the schedule from the database
@@ -781,13 +799,13 @@ func (h *ScheduleHandler) UpdateTranscriptBySchedule(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
-	// Update the VideoTranscript field if provided
-	if scheduleDTO.VideoTranscript != nil {
-		schedule.VideoTranscript = *scheduleDTO.VideoTranscript
+	// Convert the JSON object to a string
+	videoTranscriptStr, _ := json.Marshal(videoTranscript)
 
-		now := time.Now()
-		schedule.UpdatedAt = &now
-	}
+	schedule.VideoTranscript = string(videoTranscriptStr)
+
+	now := time.Now()
+	schedule.UpdatedAt = &now
 
 	// Save the updated schedule back to the database
 	if result := h.DB.Save(&schedule); result.Error != nil {
