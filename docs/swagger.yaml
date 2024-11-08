@@ -1026,6 +1026,27 @@ paths:
       summary: Delete document
       tags:
       - document
+  /dbms/v1/document/{document_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get document by ID
+      parameters:
+      - description: Document ID
+        in: path
+        name: document_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwDocument'
+      summary: Get document by ID
+      tags:
+      - document
   /dbms/v1/document/schedule/{schedule_id}:
     get:
       consumes:

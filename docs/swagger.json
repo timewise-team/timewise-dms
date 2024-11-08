@@ -498,6 +498,38 @@
                 }
             }
         },
+        "/dbms/v1/document/{document_id}": {
+            "get": {
+                "description": "Get document by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Get document by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID",
+                        "name": "document_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwDocument"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/notification": {
             "get": {
                 "description": "Get unsent notifications",

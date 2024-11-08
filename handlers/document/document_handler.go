@@ -1,10 +1,12 @@
 package document
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos/document_dtos"
 	"github.com/timewise-team/timewise-models/models"
+	"gorm.io/gorm"
 	"log"
 )
 
@@ -134,4 +136,28 @@ func (h *DocumentHandler) deleteDocument(c *fiber.Ctx) error {
 		return fmt.Errorf("failed to delete document from database: %v", err)
 	}
 	return c.SendStatus(fiber.StatusNoContent)
+}
+
+// getDocumentsById godoc
+// @Summary Get document by ID
+// @Description Get document by ID
+// @Tags document
+// @Accept json
+// @Produce json
+// @Param document_id path string true "Document ID"
+// @Success 200 {object} models.TwDocument
+// @Router /dbms/v1/document/{document_id} [get]
+func (h *DocumentHandler) getDocumentsById(c *fiber.Ctx) error {
+	documentID := c.Params("document_id")
+	if documentID == "" {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+	var document models.TwDocument
+	if err := h.DB.First(&document, documentID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Document not found"})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.JSON(document)
 }
