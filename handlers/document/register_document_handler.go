@@ -21,4 +21,5 @@ func RegisterDocumentHandler(router fiber.Router, db *gorm.DB) {
 	router.Get("/schedule_id/:schedule_id", documentHandler.getDocumentsByScheduleID)
 	router.Get("/:document_id", documentHandler.getDocumentsById)
 	router.Post("/upload", documentHandler.createDocument)
+	router.Delete("/", documentHandler.deleteDocument)
 }
