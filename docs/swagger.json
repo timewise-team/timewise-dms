@@ -393,6 +393,42 @@
                 }
             }
         },
+        "/dbms/v1/document": {
+            "delete": {
+                "description": "Delete document",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Delete document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID associated with the file",
+                        "name": "scheduleId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name of the file to delete",
+                        "name": "fileName",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/dbms/v1/document/schedule/{schedule_id}": {
             "get": {
                 "description": "Get documents by schedule",
@@ -450,6 +486,38 @@
                         "schema": {
                             "$ref": "#/definitions/models.TwDocument"
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwDocument"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/document/{document_id}": {
+            "get": {
+                "description": "Get document by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Get document by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID",
+                        "name": "document_id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
