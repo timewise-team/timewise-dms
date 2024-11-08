@@ -1,6 +1,7 @@
 package document
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos/document_dtos"
 	"github.com/timewise-team/timewise-models/models"
@@ -108,4 +109,29 @@ func (h *DocumentHandler) createDocument(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 	return c.JSON(document)
+}
+
+// deleteDocument godoc
+// @Summary Delete document
+// @Description Delete document
+// @Tags document
+// @Accept json
+// @Produce json
+// @Param scheduleId query string true "Schedule ID associated with the file"
+// @Param fileName query string true "Name of the file to delete"
+// @Success 204 "No Content"
+// @Router /dbms/v1/document [delete]
+func (h *DocumentHandler) deleteDocument(c *fiber.Ctx) error {
+	scheduleID := c.Query("scheduleId")
+	if scheduleID == "" {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+	fileName := c.Query("fileName")
+	if fileName == "" {
+		return c.SendStatus(fiber.StatusBadRequest)
+	}
+	if err := h.DB.Where("schedule_id = ? AND file_name = ?", scheduleID, fileName).Delete(&models.TwDocument{}).Error; err != nil {
+		return fmt.Errorf("failed to delete document from database: %v", err)
+	}
+	return c.SendStatus(fiber.StatusNoContent)
 }

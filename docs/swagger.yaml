@@ -1002,6 +1002,30 @@ paths:
       summary: Get comments by schedule
       tags:
       - comments
+  /dbms/v1/document:
+    delete:
+      consumes:
+      - application/json
+      description: Delete document
+      parameters:
+      - description: Schedule ID associated with the file
+        in: query
+        name: scheduleId
+        required: true
+        type: string
+      - description: Name of the file to delete
+        in: query
+        name: fileName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete document
+      tags:
+      - document
   /dbms/v1/document/schedule/{schedule_id}:
     get:
       consumes:
