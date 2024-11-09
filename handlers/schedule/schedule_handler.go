@@ -282,6 +282,8 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		BoardColumnId: *scheduleDTO.BoardColumnID,
 		Title:         *scheduleDTO.Title,
 		Description:   *scheduleDTO.Description,
+		StartTime:     &now,
+		EndTime:       &now,
 		CreatedBy:     *scheduleDTO.WorkspaceUserID,
 		CreatedAt:     &now,
 		UpdatedAt:     &now,
