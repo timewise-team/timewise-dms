@@ -765,12 +765,12 @@ func (h *ScheduleHandler) getSchedulesByBoardColumn(c *fiber.Ctx) error {
 // @Router /dbms/v1/schedule/{schedule_id}/transcript [put]
 func (h *ScheduleHandler) UpdateTranscriptBySchedule(ctx *fiber.Ctx) error {
 	// get an api_key from params
-	apiKey := ctx.Get("x_api_key")
-	if apiKey != "667qwsrUlyVa" {
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Unauthorized",
-		})
-	}
+	//apiKey := ctx.Get("x_api_key")
+	//if apiKey != "667qwsrUlyVa" {
+	//	return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+	//		"error": "Unauthorized",
+	//	})
+	//}
 
 	// Parse schedule_id from params
 	scheduleId := ctx.Params("schedule_id")
