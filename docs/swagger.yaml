@@ -1,4 +1,20 @@
 definitions:
+  board_columns.RageRequest:
+    properties:
+      position1:
+        type: integer
+      position2:
+        type: integer
+      workspace_id:
+        type: integer
+    type: object
+  board_columns.RequestBody:
+    properties:
+      position:
+        type: integer
+      workspace_id:
+        type: integer
+    type: object
   board_columns_dtos.BoardColumnsRequest:
     properties:
       name:
@@ -46,6 +62,8 @@ definitions:
         type: string
       workspace_id:
         description: Nullable field
+        type: integer
+      workspace_user_id:
         type: integer
     type: object
   core_dtos.TwCreateShecduleResponse:
@@ -874,6 +892,70 @@ paths:
       summary: Update board column field
       tags:
       - board_columns
+  /dbms/v1/board_columns/rage/position:
+    get:
+      consumes:
+      - application/json
+      description: Get rage
+      parameters:
+      - description: Get rage request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/board_columns.RageRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwBoardColumn'
+            type: array
+      summary: Get rage
+      tags:
+      - board_columns
+  /dbms/v1/board_columns/update_position/position:
+    put:
+      consumes:
+      - application/json
+      description: Update position
+      parameters:
+      - description: Update position request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwBoardColumn'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update position
+      tags:
+      - board_columns
+  /dbms/v1/board_columns/update_position_after_deletion:
+    put:
+      consumes:
+      - application/json
+      description: Update position after deletion
+      parameters:
+      - description: Update position after deletion request
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/board_columns.RequestBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Update position after deletion
+      tags:
+      - board_columns
   /dbms/v1/comment/schedule/{schedule_id}:
     get:
       consumes:
@@ -920,6 +1002,51 @@ paths:
       summary: Get comments by schedule
       tags:
       - comments
+  /dbms/v1/document:
+    delete:
+      consumes:
+      - application/json
+      description: Delete document
+      parameters:
+      - description: Schedule ID associated with the file
+        in: query
+        name: scheduleId
+        required: true
+        type: string
+      - description: Name of the file to delete
+        in: query
+        name: fileName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+      summary: Delete document
+      tags:
+      - document
+  /dbms/v1/document/{document_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get document by ID
+      parameters:
+      - description: Document ID
+        in: path
+        name: document_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwDocument'
+      summary: Get document by ID
+      tags:
+      - document
   /dbms/v1/document/schedule/{schedule_id}:
     get:
       consumes:
@@ -941,6 +1068,28 @@ paths:
               $ref: '#/definitions/models.TwDocument'
             type: array
       summary: Get documents by schedule
+      tags:
+      - document
+  /dbms/v1/document/upload:
+    post:
+      consumes:
+      - application/json
+      description: Create document
+      parameters:
+      - description: Document object
+        in: body
+        name: document
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwDocument'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwDocument'
+      summary: Create document
       tags:
       - document
   /dbms/v1/notification:
@@ -1206,6 +1355,35 @@ paths:
           schema:
             $ref: '#/definitions/core_dtos.TwUpdateScheduleResponse'
       summary: Update an existing schedule
+      tags:
+      - schedule
+  /dbms/v1/schedule/{schedule_id}/transcript:
+    put:
+      consumes:
+      - application/json
+      description: Update transcript by schedule
+      parameters:
+      - description: API Key
+        in: header
+        name: x_api_key
+        required: true
+        type: string
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: string
+      - description: Video transcript
+        in: formData
+        name: video_transcript
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Updated successfully
+      summary: Update transcript by schedule
       tags:
       - schedule
   /dbms/v1/schedule/schedules/filter:
@@ -1765,6 +1943,32 @@ paths:
           schema:
             $ref: '#/definitions/models.TwUserEmail'
       summary: Create a new user email
+      tags:
+      - user_email
+  /dbms/v1/user_email/check:
+    get:
+      consumes:
+      - application/json
+      description: Get user email to check before link
+      parameters:
+      - description: Email
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: User ID
+        in: query
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwUserEmail'
+      summary: Get user email to check before link
       tags:
       - user_email
   /dbms/v1/user_email/email/{email}:

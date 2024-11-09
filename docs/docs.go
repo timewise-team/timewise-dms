@@ -49,6 +49,105 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/board_columns/rage/position": {
+            "get": {
+                "description": "Get rage",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Get rage",
+                "parameters": [
+                    {
+                        "description": "Get rage request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/board_columns.RageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwBoardColumn"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/board_columns/update_position/position": {
+            "put": {
+                "description": "Update position",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Update position",
+                "parameters": [
+                    {
+                        "description": "Update position request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwBoardColumn"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/dbms/v1/board_columns/update_position_after_deletion": {
+            "put": {
+                "description": "Update position after deletion",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "board_columns"
+                ],
+                "summary": "Update position after deletion",
+                "parameters": [
+                    {
+                        "description": "Update position after deletion request",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/board_columns.RequestBody"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
         "/dbms/v1/board_columns/{id}": {
             "get": {
                 "description": "Get board column by ID",
@@ -302,6 +401,42 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/document": {
+            "delete": {
+                "description": "Delete document",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Delete document",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID associated with the file",
+                        "name": "scheduleId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Name of the file to delete",
+                        "name": "fileName",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    }
+                }
+            }
+        },
         "/dbms/v1/document/schedule/{schedule_id}": {
             "get": {
                 "description": "Get documents by schedule",
@@ -332,6 +467,72 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/models.TwDocument"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/document/upload": {
+            "post": {
+                "description": "Create document",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Create document",
+                "parameters": [
+                    {
+                        "description": "Document object",
+                        "name": "document",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwDocument"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwDocument"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/document/{document_id}": {
+            "get": {
+                "description": "Get document by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Get document by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Document ID",
+                        "name": "document_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwDocument"
                         }
                     }
                 }
@@ -835,6 +1036,49 @@ const docTemplate = `{
                 "responses": {
                     "204": {
                         "description": "No Content"
+                    }
+                }
+            }
+        },
+        "/dbms/v1/schedule/{schedule_id}/transcript": {
+            "put": {
+                "description": "Update transcript by schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule"
+                ],
+                "summary": "Update transcript by schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "API Key",
+                        "name": "x_api_key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Video transcript",
+                        "name": "video_transcript",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully"
                     }
                 }
             }
@@ -1566,6 +1810,45 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Status",
                         "name": "status",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/user_email/check": {
+            "get": {
+                "description": "Get user email to check before link",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Get user email to check before link",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
                         "in": "query",
                         "required": true
                     }
@@ -2627,6 +2910,31 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "board_columns.RageRequest": {
+            "type": "object",
+            "properties": {
+                "position1": {
+                    "type": "integer"
+                },
+                "position2": {
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "board_columns.RequestBody": {
+            "type": "object",
+            "properties": {
+                "position": {
+                    "type": "integer"
+                },
+                "workspace_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "board_columns_dtos.BoardColumnsRequest": {
             "type": "object",
             "properties": {
@@ -2692,6 +3000,9 @@ const docTemplate = `{
                 },
                 "workspace_id": {
                     "description": "Nullable field",
+                    "type": "integer"
+                },
+                "workspace_user_id": {
                     "type": "integer"
                 }
             }
