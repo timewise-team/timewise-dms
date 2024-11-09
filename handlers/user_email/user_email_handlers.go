@@ -230,3 +230,46 @@ func (h *UserEmailHandler) searchUserEmail(c *fiber.Ctx) error {
 
 	return c.JSON(userEmailInfo)
 }
+
+func (h *UserEmailHandler) getEmailInProgress(c *fiber.Ctx) error {
+	var userInfo []user_email_dtos.UserEmailStatusResponse
+	scheduleId := c.Params("scheduleId")
+
+	if scheduleId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Schedule ID không hợp lệ",
+		})
+	}
+
+	// Thực hiện truy vấn SQL với nhiều phép JOIN và loại bỏ email trùng lặp
+	err := h.DB.Table("tw_schedule_participants AS sp").
+		Select(`
+        DISTINCT ue.id AS id,
+        ue.email,
+        u.first_name,
+        u.last_name,
+        u.profile_picture,
+        wu.status,
+        wu.is_verified
+    `).
+		Joins("JOIN tw_workspace_users AS wu ON wu.id = sp.workspace_user_id").
+		Joins("JOIN tw_user_emails AS ue ON wu.user_email_id = ue.id").
+		Joins("JOIN tw_users AS u ON ue.user_id = u.id").
+		Where("sp.schedule_id = ?", scheduleId).
+		Where("wu.status = 'pending'").
+		Where("wu.is_verified = 0").
+		Where("sp.deleted_at IS NULL").
+		Where("wu.deleted_at IS NULL").
+		Where("ue.deleted_at IS NULL").
+		Where("u.deleted_at IS NULL").
+		Scan(&userInfo).Error
+
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(userInfo)
+
+}
