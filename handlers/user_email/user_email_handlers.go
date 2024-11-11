@@ -228,15 +228,13 @@ func (h *UserEmailHandler) getUserEmailByEmail(c *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param email query string true "Email"
-// @Param user_id query string true "User ID"
 // @Success 200 {object} models.TwUserEmail
 // @Router /dbms/v1/user_email/check [get]
 func (h *UserEmailHandler) getUserEmailToCheckBeforeLink(c *fiber.Ctx) error {
 	var userEmails models.TwUserEmail
 	email := c.Query("email")
-	userId := c.Query("user_id")
 
-	if err := h.DB.Where("email = ? AND is_link_to = ? AND status is not null", email, userId).First(&userEmails).Error; err != nil {
+	if err := h.DB.Where("email = ? AND is_linked_to is not null AND status is not null", email).First(&userEmails).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).SendString("Email not found and ok to be linked")
 		}

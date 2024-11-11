@@ -1844,13 +1844,6 @@ const docTemplate = `{
                         "name": "email",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
