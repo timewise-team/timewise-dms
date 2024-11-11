@@ -537,6 +537,26 @@ func (h *WorkspaceUserHandler) GetWorkspaceUserInfoById(ctx *fiber.Ctx) error {
 	return ctx.JSON(workspaceUser)
 }
 
+// GetWspUserByUserEmailId godoc
+// @Summary Get workspace user ID by user email ID
+// @Description Get workspace user ID by user email ID
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param user_email_id path string true "User Email ID"
+// @Success 200 {object} models.TwWorkspaceUser
+// @Router /dbms/v1/workspace_user/user_email_id/{user_email_id} [get]
+func (h *WorkspaceUserHandler) GetWspUserByUserEmailId(c *fiber.Ctx) error {
+	var workspaceUser models.TwWorkspaceUser
+	userEmailId := c.Params("user_email_id")
+
+	if result := h.DB.Where("user_email_id = ?", userEmailId).First(&workspaceUser).Error; result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error())
+	}
+
+	return c.JSON(workspaceUser)
+}
+
 // UpdateWorkspaceUserStatusByEmailAndWorkspace godoc
 // @Summary Update workspace user status by email and workspace
 // @Description Update workspace user status by email and workspace
