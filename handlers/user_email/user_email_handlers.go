@@ -51,12 +51,12 @@ func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
 	userId := c.Params("user_id")
 	status := c.Query("status")
 	if status != "" {
-		if err := h.DB.Where("user_id = ? AND status = ?", userId, status).Find(&userEmails).Error; err != nil {
+		if err := h.DB.Where("(user_id = ? OR is_linked_to = ?) AND status = ? ", userId, status, userId).Find(&userEmails).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 		}
 		return c.JSON(userEmails)
 	}
-	if err := h.DB.Where("user_id = ?", userId).Find(&userEmails).Error; err != nil {
+	if err := h.DB.Where("user_id = ? OR is_linked_to = ?", userId, userId).Find(&userEmails).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 	if len(userEmails) == 0 {
@@ -109,39 +109,59 @@ func (h *UserEmailHandler) createUserEmail(ctx *fiber.Ctx) error {
 // @Param status query string true "Status"
 // @Success 200 {object} models.TwUserEmail
 // @Router /dbms/v1/user_email [patch]
-func (h *UserEmailHandler) updateUserIdInUserEmail(c *fiber.Ctx) error {
+func (h *UserEmailHandler) updateStatusInUserEmail(c *fiber.Ctx) error {
 	var userEmail models.TwUserEmail
 	email := c.Query("email")
-	userIdStr := c.Query("user_id")
 	status := c.Query("status")
-	if status == "rejected" {
-		if err := h.DB.Where("email = ? AND user_id = ?", email, userIdStr).First(&userEmail).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.Status(fiber.StatusNotFound).SendString("Email not found")
-			}
-			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	if err := h.DB.Where("email = ?", email).First(&userEmail).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("Email not found")
 		}
-	} else {
-		if err := h.DB.Where("email = ?", email).First(&userEmail).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return c.Status(fiber.StatusNotFound).SendString("Email not found")
-			}
-			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
-	// Update userId in userEmail
-	userId, ok := strconv.Atoi(userIdStr)
-	if ok != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(ok.Error())
-	}
-	userEmail.UserId = userId
-	// if status = "", then set null to status
+	// if status = "", then set null to status, and set null to is_linked_to
 	if status == "" {
 		userEmail.Status = nil
+		userEmail.IsLinkedTo = nil
 	} else {
 		userEmail.Status = &status
 	}
 	userEmail.DeletedAt = nil
+	if result := h.DB.Save(&userEmail); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	return c.JSON(userEmail)
+}
+
+// updateUserEmailStatus godoc
+// @Summary Update user email status
+// @Description Update user email status
+// @Tags user_email
+// @Accept json
+// @Produce json
+// @Param email query string true "Email"
+// @Param status query string true "Status"
+// @Param target_user_id query string true "Target User ID"
+// @Success 200 {object} models.TwUserEmail
+// @Router /dbms/v1/user_email/status [patch]
+func (h *UserEmailHandler) updateUserEmailStatusAndIsLinkedTo(c *fiber.Ctx) error {
+	var userEmail models.TwUserEmail
+	email := c.Query("email")
+	status := c.Query("status")
+	targetUserId := c.Query("target_user_id")
+	if err := h.DB.Where("email = ?", email).First(&userEmail).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("Email not found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+	userEmail.Status = &status
+	targetUserIdInt, err := strconv.Atoi(targetUserId)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	}
+	userEmail.IsLinkedTo = &targetUserIdInt
 	if result := h.DB.Save(&userEmail); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
@@ -216,7 +236,7 @@ func (h *UserEmailHandler) getUserEmailToCheckBeforeLink(c *fiber.Ctx) error {
 	email := c.Query("email")
 	userId := c.Query("user_id")
 
-	if err := h.DB.Where("email = ? AND user_id = ? AND status is not null", email, userId).First(&userEmails).Error; err != nil {
+	if err := h.DB.Where("email = ? AND is_link_to = ? AND status is not null", email, userId).First(&userEmails).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return c.Status(fiber.StatusNotFound).SendString("Email not found and ok to be linked")
 		}

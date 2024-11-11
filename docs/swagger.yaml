@@ -558,6 +558,8 @@ definitions:
         type: string
       id:
         type: integer
+      is_linked_to:
+        type: integer
       status:
         type: string
       updated_at:
@@ -2015,6 +2017,37 @@ paths:
               $ref: '#/definitions/user_email_dtos.SearchUserEmailResponse'
             type: array
       summary: Search user email
+      tags:
+      - user_email
+  /dbms/v1/user_email/status:
+    patch:
+      consumes:
+      - application/json
+      description: Update user email status
+      parameters:
+      - description: Email
+        in: query
+        name: email
+        required: true
+        type: string
+      - description: Status
+        in: query
+        name: status
+        required: true
+        type: string
+      - description: Target User ID
+        in: query
+        name: target_user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwUserEmail'
+      summary: Update user email status
       tags:
       - user_email
   /dbms/v1/user_email/user/{user_id}:
