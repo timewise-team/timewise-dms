@@ -2640,6 +2640,29 @@ paths:
       summary: Update workspace user status by email and workspace
       tags:
       - workspace_user
+  /dbms/v1/workspace_user/user_email_id/{user_email_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspace user ID by user email ID
+      parameters:
+      - description: User Email ID
+        in: path
+        name: user_email_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of workspace IDs
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Get workspace user ID by user email ID
+      tags:
+      - workspace_user
   /dbms/v1/workspace_user/verify-invitation/workspace/{workspace_id}/email/{email}:
     put:
       consumes:
