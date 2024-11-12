@@ -2794,6 +2794,41 @@
                 }
             }
         },
+        "/dbms/v1/workspace_user/user_email_id/{user_email_id}": {
+            "get": {
+                "description": "Get workspace user ID by user email ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace user ID by user email ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Email ID",
+                        "name": "user_email_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of workspace IDs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/verify-invitation/workspace/{workspace_id}/email/{email}": {
             "put": {
                 "description": "Verify member's request invitation",
