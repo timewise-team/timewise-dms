@@ -899,3 +899,93 @@ func (h *ScheduleHandler) UpdateTranscriptBySchedule(ctx *fiber.Ctx) error {
 	// Return the updated schedule in the response
 	return ctx.JSON("Updated successfully")
 }
+
+// GetSchedulesByBoardColumnFilter godoc
+// @Summary Get schedules by board column with filters
+// @Description Get schedules by board column with filters
+// @Tags schedule
+// @Accept json
+// @Produce json
+// @Param workspace_id path int true "Workspace ID"
+// @Param board_column_id path int true "Board Column ID"
+// @Param search query string false "Search by schedule title"
+// @Param member query string false "Filter by member emails"
+// @Param due query string false "Filter by due date (day, week, month)"
+// @Param dueComplete query string false "Filter by due complete"
+// @Param overdue query string false "Filter by overdue"
+// @Param notDue query string false "Filter by not due"
+// @Success 200 {array} models.TwSchedule
+// @Failure 400 {object} fiber.Map
+// @Failure 500 {object} fiber.Map
+// @Router /dbms/v1/schedule/workspace/{workspace_id}/board_column/{board_column_id}/filter [get]
+func (h *ScheduleHandler) getSchedulesByBoardColumnFilter(c *fiber.Ctx) error {
+	boardColumnID := c.Params("board_column_id")
+	workspaceID := c.Params("workspace_id")
+	if boardColumnID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid board column ID",
+		})
+	}
+	search := c.Query("search", "")
+	membersParam := c.Query("member", "")
+	dueParam := c.Query("due")
+	dueCompleteParam := c.Query("dueComplete")
+	overdueParam := c.Query("overdue")
+	notDueParam := c.Query("notDue")
+
+	var schedules []models.TwSchedule
+	query := h.DB.
+		Table("tw_schedules").
+		Select("tw_schedules.*").
+		Joins("JOIN tw_schedule_participants ON tw_schedule_participants.schedule_id = tw_schedules.id").
+		Joins("JOIN tw_workspaces ON tw_workspaces.id = tw_schedules.workspace_id")
+
+	// Apply filters
+	if search != "" {
+		query = query.Where("tw_schedules.title LIKE ?", "%"+search+"%")
+	}
+	if dueParam == "day" {
+		query = query.Where("DATE(tw_schedules.start_time) = CURRENT_DATE")
+	} else if dueParam == "week" {
+		query = query.Where("DATE(tw_schedules.start_time) >= CURRENT_DATE AND DATE(tw_schedules.start_time) <= DATE_ADD(CURRENT_DATE, INTERVAL 6 DAY)")
+	} else if dueParam == "month" {
+		query = query.Where("DATE(tw_schedules.start_time) >= CURRENT_DATE AND DATE(tw_schedules.start_time) <= DATE_ADD(CURRENT_DATE, INTERVAL 29 DAY)")
+	}
+	if dueCompleteParam == "true" {
+		query = query.Where("tw_schedules.status = 'done'")
+	}
+	if overdueParam == "true" {
+		query = query.Where("DATE(tw_schedules.start_time) < CURRENT_DATE AND tw_schedules.status != 'done'")
+	}
+	if notDueParam == "true" {
+		query = query.Where("tw_schedules.start_time IS NULL")
+	}
+
+	// Filter by member emails if provided
+	if membersParam != "" {
+		emails := strings.Split(membersParam, ",")
+		query = query.Joins("JOIN tw_workspace_users ON tw_workspace_users.id = tw_schedule_participants.workspace_user_id ").
+			Joins("JOIN tw_user_emails ON tw_user_emails.id = tw_workspace_users.user_email_id").
+			Where("tw_schedule_participants.invitation_status ='joined' AND tw_schedule_participants.deleted_at IS NULL").
+			Where("tw_workspace_users.deleted_at IS NULL AND tw_workspace_users.status = 'joined' AND tw_workspace_users.is_active=true AND tw_workspace_users.is_verified = true").
+			Where("tw_user_emails.deleted_at IS NULL AND tw_user_emails.status NOT IN ('rejected', 'pending')").
+			Where("tw_user_emails.email IN (?)", emails)
+	}
+	query = query.
+		Where("tw_schedules.board_column_id = ? AND tw_schedules.workspace_id = ? AND tw_schedules.is_deleted = false AND tw_workspaces.deleted_at IS NULL", boardColumnID, workspaceID)
+
+	if result := query.
+		Order("tw_schedules.position").
+		Find(&schedules); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": result.Error.Error(),
+		})
+	}
+	if schedules == nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Failed to get schedules",
+		})
+	}
+
+	return c.JSON(schedules)
+}
