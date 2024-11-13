@@ -777,6 +777,98 @@ info:
   title: timewise-dbms
   version: "1.0"
 paths:
+  /api/v1/reminder:
+    post:
+      consumes:
+      - application/json
+      description: Create a reminder
+      parameters:
+      - description: Reminder
+        in: body
+        name: reminder
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwReminder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwReminder'
+      summary: Create a reminder
+      tags:
+      - reminder
+  /api/v1/reminder/{reminder_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get reminder by ID
+      parameters:
+      - description: Reminder ID
+        in: path
+        name: reminder_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwReminder'
+      summary: Get reminder by ID
+      tags:
+      - reminder
+    put:
+      consumes:
+      - application/json
+      description: Update a reminder
+      parameters:
+      - description: Reminder ID
+        in: path
+        name: reminder_id
+        required: true
+        type: string
+      - description: Reminder
+        in: body
+        name: reminder
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwReminder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwReminder'
+      summary: Update a reminder
+      tags:
+      - reminder
+  /api/v1/reminder/schedule/{schedule_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get reminders by schedule ID
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwReminder'
+            type: array
+      summary: Get reminders by schedule ID
+      tags:
+      - reminder
   /dbms/v1/board_columns:
     post:
       consumes:
