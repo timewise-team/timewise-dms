@@ -14,4 +14,6 @@ func RegisterReminderHandler(router fiber.Router, db *gorm.DB) {
 	router.Get("/schedule/:schedule_id", reminderHandler.GetRemindersByScheduleId)
 	router.Put("/:reminder_id", reminderHandler.UpdateReminder)
 	router.Delete("/:reminder_id", reminderHandler.DeleteReminder)
+	router.Get("", reminderHandler.GetReminders)
+	router.Put("/:reminder_id/is_sent", reminderHandler.CompleteReminder)
 }
