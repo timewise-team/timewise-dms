@@ -43,5 +43,6 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	comments.RegisterCommentsHandler(v1.Group("/comment"), db)
 	notification.RegisterNotificationHandler(v1.Group("/notification"), db)
 	reminder.RegisterReminderHandler(v1.Group("/reminder"), db)
+	notification.RegisterNotificationHandler(v1.Group("/notification"), db)
 	return router
 }
