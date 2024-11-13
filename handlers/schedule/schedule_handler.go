@@ -9,11 +9,22 @@ import (
 	"github.com/timewise-team/timewise-models/models"
 	"gorm.io/gorm"
 	"strconv"
+	"strings"
 	"time"
 )
 
 type ScheduleHandler struct {
 	DB *gorm.DB
+}
+
+func parseTime(timeStr string) (time.Time, error) {
+	// Sử dụng thư viện dateparse để phân tích chuỗi thời gian
+	layout := "2006-01-02 15:04:05.000"
+	parsedTime, err := time.ParseInLocation(layout, timeStr, time.UTC)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return parsedTime.UTC(), nil
 }
 
 // FilterSchedules godoc
@@ -53,7 +64,8 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 	assignedTo := c.Query("assigned_to")
 
 	if workspaceID != "" {
-		query = query.Where("workspace_id IN (?)", workspaceID)
+		workspaceIDSubStrings := strings.Split(workspaceID, ",")
+		query = query.Where("workspace_id IN (?)", workspaceIDSubStrings)
 	}
 
 	if boardColumnID != "" {
@@ -65,17 +77,19 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 	}
 
 	if startTime != "" {
-		parsedStartTime, err := time.Parse(time.RFC3339, startTime)
-		if err == nil {
-			query = query.Where("start_time >= ?", parsedStartTime)
+		parsedStartTime, err := parseTime(startTime)
+		if err != nil {
+			return err
 		}
+		query = query.Where("start_time >= ?", parsedStartTime)
 	}
 
 	if endTime != "" {
-		parsedEndTime, err := time.Parse(time.RFC3339, endTime)
-		if err == nil {
-			query = query.Where("end_time <= ?", parsedEndTime)
+		parsedEndTime, err := parseTime(endTime)
+		if err != nil {
+			return err
 		}
+		query = query.Where("end_time <= ?", parsedEndTime)
 	}
 
 	if location != "" {
@@ -104,7 +118,7 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 		query = query.Where("assigned_to @> ?", "{"+assignedTo+"}")
 	}
 
-	if result := query.Find(&schedules); result.Error != nil {
+	if result := query.Debug().Find(&schedules); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 

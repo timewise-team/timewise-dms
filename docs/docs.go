@@ -1844,13 +1844,6 @@ const docTemplate = `{
                         "name": "email",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -1928,6 +1921,52 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/user_email_dtos.SearchUserEmailResponse"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/user_email/status": {
+            "patch": {
+                "description": "Update user email status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Update user email status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status",
+                        "name": "status",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Target User ID",
+                        "name": "target_user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
                         }
                     }
                 }
@@ -2758,6 +2797,41 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/models.TwWorkspaceUser"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/workspace_user/user_email_id/{user_email_id}": {
+            "get": {
+                "description": "Get workspace user ID by user email ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace user ID by user email ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User Email ID",
+                        "name": "user_email_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of workspace IDs",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -3750,6 +3824,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "is_linked_to": {
                     "type": "integer"
                 },
                 "status": {
