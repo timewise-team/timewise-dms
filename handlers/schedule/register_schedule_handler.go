@@ -23,5 +23,7 @@ func RegisterScheduleHandler(router fiber.Router, db *gorm.DB) {
 		router.Get("/workspace/:workspace_id/schedules", scheduleHandler.GetSchedulesByWorkspace)
 		router.Put("/:schedule_id/transcript", scheduleHandler.UpdateTranscriptBySchedule)
 		router.Put("/position/:schedule_id/workspace_user/:workspace_user_id", scheduleHandler.UpdateSchedulePosition)
+		router.Get("/workspace/:workspace_id/board_column/:board_column_id/filter", scheduleHandler.getSchedulesByBoardColumnFilter)
+
 	})
 }
