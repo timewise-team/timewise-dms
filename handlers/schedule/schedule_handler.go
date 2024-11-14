@@ -3,6 +3,7 @@ package schedule
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/models"
@@ -346,6 +347,26 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	})
 }
 
+func convertDateFormat(dateStr *string) *time.Time {
+	if dateStr == nil {
+		return nil
+	}
+
+	// Định dạng ngày giờ đầu vào, bao gồm múi giờ (UTC nếu không có múi giờ cụ thể)
+	const inputFormat = "2006-01-02T15:04:05Z07:00"
+
+	// Phân tích chuỗi ngày giờ theo múi giờ UTC
+	parsedTime, err := time.Parse(inputFormat, *dateStr)
+	if err != nil {
+		fmt.Println("Error parsing date:", err)
+		return nil
+	}
+
+	// Trả về giá trị UTC để lưu trữ
+	utcTime := parsedTime.UTC()
+	return &utcTime
+}
+
 // UpdateSchedule godoc
 // @Summary Update an existing schedule
 // @Description Update an existing schedule
@@ -408,8 +429,12 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		if schedule.StartTime != nil {
 			oldStartTime = schedule.StartTime.String()
 		}
-		checkAndLog("start_time", oldStartTime, scheduleDTO.StartTime.String())
-		schedule.StartTime = scheduleDTO.StartTime
+		checkAndLog("start_time", oldStartTime, *scheduleDTO.StartTime)
+		parsedTime := convertDateFormat(scheduleDTO.StartTime)
+		if parsedTime != nil {
+			schedule.StartTime = parsedTime
+		}
+
 	}
 
 	if scheduleDTO.EndTime != nil {
@@ -417,8 +442,11 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		if schedule.EndTime != nil {
 			oldEndTime = schedule.EndTime.String()
 		}
-		checkAndLog("end_time", oldEndTime, scheduleDTO.EndTime.String())
-		schedule.EndTime = scheduleDTO.EndTime
+		checkAndLog("end_time", oldEndTime, *scheduleDTO.EndTime)
+		parsedTime := convertDateFormat(scheduleDTO.EndTime)
+		if parsedTime != nil {
+			schedule.EndTime = parsedTime
+		}
 	}
 
 	if scheduleDTO.Location != nil {
