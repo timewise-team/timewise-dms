@@ -784,6 +784,232 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/reminder": {
+            "get": {
+                "description": "Get all reminders",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reminder"
+                ],
+                "summary": "Get all reminders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwReminder"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a reminder",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reminder"
+                ],
+                "summary": "Create a reminder",
+                "parameters": [
+                    {
+                        "description": "Reminder",
+                        "name": "reminder",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwReminder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwReminder"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/reminder/schedule/{schedule_id}": {
+            "get": {
+                "description": "Get reminders by schedule ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reminder"
+                ],
+                "summary": "Get reminders by schedule ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwReminder"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/reminder/{reminder_id}": {
+            "get": {
+                "description": "Get reminder by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reminder"
+                ],
+                "summary": "Get reminder by ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reminder ID",
+                        "name": "reminder_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwReminder"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update a reminder",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reminder"
+                ],
+                "summary": "Update a reminder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reminder ID",
+                        "name": "reminder_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Reminder",
+                        "name": "reminder",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwReminder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwReminder"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a reminder",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reminder"
+                ],
+                "summary": "Delete a reminder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reminder ID",
+                        "name": "reminder_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwReminder"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/reminder/{reminder_id}/is_sent": {
+            "put": {
+                "description": "Complete a reminder",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "reminder"
+                ],
+                "summary": "Complete a reminder",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Reminder ID",
+                        "name": "reminder_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwReminder"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/schedule": {
             "get": {
                 "description": "Get all schedules",
@@ -937,6 +1163,96 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/fiber.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/schedule/workspace/{workspace_id}/board_column/{board_column_id}/filter": {
+            "get": {
+                "description": "Get schedules by board column with filters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule"
+                ],
+                "summary": "Get schedules by board column with filters",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Board Column ID",
+                        "name": "board_column_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search by schedule title",
+                        "name": "search",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by member emails",
+                        "name": "member",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by due date (day, week, month)",
+                        "name": "due",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by due complete",
+                        "name": "dueComplete",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by overdue",
+                        "name": "overdue",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter by not due",
+                        "name": "notDue",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwSchedule"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/fiber.Map"
                         }
                     }
                 }
@@ -3580,6 +3896,47 @@ const docTemplate = `{
                     "$ref": "#/definitions/models.TwUserEmail"
                 },
                 "user_email_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TwReminder": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_sent": {
+                    "type": "boolean"
+                },
+                "method": {
+                    "type": "string"
+                },
+                "reminder_time": {
+                    "type": "string"
+                },
+                "schedule": {
+                    "$ref": "#/definitions/models.TwSchedule"
+                },
+                "schedule_id": {
+                    "type": "integer"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "workspaceUser": {
+                    "$ref": "#/definitions/models.TwWorkspaceUser"
+                },
+                "workspace_user_id": {
                     "type": "integer"
                 }
             }

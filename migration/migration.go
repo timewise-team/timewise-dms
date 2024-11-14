@@ -4,6 +4,7 @@ import (
 	"dbms/config"
 	"dbms/database"
 	"github.com/spf13/viper"
+	"github.com/timewise-team/timewise-models/models"
 	"log"
 )
 
@@ -36,21 +37,21 @@ func main() {
 
 	// Migrate the schema
 	err = db.AutoMigrate(
-	//&models.TwUser{},
-	//&models.TwUserEmail{},
-	//&models.TwWorkspace{},
-	//&models.TwWorkspaceUser{},
-	//&models.TwBoardColumn{},
-	//&models.TwSchedule{},
-	//&models.TwScheduleParticipant{},
-	//&models.TwScheduleLog{},
-	//&models.TwComment{},
-	//&models.TwRecurrenceException{},
-	//&models.TwReminder{},
-	//&models.TwWorkspaceLog{},
-	//&models.TwNotificationSettings{},
-	//&models.TwNotifications{},
-	//&models.TwDocument{},
+		//&models.TwUser{},
+		//&models.TwUserEmail{},
+		//&models.TwWorkspace{},
+		//&models.TwWorkspaceUser{},
+		//&models.TwBoardColumn{},
+		//&models.TwSchedule{},
+		//&models.TwScheduleParticipant{},
+		//&models.TwScheduleLog{},
+		//&models.TwComment{},
+		//&models.TwRecurrenceException{},
+		&models.TwReminder{},
+		//&models.TwWorkspaceLog{},
+		//&models.TwNotificationSettings{},
+		//&models.TwNotifications{},
+		//&models.TwDocument{},
 	)
 	if err != nil {
 		log.Fatalf("Could not migrate schema: %v", err)
