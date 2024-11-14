@@ -3,7 +3,6 @@ package schedule
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/timewise-team/timewise-models/dtos/core_dtos"
 	"github.com/timewise-team/timewise-models/models"
@@ -227,57 +226,19 @@ func (h *ScheduleHandler) GetScheduleById(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
-	var startTime, endTime, createdAt, updatedAt string
+	var startTime, endTime, createdAt, updatedAt time.Time
 
 	if schedule.StartTime != nil {
-		startTime = schedule.StartTime.Format("2006-01-02 15:04:05.000")
+		startTime = *schedule.StartTime
 	}
 	if schedule.EndTime != nil {
-		endTime = schedule.EndTime.Format("2006-01-02 15:04:05.000")
+		endTime = *schedule.EndTime
 	}
 	if schedule.CreatedAt != nil {
-		createdAt = schedule.CreatedAt.Format("2006-01-02 15:04:05.000")
+		createdAt = *schedule.CreatedAt
 	}
 	if schedule.UpdatedAt != nil {
-		updatedAt = schedule.UpdatedAt.Format("2006-01-02 15:04:05.000")
-	}
-
-	scheduleDTO := core_dtos.TwGetScheduleResponse{
-		ID:                int(schedule.ID),
-		WorkspaceId:       schedule.WorkspaceId,
-		BoardColumnId:     schedule.BoardColumnId,
-		Title:             schedule.Title,
-		Description:       schedule.Description,
-		StartTime:         startTime,
-		EndTime:           endTime,
-		Location:          schedule.Location,
-		CreatedBy:         schedule.CreatedBy,
-		CreatedAt:         createdAt,
-		UpdatedAt:         updatedAt,
-		Status:            schedule.Status,
-		AllDay:            schedule.AllDay,
-		Visibility:        schedule.Visibility,
-		VideoTranscript:   schedule.VideoTranscript,
-		ExtraData:         schedule.ExtraData,
-		IsDeleted:         schedule.IsDeleted,
-		RecurrencePattern: schedule.RecurrencePattern,
-		Position:          schedule.Position,
-		Priority:          schedule.Priority,
-		//AssignedTo:        []int{schedule.AssignedTo},
-	}
-
-	return c.JSON(scheduleDTO)
-}
-
-func (h *ScheduleHandler) GetScheduleOriById(c *fiber.Ctx) error {
-	var schedule models.TwSchedule
-	scheduleId := c.Params("schedule_id")
-
-	if err := h.DB.Where("id = ?", scheduleId).First(&schedule).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return c.Status(fiber.StatusNotFound).SendString("Schedule not found")
-		}
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		updatedAt = *schedule.UpdatedAt
 	}
 
 	scheduleDTO := core_dtos.TwScheduleResponse{
@@ -286,12 +247,12 @@ func (h *ScheduleHandler) GetScheduleOriById(c *fiber.Ctx) error {
 		BoardColumnID:     schedule.BoardColumnId,
 		Title:             schedule.Title,
 		Description:       schedule.Description,
-		StartTime:         *schedule.StartTime,
-		EndTime:           *schedule.EndTime,
+		StartTime:         startTime,
+		EndTime:           endTime,
 		Location:          schedule.Location,
 		CreatedBy:         schedule.CreatedBy,
-		CreatedAt:         *schedule.CreatedAt,
-		UpdatedAt:         *schedule.UpdatedAt,
+		CreatedAt:         createdAt,
+		UpdatedAt:         updatedAt,
 		Status:            schedule.Status,
 		AllDay:            schedule.AllDay,
 		Visibility:        schedule.Visibility,
@@ -385,26 +346,6 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	})
 }
 
-func convertDateFormat(dateStr *string) *time.Time {
-	if dateStr == nil {
-		return nil
-	}
-
-	// Định dạng ngày giờ đầu vào, bao gồm múi giờ (UTC nếu không có múi giờ cụ thể)
-	const inputFormat = "2006-01-02T15:04:05Z07:00"
-
-	// Phân tích chuỗi ngày giờ theo múi giờ UTC
-	parsedTime, err := time.Parse(inputFormat, *dateStr)
-	if err != nil {
-		fmt.Println("Error parsing date:", err)
-		return nil
-	}
-
-	// Trả về giá trị UTC để lưu trữ
-	utcTime := parsedTime.UTC()
-	return &utcTime
-}
-
 // UpdateSchedule godoc
 // @Summary Update an existing schedule
 // @Description Update an existing schedule
@@ -467,13 +408,8 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		if schedule.StartTime != nil {
 			oldStartTime = schedule.StartTime.String()
 		}
-		checkAndLog("start_time", oldStartTime, *scheduleDTO.StartTime)
-		parsedTime := convertDateFormat(scheduleDTO.StartTime)
-		if parsedTime != nil {
-			adjustedTime := parsedTime.Add(-7 * time.Hour)
-			schedule.StartTime = &adjustedTime
-		}
-
+		checkAndLog("start_time", oldStartTime, scheduleDTO.StartTime.String())
+		schedule.StartTime = scheduleDTO.StartTime
 	}
 
 	if scheduleDTO.EndTime != nil {
@@ -481,12 +417,8 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		if schedule.EndTime != nil {
 			oldEndTime = schedule.EndTime.String()
 		}
-		checkAndLog("end_time", oldEndTime, *scheduleDTO.EndTime)
-		parsedTime := convertDateFormat(scheduleDTO.EndTime)
-		if parsedTime != nil {
-			adjustedTime := parsedTime.Add(-7 * time.Hour)
-			schedule.EndTime = &adjustedTime
-		}
+		checkAndLog("end_time", oldEndTime, scheduleDTO.EndTime.String())
+		schedule.EndTime = scheduleDTO.EndTime
 	}
 
 	if scheduleDTO.Location != nil {
