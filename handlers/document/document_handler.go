@@ -42,7 +42,7 @@ func (h *DocumentHandler) getDocumentsBySchedule(c *fiber.Ctx) error {
 // @Produce json
 // @Param schedule_id path string true "Schedule ID"
 // @Success 200 {array} models.TwDocument
-// @Router /dbms/v1/document/schedule/{schedule_id} [get]
+// @Router /dbms/v1/document/schedule_id/{schedule_id} [get]
 func (h *DocumentHandler) getDocumentsByScheduleID(c *fiber.Ctx) error {
 	scheduleId := c.Params("schedule_id")
 	if scheduleId == "" {

@@ -7,6 +7,111 @@
         "version": "1.0"
     },
     "paths": {
+        "/api/v1/notification-setting": {
+            "post": {
+                "description": "Create notification setting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification_setting"
+                ],
+                "summary": "Create notification setting",
+                "parameters": [
+                    {
+                        "description": "Notification Setting",
+                        "name": "notification_setting",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/notification-setting/{user_id}": {
+            "get": {
+                "description": "Get notification setting by user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification_setting"
+                ],
+                "summary": "Get notification setting by user id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update notification setting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification_setting"
+                ],
+                "summary": "Update notification setting",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Notification Setting",
+                        "name": "notification_setting",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/board_columns": {
             "post": {
                 "description": "Create board column",
@@ -430,6 +535,41 @@
             }
         },
         "/dbms/v1/document/schedule/{schedule_id}": {
+            "get": {
+                "description": "Get documents by schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "document"
+                ],
+                "summary": "Get documents by schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "schedule_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwDocument"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/document/schedule_id/{schedule_id}": {
             "get": {
                 "description": "Get documents by schedule",
                 "consumes": [
@@ -3841,6 +3981,47 @@
                     "$ref": "#/definitions/models.TwWorkspaceUser"
                 },
                 "workspace_user_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.TwNotificationSettings": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "extra_data": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "notification_on_comment": {
+                    "type": "boolean"
+                },
+                "notification_on_due_date": {
+                    "type": "boolean"
+                },
+                "notification_on_email": {
+                    "type": "boolean"
+                },
+                "notification_on_schedule_change": {
+                    "type": "boolean"
+                },
+                "notification_on_tag": {
+                    "type": "boolean"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user": {
+                    "$ref": "#/definitions/models.TwUser"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }
