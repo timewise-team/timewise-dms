@@ -9,7 +9,6 @@ func RegisterNotificationSettingHandler(router fiber.Router, db *gorm.DB) {
 	notificationSettingHandler := NotificationSettingHandler{
 		DB: db,
 	}
-	router.Get("/", notificationSettingHandler.GetNotificationSettings)
 	router.Get("/:user_id", notificationSettingHandler.GetNotificationSettingByUserId)
 	router.Post("/", notificationSettingHandler.CreateNotificationSetting)
 	router.Put("/:user_id", notificationSettingHandler.UpdateNotificationSetting)

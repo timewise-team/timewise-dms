@@ -367,6 +367,33 @@ definitions:
       workspaceUser:
         $ref: '#/definitions/models.TwWorkspaceUser'
     type: object
+  models.TwNotificationSettings:
+    properties:
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      extra_data:
+        type: string
+      id:
+        type: integer
+      notification_on_comment:
+        type: boolean
+      notification_on_due_date:
+        type: boolean
+      notification_on_email:
+        type: boolean
+      notification_on_schedule_change:
+        type: boolean
+      notification_on_tag:
+        type: boolean
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/models.TwUser'
+      user_id:
+        type: integer
+    type: object
   models.TwNotifications:
     properties:
       created_at:
@@ -1099,6 +1126,29 @@ paths:
       summary: Get documents by schedule
       tags:
       - document
+  /dbms/v1/document/schedule_id/{schedule_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get documents by schedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: schedule_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwDocument'
+            type: array
+      summary: Get documents by schedule
+      tags:
+      - document
   /dbms/v1/document/upload:
     post:
       consumes:
@@ -1180,6 +1230,75 @@ paths:
       summary: Update notification to sent
       tags:
       - notification
+  /dbms/v1/notification_setting:
+    post:
+      consumes:
+      - application/json
+      description: Create notification setting
+      parameters:
+      - description: Notification Setting
+        in: body
+        name: notification_setting
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwNotificationSettings'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwNotificationSettings'
+      summary: Create notification setting
+      tags:
+      - notification_setting
+  /dbms/v1/notification_setting/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get notification setting by user id
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwNotificationSettings'
+      summary: Get notification setting by user id
+      tags:
+      - notification_setting
+    put:
+      consumes:
+      - application/json
+      description: Update notification setting
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Notification Setting
+        in: body
+        name: notification_setting
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwNotificationSettings'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwNotificationSettings'
+      summary: Update notification setting
+      tags:
+      - notification_setting
   /dbms/v1/recurrence_exception:
     get:
       consumes:
