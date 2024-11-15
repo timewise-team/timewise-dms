@@ -69,7 +69,7 @@ func (h NotificationSettingHandler) UpdateNotificationSetting(ctx *fiber.Ctx) er
 	if err := ctx.BodyParser(&notificationSetting); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
-	if result := h.DB.Save(&notificationSetting); result.Error != nil {
+	if result := h.DB.Omit("deleted_at", "created_at").Save(&notificationSetting); result.Error != nil {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return ctx.JSON(notificationSetting)
