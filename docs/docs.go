@@ -15,111 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/v1/notification-setting": {
-            "post": {
-                "description": "Create notification setting",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "notification_setting"
-                ],
-                "summary": "Create notification setting",
-                "parameters": [
-                    {
-                        "description": "Notification Setting",
-                        "name": "notification_setting",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.TwNotificationSettings"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TwNotificationSettings"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/notification-setting/{user_id}": {
-            "get": {
-                "description": "Get notification setting by user id",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "notification_setting"
-                ],
-                "summary": "Get notification setting by user id",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TwNotificationSettings"
-                        }
-                    }
-                }
-            },
-            "put": {
-                "description": "Update notification setting",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "notification_setting"
-                ],
-                "summary": "Update notification setting",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "user_id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Notification Setting",
-                        "name": "notification_setting",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/models.TwNotificationSettings"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.TwNotificationSettings"
-                        }
-                    }
-                }
-            }
-        },
         "/dbms/v1/board_columns": {
             "post": {
                 "description": "Create board column",
@@ -763,6 +658,111 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/fiber.Map"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/notification_setting": {
+            "post": {
+                "description": "Create notification setting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification_setting"
+                ],
+                "summary": "Create notification setting",
+                "parameters": [
+                    {
+                        "description": "Notification Setting",
+                        "name": "notification_setting",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/notification_setting/{user_id}": {
+            "get": {
+                "description": "Get notification setting by user id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification_setting"
+                ],
+                "summary": "Get notification setting by user id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update notification setting",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification_setting"
+                ],
+                "summary": "Update notification setting",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Notification Setting",
+                        "name": "notification_setting",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotificationSettings"
                         }
                     }
                 }

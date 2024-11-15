@@ -18,7 +18,7 @@ type NotificationSettingHandler struct {
 // @Produce json
 // @Param user_id path string true "User ID"
 // @Success 200 {object} models.TwNotificationSettings
-// @Router /api/v1/notification-setting/{user_id} [get]
+// @Router /dbms/v1/notification_setting/{user_id} [get]
 func (h NotificationSettingHandler) GetNotificationSettingByUserId(ctx *fiber.Ctx) error {
 	id := ctx.Params("user_id")
 	var notificationSetting models.TwNotificationSettings
@@ -37,7 +37,7 @@ func (h NotificationSettingHandler) GetNotificationSettingByUserId(ctx *fiber.Ct
 // @Produce json
 // @Param notification_setting body models.TwNotificationSettings true "Notification Setting"
 // @Success 200 {object} models.TwNotificationSettings
-// @Router /api/v1/notification-setting [post]
+// @Router /dbms/v1/notification_setting [post]
 func (h NotificationSettingHandler) CreateNotificationSetting(ctx *fiber.Ctx) error {
 	var notificationSetting models.TwNotificationSettings
 	if err := ctx.BodyParser(&notificationSetting); err != nil {
@@ -59,7 +59,7 @@ func (h NotificationSettingHandler) CreateNotificationSetting(ctx *fiber.Ctx) er
 // @Param user_id path string true "User ID"
 // @Param notification_setting body models.TwNotificationSettings true "Notification Setting"
 // @Success 200 {object} models.TwNotificationSettings
-// @Router /api/v1/notification-setting/{user_id} [put]
+// @Router /dbms/v1/notification_setting/{user_id} [put]
 func (h NotificationSettingHandler) UpdateNotificationSetting(ctx *fiber.Ctx) error {
 	id := ctx.Params("user_id")
 	var notificationSetting models.TwNotificationSettings

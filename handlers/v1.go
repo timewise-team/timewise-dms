@@ -7,6 +7,7 @@ import (
 	comments "dbms/handlers/comments"
 	"dbms/handlers/document"
 	"dbms/handlers/notification"
+	"dbms/handlers/notification_setting"
 	"dbms/handlers/recurrence_exception"
 	"dbms/handlers/reminder"
 	"dbms/handlers/schedule"
@@ -43,6 +44,6 @@ func RegisterHandlerV1(db *gorm.DB) *fiber.App {
 	comments.RegisterCommentsHandler(v1.Group("/comment"), db)
 	notification.RegisterNotificationHandler(v1.Group("/notification"), db)
 	reminder.RegisterReminderHandler(v1.Group("/reminder"), db)
-	notification.RegisterNotificationHandler(v1.Group("/notification"), db)
+	notification_setting.RegisterNotificationSettingHandler(v1.Group("/notification_setting"), db)
 	return router
 }

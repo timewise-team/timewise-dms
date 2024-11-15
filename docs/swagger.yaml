@@ -804,75 +804,6 @@ info:
   title: timewise-dbms
   version: "1.0"
 paths:
-  /api/v1/notification-setting:
-    post:
-      consumes:
-      - application/json
-      description: Create notification setting
-      parameters:
-      - description: Notification Setting
-        in: body
-        name: notification_setting
-        required: true
-        schema:
-          $ref: '#/definitions/models.TwNotificationSettings'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.TwNotificationSettings'
-      summary: Create notification setting
-      tags:
-      - notification_setting
-  /api/v1/notification-setting/{user_id}:
-    get:
-      consumes:
-      - application/json
-      description: Get notification setting by user id
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.TwNotificationSettings'
-      summary: Get notification setting by user id
-      tags:
-      - notification_setting
-    put:
-      consumes:
-      - application/json
-      description: Update notification setting
-      parameters:
-      - description: User ID
-        in: path
-        name: user_id
-        required: true
-        type: string
-      - description: Notification Setting
-        in: body
-        name: notification_setting
-        required: true
-        schema:
-          $ref: '#/definitions/models.TwNotificationSettings'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.TwNotificationSettings'
-      summary: Update notification setting
-      tags:
-      - notification_setting
   /dbms/v1/board_columns:
     post:
       consumes:
@@ -1299,6 +1230,75 @@ paths:
       summary: Update notification to sent
       tags:
       - notification
+  /dbms/v1/notification_setting:
+    post:
+      consumes:
+      - application/json
+      description: Create notification setting
+      parameters:
+      - description: Notification Setting
+        in: body
+        name: notification_setting
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwNotificationSettings'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwNotificationSettings'
+      summary: Create notification setting
+      tags:
+      - notification_setting
+  /dbms/v1/notification_setting/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get notification setting by user id
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwNotificationSettings'
+      summary: Get notification setting by user id
+      tags:
+      - notification_setting
+    put:
+      consumes:
+      - application/json
+      description: Update notification setting
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      - description: Notification Setting
+        in: body
+        name: notification_setting
+        required: true
+        schema:
+          $ref: '#/definitions/models.TwNotificationSettings'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwNotificationSettings'
+      summary: Update notification setting
+      tags:
+      - notification_setting
   /dbms/v1/recurrence_exception:
     get:
       consumes:
