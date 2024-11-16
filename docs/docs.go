@@ -3258,8 +3258,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/dbms/v1/workspace_user/user_email_id/{user_email_id}": {
-            "get": {
+        "/dbms/v1/workspace_user/user_email_id": {
+            "post": {
                 "description": "Get workspace user ID by user email ID",
                 "consumes": [
                     "application/json"
@@ -3273,11 +3273,16 @@ const docTemplate = `{
                 "summary": "Get workspace user ID by user email ID",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User Email ID",
-                        "name": "user_email_id",
-                        "in": "path",
-                        "required": true
+                        "description": "List of User Email IDs",
+                        "name": "user_email_ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
                     }
                 ],
                 "responses": {
