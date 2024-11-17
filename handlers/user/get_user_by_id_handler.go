@@ -130,16 +130,16 @@ func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	}
 
 	// Update the fields if they are provided (not nil)
-	if userDTO.FirstName != nil {
+	if userDTO.FirstName != nil && *userDTO.FirstName != "" {
 		user.FirstName = *userDTO.FirstName
 	}
-	if userDTO.LastName != nil {
+	if userDTO.LastName != nil && *userDTO.LastName != "" {
 		user.LastName = *userDTO.LastName
 	}
-	if userDTO.Email != nil {
+	if userDTO.Email != nil && *userDTO.Email != "" {
 		user.Email = *userDTO.Email
 	}
-	if userDTO.ProfilePicture != nil {
+	if userDTO.ProfilePicture != nil && *userDTO.ProfilePicture != "" {
 		user.ProfilePicture = *userDTO.ProfilePicture
 	}
 	if userDTO.Timezone != nil {
