@@ -303,6 +303,8 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		CreatedAt:     &now,
 		UpdatedAt:     &now,
 		Position:      len(existingSchedules) + 1,
+		Status:        "not yet",
+		Visibility:    "public",
 	}
 
 	if result := h.DB.Create(&schedule); result.Error != nil {
