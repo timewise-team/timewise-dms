@@ -544,21 +544,21 @@ func (h *WorkspaceUserHandler) GetWorkspaceUserInfoById(ctx *fiber.Ctx) error {
 // @Accept json
 // @Produce json
 // @Param user_email_ids body []string true "List of User Email IDs"
-// @Success 200 {array} string "List of workspace IDs"
+// @Success 200 {array} models.TwWorkspaceUser
 // @Router /dbms/v1/workspace_user/user_email_id [POST]
 func (h *WorkspaceUserHandler) GetWspUserByUserEmailId(c *fiber.Ctx) error {
 	var userEmailIds []string
 	if err := c.BodyParser(&userEmailIds); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString("Invalid request body")
 	}
-	var workspaceIDs []string
+	var workspaces []models.TwWorkspaceUser
 	if err := h.DB.Model(&models.TwWorkspaceUser{}).
 		Where("user_email_id IN (?)", userEmailIds).
-		Pluck("workspace_id", &workspaceIDs).Error; err != nil {
+		Scan(&workspaces).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
 
-	return c.JSON(workspaceIDs)
+	return c.JSON(workspaces)
 }
 
 // UpdateWorkspaceUserStatusByEmailAndWorkspace godoc

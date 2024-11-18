@@ -2021,6 +2021,37 @@ paths:
       summary: Update schedule participant
       tags:
       - schedule_participant
+  /dbms/v1/schedule_participant/{scheduleId}/participants:
+    get:
+      consumes:
+      - application/json
+      description: Check if any workspace user in the list is a participant in the
+        schedule
+      parameters:
+      - description: Schedule ID
+        in: path
+        name: scheduleId
+        required: true
+        type: string
+      - description: List of workspace user IDs (comma-separated)
+        in: query
+        name: workspace_user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User is participant
+          schema:
+            type: boolean
+        "404":
+          description: User is not participant
+          schema:
+            type: boolean
+      summary: Check if workspace user is participant in the schedule
+      tags:
+      - schedule_participant
   /dbms/v1/schedule_participant/schedule/{scheduleId}:
     get:
       consumes:
@@ -3013,10 +3044,10 @@ paths:
       - application/json
       responses:
         "200":
-          description: List of workspace IDs
+          description: OK
           schema:
             items:
-              type: string
+              $ref: '#/definitions/models.TwWorkspaceUser'
             type: array
       summary: Get workspace user ID by user email ID
       tags:
