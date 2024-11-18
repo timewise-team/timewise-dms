@@ -1941,6 +1941,51 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/schedule_participant/{scheduleId}/participants": {
+            "get": {
+                "description": "Check if any workspace user in the list is a participant in the schedule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "schedule_participant"
+                ],
+                "summary": "Check if workspace user is participant in the schedule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schedule ID",
+                        "name": "scheduleId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "List of workspace user IDs (comma-separated)",
+                        "name": "workspace_user_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User is participant",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    "404": {
+                        "description": "User is not participant",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/user": {
             "get": {
                 "description": "Get all users",
@@ -3287,11 +3332,11 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of workspace IDs",
+                        "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "type": "string"
+                                "$ref": "#/definitions/models.TwWorkspaceUser"
                             }
                         }
                     }

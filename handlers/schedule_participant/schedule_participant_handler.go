@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -191,6 +192,43 @@ func (h *ScheduleParticipantHandler) getScheduleParticipantByScheduleIdAndWorksp
 	}
 
 	return c.JSON(scheduleParticipant)
+}
+
+// isParticipantInSchedule godoc
+// @Summary Check if workspace user is participant in the schedule
+// @Description Check if any workspace user in the list is a participant in the schedule
+// @Tags schedule_participant
+// @Accept json
+// @Produce json
+// @Param scheduleId path string true "Schedule ID"
+// @Param workspace_user_id query string true "List of workspace user IDs (comma-separated)"
+// @Success 200 {boolean} true "User is participant"
+// @Success 404 {boolean} false "User is not participant"
+// @Router /dbms/v1/schedule_participant/{scheduleId}/participants [get]
+func (h *ScheduleParticipantHandler) isParticipantInSchedule(c *fiber.Ctx) error {
+	scheduleId := c.Params("scheduleId")
+	workspaceUserIds := c.Query("workspace_user_id") // Lấy danh sách workspaceUserIds từ query
+
+	if workspaceUserIds == "" {
+		return errors.New("workspaceUserIds parameter is required")
+	}
+
+	// Chuyển danh sách workspaceUserIds từ chuỗi thành mảng
+	workspaceUserIdsList := strings.Split(workspaceUserIds, ",")
+
+	// Kiểm tra xem có workspaceUserId nào thuộc scheduleId không
+	var scheduleParticipants []models.TwScheduleParticipant
+	if err := h.DB.Where("workspace_user_id IN (?) AND schedule_id = ? AND invitation_status = `joined`", workspaceUserIdsList, scheduleId).Find(&scheduleParticipants).Error; err != nil {
+		return err
+	}
+
+	// Nếu không tìm thấy participants nào, trả về false
+	if len(scheduleParticipants) == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(errors.New("User is not participant"))
+	}
+
+	// Nếu tìm thấy ít nhất một participant, trả về true
+	return nil
 }
 
 // getScheduleParticipantsByScheduleId godoc
