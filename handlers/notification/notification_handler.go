@@ -51,6 +51,74 @@ func (h *NotificationHandler) GetUnsentNotifications(ctx *fiber.Ctx) error {
 	return ctx.JSON(notifications)
 }
 
+// GetNotiByUserEmailIds godoc
+// @Summary Get notifications by user email ids
+// @Description Get notifications by user email ids
+// @Tags notification
+// @Accept json
+// @Produce json
+// @Param user_email_ids body []string true "User email ids"
+// @Success 200 {array} models.TwNotifications
+// @Router /dbms/v1/notification/user-email-ids [post]
+func (h *NotificationHandler) GetNotiByUserEmailIds(ctx *fiber.Ctx) error {
+	var req []string
+	userEmailIds := ctx.BodyParser(&req)
+	var notifications []models.TwNotifications
+	if err := h.DB.Where("user_email_id in (?)", userEmailIds).Preload("UserEmail").Find(&notifications).Error; err != nil {
+		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return ctx.JSON(notifications)
+}
+
+// UpdateNotiStatus godoc
+// @Summary Update notification status
+// @Description Update notification status
+// @Tags notification
+// @Accept json
+// @Produce json
+// @Param notification_id query string true "Notification ID"
+// @Param is_read query string true "Is read"
+// @Success 200 {object} models.TwNotifications
+// @Router /dbms/v1/notification/update-status [put]
+func (h *NotificationHandler) UpdateNotiStatus(c *fiber.Ctx) error {
+	notiId := c.Query("notification_id")
+	if notiId == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Notification ID is required",
+		})
+	}
+	isRead := c.Query("is_read")
+	if isRead == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Is read is required",
+		})
+	}
+	var notification models.TwNotifications
+	if err := h.DB.First(&notification, notiId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"error": "Notification not found",
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	if isRead == "true" {
+		notification.IsRead = true
+	} else {
+		notification.IsRead = false
+	}
+	if err := h.DB.Save(&notification).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+	return c.JSON(notification)
+}
+
 // updateNotificationToSent godoc
 // @Summary Update notification to sent
 // @Description Update notification to sent

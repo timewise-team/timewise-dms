@@ -617,7 +617,86 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/core_dtos.PushNotificationDto"
+                            "$ref": "#/definitions/models.TwNotifications"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/notification/update-status": {
+            "put": {
+                "description": "Update notification status",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification"
+                ],
+                "summary": "Update notification status",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Notification ID",
+                        "name": "notification_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Is read",
+                        "name": "is_read",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwNotifications"
+                        }
+                    }
+                }
+            }
+        },
+        "/dbms/v1/notification/user-email-ids": {
+            "post": {
+                "description": "Get notifications by user email ids",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "notification"
+                ],
+                "summary": "Get notifications by user email ids",
+                "parameters": [
+                    {
+                        "description": "User email ids",
+                        "name": "user_email_ids",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwNotifications"
+                            }
                         }
                     }
                 }
