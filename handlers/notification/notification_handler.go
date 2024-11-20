@@ -61,8 +61,8 @@ func (h *NotificationHandler) GetUnsentNotifications(ctx *fiber.Ctx) error {
 // @Success 200 {array} models.TwNotifications
 // @Router /dbms/v1/notification/user-email-ids [post]
 func (h *NotificationHandler) GetNotiByUserEmailIds(ctx *fiber.Ctx) error {
-	var req []string
-	userEmailIds := ctx.BodyParser(&req)
+	var userEmailIds []string
+	_ = ctx.BodyParser(&userEmailIds)
 	var notifications []models.TwNotifications
 	if err := h.DB.Where("user_email_id in (?)", userEmailIds).Preload("UserEmail").Find(&notifications).Error; err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
