@@ -218,7 +218,7 @@ func (h *ScheduleParticipantHandler) isParticipantInSchedule(c *fiber.Ctx) error
 
 	// Kiểm tra xem có workspaceUserId nào thuộc scheduleId không
 	var scheduleParticipants []models.TwScheduleParticipant
-	if err := h.DB.Where("workspace_user_id IN (?) AND schedule_id = ? AND invitation_status = `joined`", workspaceUserIdsList, scheduleId).Find(&scheduleParticipants).Error; err != nil {
+	if err := h.DB.Debug().Where("workspace_user_id IN (?) AND schedule_id = ? AND invitation_status = 'joined'", workspaceUserIdsList, scheduleId).Find(&scheduleParticipants).Error; err != nil {
 		return err
 	}
 
@@ -228,7 +228,7 @@ func (h *ScheduleParticipantHandler) isParticipantInSchedule(c *fiber.Ctx) error
 	}
 
 	// Nếu tìm thấy ít nhất một participant, trả về true
-	return nil
+	return c.Status(fiber.StatusOK).JSON(scheduleParticipants)
 }
 
 // getScheduleParticipantsByScheduleId godoc

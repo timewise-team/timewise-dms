@@ -4164,6 +4164,9 @@
                 "deleted_at": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "extra_data": {
                     "type": "string"
                 },
@@ -4176,6 +4179,9 @@
                 "is_sent": {
                     "type": "boolean"
                 },
+                "link": {
+                    "type": "string"
+                },
                 "message": {
                     "type": "string"
                 },
@@ -4186,6 +4192,9 @@
                     "type": "integer"
                 },
                 "related_item_type": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "type": {

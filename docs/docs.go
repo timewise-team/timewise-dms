@@ -4172,6 +4172,9 @@ const docTemplate = `{
                 "deleted_at": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "extra_data": {
                     "type": "string"
                 },
@@ -4184,6 +4187,9 @@ const docTemplate = `{
                 "is_sent": {
                     "type": "boolean"
                 },
+                "link": {
+                    "type": "string"
+                },
                 "message": {
                     "type": "string"
                 },
@@ -4194,6 +4200,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "related_item_type": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "type": {

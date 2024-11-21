@@ -400,6 +400,8 @@ definitions:
         type: string
       deleted_at:
         type: string
+      description:
+        type: string
       extra_data:
         type: string
       id:
@@ -408,6 +410,8 @@ definitions:
         type: boolean
       is_sent:
         type: boolean
+      link:
+        type: string
       message:
         type: string
       notified_at:
@@ -415,6 +419,8 @@ definitions:
       related_item_id:
         type: integer
       related_item_type:
+        type: string
+      title:
         type: string
       type:
         type: string
