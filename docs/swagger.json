@@ -3239,6 +3239,41 @@
                 }
             }
         },
+        "/dbms/v1/workspace_user/manage/workspace/{workspace_id}": {
+            "get": {
+                "description": "Get workspace users by workspace ID for manage",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace users by workspace ID for manage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/role/workspace/{workspace_id}": {
             "put": {
                 "description": "Update role of workspace user",

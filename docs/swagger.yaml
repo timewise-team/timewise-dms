@@ -2994,6 +2994,29 @@ paths:
       summary: Get workspace user invitation not verified list
       tags:
       - workspace_user
+  /dbms/v1/workspace_user/manage/workspace/{workspace_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspace users by workspace ID for manage
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
+            type: array
+      summary: Get workspace users by workspace ID for manage
+      tags:
+      - workspace_user
   /dbms/v1/workspace_user/role/workspace/{workspace_id}:
     put:
       consumes:
