@@ -78,10 +78,6 @@ func (h *DocumentHandler) getDocumentsByScheduleID(c *fiber.Ctx) error {
 		Joins("JOIN tw_users AS u ON ue.user_id = u.id").
 		Where("d.schedule_id = ?", scheduleId).
 		Where("d.deleted_at IS NULL").
-		Where("wu.deleted_at IS NULL").
-		Where("ue.deleted_at IS NULL").
-		Where("u.deleted_at IS NULL").
-		Where("wu.is_active = true AND wu.is_verified = true AND wu.status = 'joined'").
 		Scan(&documents).Error
 	if err != nil {
 		log.Println("Error querying document:", err)

@@ -86,3 +86,13 @@ func (h *WorkspaceLog) removeWorkspaceLogById(c *fiber.Ctx) error {
 	return c.SendStatus(fiber.StatusNoContent)
 
 }
+
+func (h *WorkspaceLog) getWorkspaceLogsByWorkspaceId(ctx *fiber.Ctx) error {
+	workspaceId := ctx.Params("workspace_id")
+	var workspaceLogs []models.TwWorkspaceLog
+	if result := h.DB.Where("workspace_id = ? and deleted_at IS NULL", workspaceId).Find(&workspaceLogs); result.Error != nil {
+		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return ctx.JSON(workspaceLogs)
+
+}

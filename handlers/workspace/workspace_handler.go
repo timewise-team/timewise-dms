@@ -46,7 +46,7 @@ func (handler *WorkspaceHandler) getWorkspaceById(c *fiber.Ctx) error {
 	var workspace models.TwWorkspace
 	workspaceId := c.Params("workspace_id")
 
-	if err := handler.DB.Where("id = ?", workspaceId).First(&workspace).Error; err != nil {
+	if err := handler.DB.Where("id = ? and deleted_at IS NULL", workspaceId).First(&workspace).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).SendString("Workspace not found")
 	}
 	return c.JSON(workspace)
@@ -294,7 +294,7 @@ func (handler *WorkspaceHandler) filterWorkspaces(c *fiber.Ctx) error {
 		Where("tw_workspace_users.role != 'guest'").
 		Where("tw_workspace_users.role != 'Guest'").
 		Where("tw_workspace_users.deleted_at IS NULL").
-		Where("tw_users.id = ?", c.Query("userid"))
+		Where("tw_user_emails.user_id = ? or (tw_user_emails.is_linked_to = ? and tw_user_emails.status = 'linked') ", c.Query("userid"), c.Query("userid"))
 	// Filter by email
 	if email := c.Query("email"); email != "" {
 		query = query.
