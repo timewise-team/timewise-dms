@@ -902,16 +902,21 @@ func (h *ScheduleHandler) getSchedulesByBoardColumnFilter(c *fiber.Ctx) error {
 		Joins("JOIN tw_schedule_participants ON tw_schedule_participants.schedule_id = tw_schedules.id").
 		Joins("JOIN tw_workspaces ON tw_workspaces.id = tw_schedules.workspace_id")
 
+	now := time.Now()
+	currentDate := now.Format("2006-01-02")
+	fmt.Println("Current date:", currentDate)
 	// Apply filters
 	if search != "" {
 		query = query.Where("tw_schedules.title LIKE ?", "%"+search+"%")
 	}
 	if dueParam == "day" {
-		query = query.Where("DATE(tw_schedules.start_time) = CURRENT_DATE")
+		query = query.Where("DATE(tw_schedules.start_time) = ?", currentDate)
 	} else if dueParam == "week" {
-		query = query.Where("DATE(tw_schedules.start_time) >= CURRENT_DATE AND DATE(tw_schedules.start_time) <= DATE_ADD(CURRENT_DATE, INTERVAL 6 DAY)")
+		weekEnd := now.AddDate(0, 0, 6).Format("2006-01-02")
+		query = query.Where("DATE(tw_schedules.start_time) >= ? AND DATE(tw_schedules.start_time) <= ?", currentDate, weekEnd)
 	} else if dueParam == "month" {
-		query = query.Where("DATE(tw_schedules.start_time) >= CURRENT_DATE AND DATE(tw_schedules.start_time) <= DATE_ADD(CURRENT_DATE, INTERVAL 29 DAY)")
+		monthEnd := now.AddDate(0, 0, 29).Format("2006-01-02")
+		query = query.Where("DATE(tw_schedules.start_time) >= ? AND DATE(tw_schedules.start_time) <= ?", currentDate, monthEnd)
 	}
 	if dueCompleteParam == "true" {
 		query = query.Where("tw_schedules.status = 'done'")
@@ -930,7 +935,7 @@ func (h *ScheduleHandler) getSchedulesByBoardColumnFilter(c *fiber.Ctx) error {
 			Joins("JOIN tw_user_emails ON tw_user_emails.id = tw_workspace_users.user_email_id").
 			Where("tw_schedule_participants.invitation_status ='joined' AND tw_schedule_participants.deleted_at IS NULL").
 			Where("tw_workspace_users.deleted_at IS NULL AND tw_workspace_users.status = 'joined' AND tw_workspace_users.is_active=true AND tw_workspace_users.is_verified = true").
-			Where("tw_user_emails.deleted_at IS NULL AND tw_user_emails.status NOT IN ('rejected', 'pending')").
+			Where("tw_user_emails.deleted_at IS NULL ").
 			Where("tw_user_emails.email IN (?)", emails)
 	}
 	query = query.
