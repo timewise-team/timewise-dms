@@ -18,6 +18,7 @@ func RegisterWorkspaceUserHandler(router fiber.Router, db *gorm.DB) {
 	router.Post("/", workspaceUserHandler.createWorkspaceUser)
 	router.Put("/:workspace_user_id", workspaceUserHandler.updateWorkspaceUser)
 	router.Get("/workspace/:workspace_id", workspaceUserHandler.getWorkspaceUsersByWorkspaceId)
+	router.Get("/manage/workspace/:workspace_id", workspaceUserHandler.getWorkspaceUsersByWorkspaceIdForManage)
 	router.Get("/user/:user_id", workspaceUserHandler.getWorkspaceUsersByUserId)
 	router.Get("/workspace_key/:workspace_key", workspaceUserHandler.getWorkspaceUsersByWorkspaceKey)
 	router.Get("/status/:status", workspaceUserHandler.getWorkspaceUsersByStatus)

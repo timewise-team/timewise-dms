@@ -3247,6 +3247,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/manage/workspace/{workspace_id}": {
+            "get": {
+                "description": "Get workspace users by workspace ID for manage",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get workspace users by workspace ID for manage",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/role/workspace/{workspace_id}": {
             "put": {
                 "description": "Update role of workspace user",
@@ -4172,6 +4207,9 @@ const docTemplate = `{
                 "deleted_at": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "extra_data": {
                     "type": "string"
                 },
@@ -4184,6 +4222,9 @@ const docTemplate = `{
                 "is_sent": {
                     "type": "boolean"
                 },
+                "link": {
+                    "type": "string"
+                },
                 "message": {
                     "type": "string"
                 },
@@ -4194,6 +4235,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "related_item_type": {
+                    "type": "string"
+                },
+                "title": {
                     "type": "string"
                 },
                 "type": {

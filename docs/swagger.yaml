@@ -400,6 +400,8 @@ definitions:
         type: string
       deleted_at:
         type: string
+      description:
+        type: string
       extra_data:
         type: string
       id:
@@ -408,6 +410,8 @@ definitions:
         type: boolean
       is_sent:
         type: boolean
+      link:
+        type: string
       message:
         type: string
       notified_at:
@@ -415,6 +419,8 @@ definitions:
       related_item_id:
         type: integer
       related_item_type:
+        type: string
+      title:
         type: string
       type:
         type: string
@@ -2986,6 +2992,29 @@ paths:
               $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
             type: array
       summary: Get workspace user invitation not verified list
+      tags:
+      - workspace_user
+  /dbms/v1/workspace_user/manage/workspace/{workspace_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get workspace users by workspace ID for manage
+      parameters:
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/workspace_user_dtos.GetWorkspaceUserListResponse'
+            type: array
+      summary: Get workspace users by workspace ID for manage
       tags:
       - workspace_user
   /dbms/v1/workspace_user/role/workspace/{workspace_id}:
