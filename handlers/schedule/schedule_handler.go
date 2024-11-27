@@ -50,8 +50,9 @@ func parseTime(timeStr string) (time.Time, error) {
 func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 	var schedules []models.TwSchedule
 
-	query := h.DB.Model(&models.TwSchedule{})
-
+	query := h.DB.Table("tw_schedules").
+		Joins("JOIN tw_workspaces ON tw_schedules.workspace_id = tw_workspaces.id AND tw_workspaces.deleted_at IS NULL").
+		Joins("JOIN tw_board_columns ON tw_schedules.board_column_id = tw_board_columns.id AND tw_board_columns.deleted_at IS NULL")
 	workspaceID := c.Query("workspace_id")
 	boardColumnID := c.Query("board_column_id")
 	title := c.Query("title")
