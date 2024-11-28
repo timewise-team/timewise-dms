@@ -50,11 +50,11 @@ func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
 	var userEmails []models.TwUserEmail
 	userId := c.Params("user_id")
 	status := c.Query("status")
-
-	query := h.DB.Debug().Where("(user_id = ? OR is_linked_to = ?) AND status IS NULL", userId, userId)
-
-	if status != "" {
-		query = query.Or("status = ?", status)
+	var query *gorm.DB
+	if status == "" {
+		query = h.DB.Debug().Where(" status IS NULL AND (user_id = ? OR is_linked_to = ?)", userId, userId)
+	} else {
+		query = h.DB.Debug().Where("(status IS NULL OR status = ?) AND (user_id = ? OR is_linked_to = ?)", status, userId, userId)
 	}
 
 	if err := query.Find(&userEmails).Error; err != nil {
