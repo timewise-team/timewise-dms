@@ -50,14 +50,11 @@ func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
 	var userEmails []models.TwUserEmail
 	userId := c.Params("user_id")
 	status := c.Query("status")
+
+	query := h.DB.Where("(user_id = ? OR is_linked_to = ?) AND status IS NULL", userId, userId)
+
 	if status != "" {
-		if err := h.DB.Where("(user_id = ? OR is_linked_to = ?) AND status = ? ", userId, userId, status).Find(&userEmails).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
-		}
-		return c.JSON(userEmails)
-	}
-	if err := h.DB.Where("user_id = ? OR is_linked_to = ?", userId, userId).Find(&userEmails).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		query = query.Or("status = ?", status)
 	}
 	if len(userEmails) == 0 {
 		return c.Status(fiber.StatusNotFound).SendString("Emails not found")
