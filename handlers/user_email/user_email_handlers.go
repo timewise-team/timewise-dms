@@ -53,6 +53,8 @@ func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
 	var query *gorm.DB
 	if status == "" {
 		query = h.DB.Debug().Where(" status IS NULL AND (user_id = ? OR is_linked_to = ?)", userId, userId)
+	} else if status == "pending" {
+		query = h.DB.Debug().Where("status = ? AND (user_id = ? OR is_linked_to = ?)", status, userId, userId)
 	} else {
 		query = h.DB.Debug().Where("(status IS NULL OR status = ?) AND (user_id = ? OR is_linked_to = ?)", status, userId, userId)
 	}
