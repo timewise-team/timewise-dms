@@ -6,6 +6,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	workspaceUserDtos "github.com/timewise-team/timewise-models/dtos/core_dtos/workspace_user_dtos"
 	"github.com/timewise-team/timewise-models/models"
+	"net/url"
 	"strconv"
 
 	"gorm.io/gorm"
@@ -234,12 +235,12 @@ func (h *WorkspaceUserHandler) getWorkspaceUserByEmailAndWorkspace(c *fiber.Ctx)
 	email := c.Params("email")
 
 	// Decode the email parameter to handle special characters
-	/*emailFix, err1 := url.QueryUnescape(email)
+	emailFix, err1 := url.QueryUnescape(email)
 	if err1 != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid email",
 		})
-	}*/
+	}
 
 	// Check required parameters
 	if workspaceId == "" {
@@ -262,7 +263,7 @@ func (h *WorkspaceUserHandler) getWorkspaceUserByEmailAndWorkspace(c *fiber.Ctx)
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
 		Where("tw_workspace_users.deleted_at IS NULL").
 		Where("tw_user_emails.deleted_at IS NULL").
-		Where("tw_workspace_users.workspace_id = ?", workspaceId).
+		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", emailFix, workspaceId).
 		Scan(&TWorkspaceUser).Error
 
 	if err != nil {
