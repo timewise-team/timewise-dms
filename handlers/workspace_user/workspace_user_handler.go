@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"gorm.io/gorm"
-	"net/url"
 )
 
 type WorkspaceUserHandler struct {
@@ -235,12 +234,12 @@ func (h *WorkspaceUserHandler) getWorkspaceUserByEmailAndWorkspace(c *fiber.Ctx)
 	email := c.Params("email")
 
 	// Decode the email parameter to handle special characters
-	emailFix, err1 := url.QueryUnescape(email)
+	/*emailFix, err1 := url.QueryUnescape(email)
 	if err1 != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "Invalid email",
 		})
-	}
+	}*/
 
 	// Check required parameters
 	if workspaceId == "" {
@@ -257,13 +256,13 @@ func (h *WorkspaceUserHandler) getWorkspaceUserByEmailAndWorkspace(c *fiber.Ctx)
 	var TWorkspaceUser models.TwWorkspaceUser
 
 	// Perform the database query
-	err := h.DB.
+	err := h.DB.Debug().
 		Table("tw_workspace_users").
 		Select("tw_workspace_users.id, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key, tw_workspace_users.role, tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified, tw_workspace_users.extra_data").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
 		Where("tw_workspace_users.deleted_at IS NULL").
 		Where("tw_user_emails.deleted_at IS NULL").
-		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", emailFix, workspaceId).
+		Where("tw_workspace_users.workspace_id = ?", workspaceId).
 		Scan(&TWorkspaceUser).Error
 
 	if err != nil {
