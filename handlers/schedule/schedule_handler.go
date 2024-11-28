@@ -66,15 +66,15 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 
 	if workspaceID != "" {
 		workspaceIDSubStrings := strings.Split(workspaceID, ",")
-		query = query.Where("workspace_id IN (?)", workspaceIDSubStrings)
+		query = query.Where("tw_schedules.workspace_id IN (?)", workspaceIDSubStrings)
 	}
 
 	if boardColumnID != "" {
-		query = query.Where("board_column_id = ?", boardColumnID)
+		query = query.Where("tw_schedules.board_column_id = ?", boardColumnID)
 	}
 
 	if title != "" {
-		query = query.Where("title LIKE ?", "%"+title+"%")
+		query = query.Where("tw_schedules.title LIKE ?", "%"+title+"%")
 	}
 
 	if startTime != "" {
@@ -82,7 +82,7 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		query = query.Where("start_time >= ?", parsedStartTime)
+		query = query.Where("tw_schedules.start_time >= ?", parsedStartTime)
 	}
 
 	if endTime != "" {
@@ -90,33 +90,33 @@ func (h *ScheduleHandler) FilterSchedules(c *fiber.Ctx) error {
 		if err != nil {
 			return err
 		}
-		query = query.Where("end_time <= ?", parsedEndTime)
+		query = query.Where("tw_schedules.end_time <= ?", parsedEndTime)
 	}
 
 	if location != "" {
-		query = query.Where("location LIKE ?", "%"+location+"%")
+		query = query.Where("tw_schedules.location LIKE ?", "%"+location+"%")
 	}
 
 	if createdBy != "" {
-		query = query.Where("created_by = ?", createdBy)
+		query = query.Where("tw_schedules.created_by = ?", createdBy)
 	}
 
 	if status != "" {
-		query = query.Where("status = ?", status)
+		query = query.Where("tw_schedules.status = ?", status)
 	}
 
 	if isDeleted != "" {
 		if isDeleted == "true" {
-			query = query.Where("is_deleted = ?", 1)
+			query = query.Where("tw_schedules.is_deleted = ?", 1)
 		} else if isDeleted == "false" {
-			query = query.Where("is_deleted = ?", 0)
+			query = query.Where("tw_schedules.is_deleted = ?", 0)
 		} else {
 			return c.Status(fiber.StatusBadRequest).SendString("Invalid value for is_deleted. Must be 'true' or 'false'")
 		}
 	}
 
 	if assignedTo != "" {
-		query = query.Where("assigned_to @> ?", "{"+assignedTo+"}")
+		query = query.Where("tw_schedules.assigned_to @> ?", "{"+assignedTo+"}")
 	}
 
 	if result := query.Debug().Find(&schedules); result.Error != nil {
