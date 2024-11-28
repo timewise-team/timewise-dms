@@ -114,7 +114,7 @@ func (h *UserHandler) createUser(ctx *fiber.Ctx) error {
 // @Success 200 {object} models.TwUser
 // @Router /dbms/v1/user/{id} [put]
 func (h *UserHandler) updateUser(c *fiber.Ctx) error {
-	var userDTO dtos.UpdateProfileRequestDto
+	var userDTO dtos.UpdateUserRequest
 	if err := c.BodyParser(&userDTO); err != nil {
 		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
 	}
@@ -130,20 +130,38 @@ func (h *UserHandler) updateUser(c *fiber.Ctx) error {
 	}
 
 	// Update the fields if they are provided (not nil)
-	if userDTO.FirstName != "" {
-		user.FirstName = userDTO.FirstName
+	if userDTO.FirstName != nil && *userDTO.FirstName != "" {
+		user.FirstName = *userDTO.FirstName
 	}
-	if userDTO.LastName != "" {
-		user.LastName = userDTO.LastName
+	if userDTO.LastName != nil && *userDTO.LastName != "" {
+		user.LastName = *userDTO.LastName
 	}
-	if userDTO.ProfilePicture != "" {
-		user.ProfilePicture = userDTO.ProfilePicture
+	if userDTO.Email != nil && *userDTO.Email != "" {
+		user.Email = *userDTO.Email
 	}
-	if userDTO.NotificationSettings != "" {
-		user.NotificationSettings = userDTO.NotificationSettings
+	if userDTO.ProfilePicture != nil && *userDTO.ProfilePicture != "" {
+		user.ProfilePicture = *userDTO.ProfilePicture
 	}
-	if userDTO.CalendarSettings != "" {
-		user.CalendarSettings = userDTO.CalendarSettings
+	if userDTO.Timezone != nil {
+		user.Timezone = *userDTO.Timezone
+	}
+	if userDTO.Locale != nil {
+		user.Locale = *userDTO.Locale
+	}
+	if userDTO.IsVerified != nil {
+		user.IsVerified = *userDTO.IsVerified
+	}
+	if userDTO.IsActive != nil {
+		user.IsActive = *userDTO.IsActive
+	}
+	if userDTO.NotificationSettings != nil {
+		user.NotificationSettings = *userDTO.NotificationSettings
+	}
+	if userDTO.CalendarSettings != nil {
+		user.CalendarSettings = *userDTO.CalendarSettings
+	}
+	if userDTO.Role != nil {
+		user.Role = *userDTO.Role
 	}
 	// temporary setting deleted_at to nil
 	user.DeletedAt = nil
