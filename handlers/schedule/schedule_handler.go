@@ -292,14 +292,14 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 	}
 
 	now := time.Now()
-
+	endTime := now.Add(1 * time.Hour)
 	schedule := models.TwSchedule{
 		WorkspaceId:   *scheduleDTO.WorkspaceID,
 		BoardColumnId: *scheduleDTO.BoardColumnID,
 		Title:         *scheduleDTO.Title,
 		Description:   *scheduleDTO.Description,
 		StartTime:     &now,
-		EndTime:       &now,
+		EndTime:       &endTime,
 		CreatedBy:     *scheduleDTO.WorkspaceUserID,
 		CreatedAt:     &now,
 		UpdatedAt:     &now,
