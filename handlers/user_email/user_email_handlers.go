@@ -51,11 +51,16 @@ func (h *UserEmailHandler) getUserEmailByUserId(c *fiber.Ctx) error {
 	userId := c.Params("user_id")
 	status := c.Query("status")
 
-	query := h.DB.Where("(user_id = ? OR is_linked_to = ?) AND status IS NULL", userId, userId)
+	query := h.DB.Debug().Where("(user_id = ? OR is_linked_to = ?) AND status IS NULL", userId, userId)
 
 	if status != "" {
 		query = query.Or("status = ?", status)
 	}
+
+	if err := query.Find(&userEmails).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
 	if len(userEmails) == 0 {
 		return c.Status(fiber.StatusNotFound).SendString("Emails not found")
 	}
