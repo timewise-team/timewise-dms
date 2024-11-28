@@ -153,12 +153,17 @@ func (h *UserEmailHandler) updateUserEmailStatusAndIsLinkedTo(c *fiber.Ctx) erro
 		}
 		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
 	}
-	userEmail.Status = &status
-	targetUserIdInt, err := strconv.Atoi(targetUserId)
-	if err != nil {
-		return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+	if status == "" {
+		userEmail.Status = nil
+		userEmail.IsLinkedTo = nil
+	} else {
+		userEmail.Status = &status
+		targetUserIdInt, err := strconv.Atoi(targetUserId)
+		if err != nil {
+			return c.Status(fiber.StatusBadRequest).SendString(err.Error())
+		}
+		userEmail.IsLinkedTo = &targetUserIdInt
 	}
-	userEmail.IsLinkedTo = &targetUserIdInt
 	if result := h.DB.Save(&userEmail); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
