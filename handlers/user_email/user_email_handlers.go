@@ -131,6 +131,7 @@ func (h *UserEmailHandler) updateStatusInUserEmail(c *fiber.Ctx) error {
 		userEmail.Status = &status
 	}
 	userEmail.DeletedAt = nil
+	userEmail.ExpiresAt = nil
 	if result := h.DB.Save(&userEmail); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
