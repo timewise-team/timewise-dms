@@ -179,6 +179,12 @@ func (h *UserEmailHandler) updateUserEmailStatusAndIsLinkedTo(c *fiber.Ctx) erro
 		}
 		userEmail.IsLinkedTo = &targetUserIdInt
 	}
+	if status == "pending" {
+		expiresAt := time.Now().Add(time.Minute * 15)
+		userEmail.ExpiresAt = &expiresAt
+	} else {
+		userEmail.ExpiresAt = nil
+	}
 	if result := h.DB.Save(&userEmail); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
