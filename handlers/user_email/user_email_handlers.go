@@ -10,6 +10,7 @@ import (
 	"log"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 // @Summary Get all user emails
@@ -130,8 +131,14 @@ func (h *UserEmailHandler) updateStatusInUserEmail(c *fiber.Ctx) error {
 	} else {
 		userEmail.Status = &status
 	}
+	if status == "pending" {
+		expiresAt := time.Now().Add(time.Minute * 15)
+		userEmail.ExpiresAt = &expiresAt
+	} else {
+		userEmail.ExpiresAt = nil
+	}
 	userEmail.DeletedAt = nil
-	userEmail.ExpiresAt = nil
+
 	if result := h.DB.Save(&userEmail); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
