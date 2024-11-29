@@ -2436,6 +2436,29 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/user_email/clear-expired": {
+            "get": {
+                "description": "Clear expired user emails",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Clear expired user emails",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/user_email/email/{email}": {
             "get": {
                 "description": "Get user emails by email",
@@ -4532,6 +4555,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "email": {
+                    "type": "string"
+                },
+                "expires_at": {
                     "type": "string"
                 },
                 "id": {

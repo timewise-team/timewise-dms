@@ -333,3 +333,24 @@ func (h *UserEmailHandler) getEmailInProgress(c *fiber.Ctx) error {
 	return c.JSON(userInfo)
 
 }
+
+// clearExpiredUserEmails godoc
+// @Summary Clear expired user emails
+// @Description Clear expired user emails
+// @Tags user_email
+// @Accept json
+// @Produce json
+// @Success 200 {string} string
+// @Router /dbms/v1/user_email/clear-expired [get]
+func (h *UserEmailHandler) clearExpiredUserEmails(c *fiber.Ctx) error {
+	if result := h.DB.Model(&models.TwUserEmail{}).
+		Where("expires_at <= NOW()").
+		Updates(map[string]interface{}{
+			"status":       nil,
+			"is_linked_to": nil,
+			"expires_at":   nil,
+		}); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return c.Status(fiber.StatusOK).SendString("Expired user emails cleared successfully")
+}

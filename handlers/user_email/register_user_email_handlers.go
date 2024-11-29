@@ -26,4 +26,5 @@ func RegisterUserEmailHandler(router fiber.Router, db *gorm.DB) {
 	router.Delete("/", userEmailHandler.deleteUserEmail)
 	router.Get("/search/:query", userEmailHandler.searchUserEmail)
 	router.Get("/listApprove/:scheduleId", userEmailHandler.getEmailInProgress)
+	router.Get("/clear-expired", userEmailHandler.clearExpiredUserEmails)
 }

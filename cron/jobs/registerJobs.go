@@ -28,6 +28,15 @@ func RegisterJobs() {
 		return
 	}
 
+	_, err = c.AddFunc("@every 10m", func() {
+		clearExpiredLinkEmailRequests()
+	})
+
+	if err != nil {
+		fmt.Println("Error adding cron job:", err)
+		return
+	}
+
 	c.Start()
 	fmt.Println("Cron jobs started")
 
@@ -431,4 +440,24 @@ func ConfigSMTP() *gomail.Dialer {
 	SmtpEmail := "timewise.space@gmail.com"
 	SmtpPassword := "dczt wlvd eisn cixf"
 	return gomail.NewDialer(SmtpHost, SmtpPort, SmtpEmail, SmtpPassword)
+}
+
+func clearExpiredLinkEmailRequests() {
+	fmt.Println("Starting cron job: clearExpiredLinkEmailRequests at", time.Now())
+
+	err := DeleteLinkEmailRequest()
+	if err != nil {
+		fmt.Println("Error getting expired link email requests:", err)
+		return
+	}
+}
+
+func DeleteLinkEmailRequest() error {
+	resp, err := http.Get("https://dms.timewise.space/dbms/v1/user_email/clear-expired")
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	return nil
 }
