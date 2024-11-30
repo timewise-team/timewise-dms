@@ -132,7 +132,7 @@ func (h *UserEmailHandler) updateStatusInUserEmail(c *fiber.Ctx) error {
 		userEmail.Status = &status
 	}
 	if status == "pending" {
-		expiresAt := time.Now().Add(time.Minute * 15)
+		expiresAt := time.Now().Add(time.Minute * 10)
 		userEmail.ExpiresAt = &expiresAt
 	} else {
 		userEmail.ExpiresAt = nil
@@ -180,7 +180,7 @@ func (h *UserEmailHandler) updateUserEmailStatusAndIsLinkedTo(c *fiber.Ctx) erro
 		userEmail.IsLinkedTo = &targetUserIdInt
 	}
 	if status == "pending" {
-		expiresAt := time.Now().Add(time.Minute * 15)
+		expiresAt := time.Now().Add(time.Minute * 10)
 		userEmail.ExpiresAt = &expiresAt
 	} else {
 		userEmail.ExpiresAt = nil
