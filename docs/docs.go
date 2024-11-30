@@ -2616,6 +2616,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/user_email/user_id/{user_id}": {
+            "get": {
+                "description": "Get exact user email by user ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Get exact user email by user ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.TwUserEmail"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace": {
             "get": {
                 "description": "Get all workspaces",

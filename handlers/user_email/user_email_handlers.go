@@ -244,6 +244,29 @@ func (h *UserEmailHandler) getUserEmailByEmail(c *fiber.Ctx) error {
 	return c.JSON(userEmails)
 }
 
+// @Summary Get exact user email by user ID
+// @Description Get exact user email by user ID
+// @Tags user_email
+// @Accept json
+// @Produce json
+// @Param user_id path string true "User ID"
+// @Success 200 {object} models.TwUserEmail
+// @Router /dbms/v1/user_email/user_id/{user_id} [get]
+func (h *UserEmailHandler) getExactUserEmailByUserId(c *fiber.Ctx) error {
+	var userEmails models.TwUserEmail
+	userId := c.Params("user_id")
+
+	if err := h.DB.Where("user_id = ?", userId).Find(&userEmails).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	if userEmails.Email == "" {
+		return c.Status(fiber.StatusNotFound).SendString("Email not found")
+	}
+
+	return c.JSON(userEmails)
+}
+
 // getUserEmailToCheckBeforeLink godoc
 // @Summary Get user email to check before link
 // @Description Get user email to check before link

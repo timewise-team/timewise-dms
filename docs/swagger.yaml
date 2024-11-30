@@ -2533,6 +2533,27 @@ paths:
       summary: Get user emails by user ID
       tags:
       - user_email
+  /dbms/v1/user_email/user_id/{user_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get exact user email by user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: user_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TwUserEmail'
+      summary: Get exact user email by user ID
+      tags:
+      - user_email
   /dbms/v1/workspace:
     get:
       consumes:
