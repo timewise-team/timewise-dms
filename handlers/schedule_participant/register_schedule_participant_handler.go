@@ -27,4 +27,6 @@ func RegisterScheduleParticipantHandler(router fiber.Router, db *gorm.DB) {
 	router.Get("/workspace/:workspaceId/schedule/:scheduleId", scheduleParticipantHandeler.getScheduleParticipantsByScheduleId)
 	router.Get("/schedule/:scheduleId", scheduleParticipantHandeler.getScheduleParticipantsBySchedule)
 	router.Post("/invite", scheduleParticipantHandeler.inviteToSchedule)
+	router.Put("/remove/:id", scheduleParticipantHandeler.RemoveParticipant)
+	router.Put("/unassign/:id", scheduleParticipantHandeler.UnassignMember)
 }
