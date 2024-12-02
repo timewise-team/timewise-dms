@@ -354,7 +354,7 @@ func (h *ScheduleParticipantHandler) getScheduleParticipantsBySchedule(c *fiber.
 		Joins("JOIN tw_user_emails AS ue ON wu.user_email_id = ue.id").
 		Joins("JOIN tw_users AS u ON ue.user_id = u.id").
 		Where("sp.schedule_id = ?", scheduleId).
-		Where("sp.deleted_at IS NULL").
+		Where("sp.deleted_at IS NULL AND sp.invitation_status != 'removed'").
 		Where("wu.deleted_at IS NULL").
 		Where("ue.deleted_at IS NULL").
 		Where("u.deleted_at IS NULL").
@@ -387,4 +387,79 @@ func (h *ScheduleParticipantHandler) inviteToSchedule(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
 	return c.JSON(scheduleParticipants)
+}
+
+func (h *ScheduleParticipantHandler) RemoveParticipant(c *fiber.Ctx) error {
+
+	var participant models.TwScheduleParticipant
+	participantID := c.Params("id")
+
+	// Tìm participant theo ID
+	if err := h.DB.Where("id = ?", participantID).First(&participant).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("Participant not found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	participant.Status = ""
+	participant.InvitationStatus = "removed"
+
+	// Cập nhật timestamp
+	now := time.Now()
+	participant.UpdatedAt = now
+
+	// Lưu participant đã cập nhật
+	if result := h.DB.Omit("deleted_at").Save(&participant); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	return c.JSON(schedule_participant_dtos.ScheduleParticipantResponse{
+		ID:               participant.ID,
+		ScheduleId:       participant.ScheduleId,
+		WorkspaceUserId:  participant.WorkspaceUserId,
+		Status:           participant.Status,
+		AssignAt:         participant.AssignAt,
+		AssignBy:         participant.AssignBy,
+		ResponseTime:     participant.ResponseTime,
+		InvitationSentAt: participant.InvitationSentAt,
+		InvitationStatus: participant.InvitationStatus,
+	})
+}
+
+func (h *ScheduleParticipantHandler) UnassignMember(c *fiber.Ctx) error {
+
+	var participant models.TwScheduleParticipant
+	participantID := c.Params("id")
+
+	// Tìm participant theo ID
+	if err := h.DB.Where("id = ?", participantID).First(&participant).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return c.Status(fiber.StatusNotFound).SendString("Participant not found")
+		}
+		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+	}
+
+	participant.Status = "participant"
+
+	// Cập nhật timestamp
+	now := time.Now()
+	participant.UpdatedAt = now
+
+	// Lưu participant đã cập nhật
+	if result := h.DB.Omit("deleted_at").Save(&participant); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+
+	return c.JSON(schedule_participant_dtos.ScheduleParticipantResponse{
+		ID:               participant.ID,
+		ScheduleId:       participant.ScheduleId,
+		WorkspaceUserId:  participant.WorkspaceUserId,
+		Status:           participant.Status,
+		AssignAt:         participant.AssignAt,
+		AssignBy:         participant.AssignBy,
+		ResponseTime:     participant.ResponseTime,
+		InvitationSentAt: participant.InvitationSentAt,
+		InvitationStatus: participant.InvitationStatus,
+	})
 }
