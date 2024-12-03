@@ -2934,6 +2934,34 @@ paths:
       summary: Delete workspace user
       tags:
       - workspace_user
+  /dbms/v1/workspace_user/check-existing/email/{email}/workspace/{workspace_id}:
+    get:
+      consumes:
+      - application/json
+      description: Get existing linked workspace user
+      parameters:
+      - description: Email
+        in: path
+        name: email
+        required: true
+        type: string
+      - description: Workspace ID
+        in: path
+        name: workspace_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.TwWorkspaceUser'
+            type: array
+      summary: Get existing linked workspace user
+      tags:
+      - workspace_user
   /dbms/v1/workspace_user/disprove-invitation/workspace/{workspace_id}/email/{email}:
     put:
       consumes:

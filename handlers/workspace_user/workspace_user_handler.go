@@ -693,3 +693,52 @@ func (h *WorkspaceUserHandler) GetWorkspaceUserInvitationNotVerifiedList(ctx *fi
 	}
 	return ctx.JSON(workspaceUsers)
 }
+
+// GetExistingLinkedWorkspaceUser godoc
+// @Summary Get existing linked workspace user
+// @Description Get existing linked workspace user
+// @Tags workspace_user
+// @Accept json
+// @Produce json
+// @Param email path string true "Email"
+// @Param workspace_id path string true "Workspace ID"
+// @Success 200 {array} models.TwWorkspaceUser
+// @Router /dbms/v1/workspace_user/check-existing/email/{email}/workspace/{workspace_id} [get]
+func (h *WorkspaceUserHandler) GetExistingLinkedWorkspaceUser(c *fiber.Ctx) error {
+	email := c.Params("email")
+	decodedEmail, err := url.QueryUnescape(email)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Invalid email format",
+		})
+	}
+
+	workspaceID := c.Params("workspace_id")
+	if workspaceID == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "workspace_id is required",
+		})
+	}
+
+	var workspaceUsers []string
+	query := `
+		WITH root_user_id AS (
+			SELECT COALESCE(is_linked_to, user_id) AS root_user_id
+			FROM tw_user_emails
+			WHERE email = ?
+		)
+		SELECT tue.email as email
+		FROM tw_user_emails tue
+		JOIN tw_workspace_users twu ON tue.id = twu.user_email_id
+		WHERE (tue.user_id = (SELECT root_user_id FROM root_user_id) OR
+		       tue.is_linked_to = (SELECT root_user_id FROM root_user_id)) AND twu.workspace_id = ?
+	`
+
+	if err := h.DB.Raw(query, decodedEmail, workspaceID).Scan(&workspaceUsers).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"error": err.Error(),
+		})
+	}
+
+	return c.JSON(workspaceUsers)
+}

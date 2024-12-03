@@ -3154,6 +3154,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/workspace_user/check-existing/email/{email}/workspace/{workspace_id}": {
+            "get": {
+                "description": "Get existing linked workspace user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "workspace_user"
+                ],
+                "summary": "Get existing linked workspace user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Workspace ID",
+                        "name": "workspace_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.TwWorkspaceUser"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/workspace_user/disprove-invitation/workspace/{workspace_id}/email/{email}": {
             "put": {
                 "description": "Disprove member's request invitation",
