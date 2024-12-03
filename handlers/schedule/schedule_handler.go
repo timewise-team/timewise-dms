@@ -899,7 +899,7 @@ func (h *ScheduleHandler) getSchedulesByBoardColumnFilter(c *fiber.Ctx) error {
 	var schedules []models.TwSchedule
 	query := h.DB.
 		Table("tw_schedules").
-		Select("tw_schedules.*").
+		Select("DISTINCT tw_schedules.*").
 		Joins("JOIN tw_schedule_participants ON tw_schedule_participants.schedule_id = tw_schedules.id").
 		Joins("JOIN tw_workspaces ON tw_workspaces.id = tw_schedules.workspace_id")
 
