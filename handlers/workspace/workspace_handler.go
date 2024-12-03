@@ -246,7 +246,7 @@ func (handler *WorkspaceHandler) getWorkspacesByEmail(c *fiber.Ctx) error {
 		Select("tw_workspaces.id, tw_workspaces.created_at, tw_workspaces.updated_at, tw_workspaces.deleted_at, tw_workspaces.title, tw_workspaces.extra_data, tw_workspaces.description, tw_workspaces.key, tw_workspaces.type, tw_workspaces.is_deleted").
 		Joins("JOIN tw_workspace_users ON tw_workspaces.id = tw_workspace_users.workspace_id").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
-		Where("tw_user_emails.email = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.role != 'Guest' and tw_workspace_users.status ='joined'", emails).
+		Where("tw_user_emails.email = ? and tw_workspace_users.is_active = true and tw_workspace_users.is_verified = true and tw_workspace_users.status ='joined'", emails).
 		Where("tw_workspaces.deleted_at IS NULL").
 		Where("tw_workspace_users.deleted_at IS NULL").
 		Where("tw_user_emails.deleted_at IS NULL").
