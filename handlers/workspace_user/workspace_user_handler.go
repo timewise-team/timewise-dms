@@ -731,7 +731,7 @@ func (h *WorkspaceUserHandler) GetExistingLinkedWorkspaceUser(c *fiber.Ctx) erro
 		FROM tw_user_emails tue
 		JOIN tw_workspace_users twu ON tue.id = twu.user_email_id
 		WHERE (tue.user_id = (SELECT root_user_id FROM root_user_id) OR
-		       tue.is_linked_to = (SELECT root_user_id FROM root_user_id)) AND twu.workspace_id = ? AND twu.is_active = true
+		       tue.is_linked_to = (SELECT root_user_id FROM root_user_id)) AND twu.workspace_id = ? AND twu.is_active = true AND twu.deleted_at IS NULL
 	`
 
 	if err := h.DB.Raw(query, decodedEmail, workspaceID).Scan(&workspaceUsers).Error; err != nil {
