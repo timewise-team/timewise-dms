@@ -28,4 +28,5 @@ func RegisterUserEmailHandler(router fiber.Router, db *gorm.DB) {
 	router.Get("/listApprove/:scheduleId", userEmailHandler.getEmailInProgress)
 	router.Get("/clear-expired", userEmailHandler.clearExpiredUserEmails)
 	router.Get("/user_id/:user_id", userEmailHandler.getExactUserEmailByUserId)
+	router.Get("clear-rejected", userEmailHandler.clearStatusRejectedEmail)
 }

@@ -2459,6 +2459,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/dbms/v1/user_email/clear-rejected": {
+            "get": {
+                "description": "Clear status rejected email",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user_email"
+                ],
+                "summary": "Clear status rejected email",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Email",
+                        "name": "email",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/dbms/v1/user_email/email/{email}": {
             "get": {
                 "description": "Get user emails by email",

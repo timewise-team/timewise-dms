@@ -391,3 +391,27 @@ func (h *UserEmailHandler) clearExpiredUserEmails(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).SendString("Expired user emails cleared successfully")
 }
+
+// clearStatusRejectedEmail godoc
+// @Summary Clear status rejected email
+// @Description Clear status rejected email
+// @Tags user_email
+// @Accept json
+// @Produce json
+// @Param email query string true "Email"
+// @Success 200 {string} string
+// @Router /dbms/v1/user_email/clear-rejected [get]
+func (h *UserEmailHandler) clearStatusRejectedEmail(c *fiber.Ctx) error {
+	email := c.Query("email")
+	if result := h.DB.Model(&models.TwUserEmail{}).
+		Where("email = ?", email).
+		Where("status = 'rejected'").
+		Updates(map[string]interface{}{
+			"status":       nil,
+			"is_linked_to": nil,
+			"expires_at":   nil,
+		}); result.Error != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
+	}
+	return c.Status(fiber.StatusOK).SendString("Rejected user emails cleared successfully")
+}

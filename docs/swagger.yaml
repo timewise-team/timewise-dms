@@ -2429,6 +2429,27 @@ paths:
       summary: Clear expired user emails
       tags:
       - user_email
+  /dbms/v1/user_email/clear-rejected:
+    get:
+      consumes:
+      - application/json
+      description: Clear status rejected email
+      parameters:
+      - description: Email
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Clear status rejected email
+      tags:
+      - user_email
   /dbms/v1/user_email/email/{email}:
     get:
       consumes:
