@@ -636,6 +636,18 @@ func (h *WorkspaceUserHandler) UpdateWorkspaceUserStatusByEmailAndWorkspace(ctx 
 			"error": "isActive must be a boolean",
 		})
 	}
+	isVerified := ctx.Query("is_verified")
+	if isVerified == "" {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "isVerified is required",
+		})
+	}
+	isVerifiedBool, err := strconv.ParseBool(isVerified)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "isVerified must be a boolean",
+		})
+	}
 	var workspaceUser models.TwWorkspaceUser
 	err = h.DB.Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id = tw_user_emails.id").
 		Where("tw_user_emails.email = ? AND tw_workspace_users.workspace_id = ?", email, workspace_id).
@@ -652,9 +664,10 @@ func (h *WorkspaceUserHandler) UpdateWorkspaceUserStatusByEmailAndWorkspace(ctx 
 	}
 	if result := h.DB.Model(&workspaceUser).
 		Updates(map[string]interface{}{
-			"status":     status,
-			"updated_at": gorm.Expr("NOW()"),
-			"is_active":  isActiveBool,
+			"status":      status,
+			"updated_at":  gorm.Expr("NOW()"),
+			"is_active":   isActiveBool,
+			"is_verified": isVerifiedBool,
 		}); result.Error != nil {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
