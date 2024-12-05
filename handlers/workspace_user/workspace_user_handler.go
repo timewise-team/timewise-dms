@@ -485,9 +485,8 @@ func (h *WorkspaceUserHandler) DisproveMemberInvitationRequest(c *fiber.Ctx) err
 
 	if result := h.DB.Model(&workspaceUser).
 		Updates(map[string]interface{}{
-			"is_verified": false,
-			"status":      "removed",
-			"updated_at":  gorm.Expr("NOW()"),
+			"status":     "removed",
+			"updated_at": gorm.Expr("NOW()"),
 		}); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
