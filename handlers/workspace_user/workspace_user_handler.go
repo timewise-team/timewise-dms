@@ -437,7 +437,6 @@ func (h *WorkspaceUserHandler) VerifyMemberInvitationRequest(c *fiber.Ctx) error
 		Updates(map[string]interface{}{
 			"is_verified": true,
 			"updated_at":  gorm.Expr("NOW()"),
-			"status":      "pending",
 		}); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
