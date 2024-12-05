@@ -308,6 +308,23 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		Visibility:    "public",
 	}
 
+	if scheduleDTO.StartTime != nil {
+		isoTime := convertToISOFormat(*scheduleDTO.StartTime)
+		parsedTime := convertDateFormat(&isoTime)
+		if parsedTime != nil {
+			schedule.StartTime = parsedTime
+		}
+
+	}
+
+	if scheduleDTO.EndTime != nil {
+		isoTime := convertToISOFormat(*scheduleDTO.EndTime)
+		parsedTime := convertDateFormat(&isoTime)
+		if parsedTime != nil {
+			schedule.EndTime = parsedTime
+		}
+	}
+
 	if result := h.DB.Create(&schedule); result.Error != nil {
 		return c.Status(fiber.StatusInternalServerError).SendString(result.Error.Error())
 	}
@@ -347,7 +364,16 @@ func (h *ScheduleHandler) CreateSchedule(c *fiber.Ctx) error {
 		Title:         schedule.Title,
 		Description:   schedule.Description,
 		Position:      schedule.Position,
+		StartTime:     *schedule.StartTime,
+		EndTime:       *schedule.EndTime,
 	})
+}
+
+func convertToISOFormat(input string) string {
+	// Thay dấu cách bằng 'T' và bỏ phần '.000' ở cuối, sau đó thêm 'Z'
+	isoFormat := strings.Replace(input, " ", "T", 1)
+	isoFormat = strings.TrimSuffix(isoFormat, ".000") + "Z"
+	return isoFormat
 }
 
 func convertDateFormat(dateStr *string) *time.Time {
