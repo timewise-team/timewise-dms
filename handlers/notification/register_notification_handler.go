@@ -15,6 +15,6 @@ func RegisterNotificationHandler(router fiber.Router, db *gorm.DB) {
 		handler.Router.Post("/user-email-ids", notification.GetNotiByUserEmailIds)
 		handler.Router.Get("/", notification.GetUnsentNotifications)
 		handler.Router.Put("/:notification_id", notification.updateNotificationToSent)
-		handler.Router.Put("/update-status", notification.UpdateNotiStatus)
+		handler.Router.Put("/update-status/read", notification.UpdateNotiStatus)
 	})
 }
