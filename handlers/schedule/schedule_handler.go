@@ -506,6 +506,10 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		checkAndLog("priority", schedule.Priority, *scheduleDTO.Priority)
 		schedule.Priority = *scheduleDTO.Priority
 	}
+	if scheduleDTO.VideoTranscript != nil {
+		checkAndLog("video_transcript", schedule.VideoTranscript, *scheduleDTO.VideoTranscript)
+		schedule.VideoTranscript = *scheduleDTO.VideoTranscript
+	}
 	schedule.CreatedBy = workspaceUserId
 
 	// Update timestamp
@@ -545,6 +549,7 @@ func (h *ScheduleHandler) UpdateSchedule(c *fiber.Ctx) error {
 		RecurrencePattern: schedule.RecurrencePattern,
 		Position:          schedule.Position,
 		Priority:          schedule.Priority,
+		VideoTranscript:   schedule.VideoTranscript,
 	})
 }
 
