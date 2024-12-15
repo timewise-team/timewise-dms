@@ -631,7 +631,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/dbms/v1/notification/update-status": {
+        "/dbms/v1/notification/update-status/read": {
             "put": {
                 "description": "Update notification status",
                 "consumes": [
@@ -3817,6 +3817,12 @@ const docTemplate = `{
                     "description": "Nullable field",
                     "type": "string"
                 },
+                "end_time": {
+                    "type": "string"
+                },
+                "start_time": {
+                    "type": "string"
+                },
                 "title": {
                     "description": "Nullable field",
                     "type": "string"
@@ -3839,11 +3845,17 @@ const docTemplate = `{
                 "description": {
                     "type": "string"
                 },
+                "end_time": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
                 "position": {
                     "type": "integer"
+                },
+                "start_time": {
+                    "type": "string"
                 },
                 "title": {
                     "type": "string"

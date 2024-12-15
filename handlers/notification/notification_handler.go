@@ -81,7 +81,7 @@ func (h *NotificationHandler) GetNotiByUserEmailIds(ctx *fiber.Ctx) error {
 // @Param notification_id query string true "Notification ID"
 // @Param is_read query string true "Is read"
 // @Success 200 {object} models.TwNotifications
-// @Router /dbms/v1/notification/update-status [put]
+// @Router /dbms/v1/notification/update-status/read [put]
 func (h *NotificationHandler) UpdateNotiStatus(c *fiber.Ctx) error {
 	notiId := c.Query("notification_id")
 	if notiId == "" {
