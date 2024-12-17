@@ -683,7 +683,7 @@ func (h *WorkspaceUserHandler) UpdateWorkspaceUserStatusByEmailAndWorkspace(ctx 
 // @Router /dbms/v1/workspace_user/invitation_not_verified/workspace/{workspace_id} [get]
 func (h *WorkspaceUserHandler) GetWorkspaceUserInvitationNotVerifiedList(ctx *fiber.Ctx) error {
 
-	var workspaceUsers []workspaceUserDtos.GetWorkspaceUserListResponse
+	var workspaceUsers []workspaceUserDtos.GetWorkspaceUserListNotVerifiedResponse
 	workspaceId := ctx.Params("workspace_id")
 	if workspaceId == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -691,9 +691,10 @@ func (h *WorkspaceUserHandler) GetWorkspaceUserInvitationNotVerifiedList(ctx *fi
 		})
 	}
 	err := h.DB.Table("tw_workspace_users").
-		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture").
+		Select("tw_workspace_users.id, tw_workspace_users.user_email_id, tw_workspace_users.workspace_id, tw_workspace_users.workspace_key,tw_workspace_users.role,  tw_workspace_users.status, tw_workspace_users.is_active, tw_workspace_users.is_verified,  tw_workspace_users.extra_data, tw_workspace_users.created_at, tw_workspace_users.updated_at, tw_workspace_users.deleted_at, tw_user_emails.email, tw_users.first_name,tw_users.last_name,tw_users.profile_picture,tw_schedule_participants.schedule_id").
 		Joins("JOIN tw_user_emails ON tw_workspace_users.user_email_id= tw_user_emails.id").
 		Joins("JOIN tw_users ON tw_user_emails.email = tw_users.email").
+		Joins("JOIN tw_schedule_participants ON tw_workspace_users.id = tw_schedule_participants.workspace_user_id").
 		Where("tw_workspace_users.workspace_id = ? and tw_workspace_users.is_verified = false and tw_users.is_verified=true and tw_users.is_active = true", workspaceId).
 		Where("tw_workspace_users.deleted_at IS NULL").
 		Where("tw_user_emails.deleted_at IS NULL").
