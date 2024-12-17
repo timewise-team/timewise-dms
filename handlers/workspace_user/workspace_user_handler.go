@@ -698,7 +698,7 @@ func (h *WorkspaceUserHandler) GetWorkspaceUserInvitationNotVerifiedList(ctx *fi
 		Where("tw_workspace_users.deleted_at IS NULL").
 		Where("tw_user_emails.deleted_at IS NULL").
 		Where("tw_users.deleted_at IS NULL").
-		Where("tw_users.status <> 'declined' AND tw_users.status <> 'removed'").
+		Where("tw_workspace_users.status <> 'declined' AND tw_workspace_users.status <> 'removed'").
 		Scan(&workspaceUsers).Error
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).SendString(err.Error())
